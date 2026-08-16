@@ -591,6 +591,9 @@ function SeccionIglesias({ iglesias, alCambiar }: { iglesias: Iglesia[]; alCambi
   const [creando, setCreando] = useState(false)
 
   const activas = iglesias.filter((g) => !g.archivada)
+  const pastores = [...new Set(iglesias.map((g) => g.pastor).filter(Boolean) as string[])].sort((a, b) =>
+    a.localeCompare(b, 'es'),
+  )
 
   return (
     <section className="hoja overflow-hidden">
@@ -620,13 +623,18 @@ function SeccionIglesias({ iglesias, alCambiar }: { iglesias: Iglesia[]; alCambi
         <ul>
           {activas.map((g) => (
             <li key={g.id} className="renglon">
-              <div className="flex min-h-[58px] items-center gap-3 px-5 py-2.5">
+              <div className="flex min-h-[62px] items-center gap-3 px-5 py-2.5">
                 <span
                   className="h-3 w-3 shrink-0 rounded-full"
                   style={{ background: colorIglesia(g.color) }}
                   aria-hidden
                 />
-                <span className="min-w-0 flex-1 truncate font-medium">{g.nombre}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{g.nombre}</span>
+                  {g.pastor && (
+                    <span className="block truncate text-menuda text-tinta2">Pastor {g.pastor}</span>
+                  )}
+                </span>
                 <span className="cifra shrink-0 text-menuda text-tinta2">
                   {g.personas} {g.personas === 1 ? 'persona' : 'personas'}
                 </span>
@@ -640,6 +648,7 @@ function SeccionIglesias({ iglesias, alCambiar }: { iglesias: Iglesia[]; alCambi
       )}
 
       <DialogoIglesia
+        pastores={pastores}
         abierto={creando || editando !== null}
         alCerrar={() => {
           setCreando(false)
@@ -660,14 +669,17 @@ function DialogoIglesia({
   abierto,
   alCerrar,
   iglesia,
+  pastores,
   alGuardar,
 }: {
   abierto: boolean
   alCerrar: () => void
   iglesia: Iglesia | null
+  pastores: string[]
   alGuardar: () => void
 }) {
   const [nombre, setNombre] = useState('')
+  const [pastor, setPastor] = useState('')
   const [color, setColor] = useState('arcilla')
   const [archivada, setArchivada] = useState(false)
   const [problema, setProblema] = useState<string | null>(null)
@@ -676,6 +688,7 @@ function DialogoIglesia({
   useEffect(() => {
     if (!abierto) return
     setNombre(iglesia?.nombre ?? '')
+    setPastor(iglesia?.pastor ?? '')
     setColor(iglesia?.color ?? 'arcilla')
     setArchivada(Boolean(iglesia?.archivada))
     setProblema(null)
@@ -689,8 +702,9 @@ function DialogoIglesia({
     }
     setGuardando(true)
     try {
-      if (iglesia) await api.editarIglesia(iglesia.id, { nombre: nombre.trim(), color, archivada })
-      else await api.crearIglesia({ nombre: nombre.trim(), color })
+      const datos = { nombre: nombre.trim(), pastor: pastor.trim() || null, color }
+      if (iglesia) await api.editarIglesia(iglesia.id, { ...datos, archivada })
+      else await api.crearIglesia(datos)
       toast.success(iglesia ? 'Iglesia actualizada' : 'Iglesia agregada')
       alGuardar()
     } catch (err) {
@@ -710,6 +724,26 @@ function DialogoIglesia({
           placeholder="Iglesia Central de Villa Duarte"
           autoFocus
         />
+        {/* El pastor se escribe libre, pero se ofrecen los que ya existen: así
+            "Juan Pérez" no termina siendo dos pastores distintos por una tilde. */}
+        <Campo
+          etiqueta="Pastor (opcional)"
+          value={pastor}
+          onChange={(e) => setPastor(e.target.value)}
+          placeholder="Nombre del pastor"
+          list="pastores-existentes"
+          autoComplete="off"
+          ayuda={
+            pastores.length > 0
+              ? 'Si es el mismo pastor de otra iglesia, escríbelo igual para poder agruparlas.'
+              : undefined
+          }
+        />
+        <datalist id="pastores-existentes">
+          {pastores.map((p) => (
+            <option key={p} value={p} />
+          ))}
+        </datalist>
         <div>
           <span className="mb-1.5 block text-menuda font-medium text-tinta2">Color de la etiqueta</span>
           <div className="flex flex-wrap gap-1.5">

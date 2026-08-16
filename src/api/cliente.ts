@@ -1,4 +1,4 @@
-import type { Categoria, Conteos, Evento, Ficha, Iglesia, PersonaEnLista, Resumen } from './tipos'
+import type { Categoria, Conteos, Evento, Ficha, Iglesia, Pastor, PersonaEnLista, Resumen } from './tipos'
 
 /**
  * Si el servidor responde con un error, ese error ya viene escrito en español
@@ -44,6 +44,7 @@ export const api = {
   aplicarPrecio: (id: number) => enviar(`/categorias/${id}/aplicar-precio`, 'POST'),
 
   iglesias: () => pedir<Iglesia[]>('/iglesias'),
+  pastores: () => pedir<Pastor[]>('/pastores'),
   crearIglesia: (datos: Record<string, unknown>) => enviar('/iglesias', 'POST', datos),
   editarIglesia: (id: number, datos: Record<string, unknown>) => enviar(`/iglesias/${id}`, 'PATCH', datos),
 

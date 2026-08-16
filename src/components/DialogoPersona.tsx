@@ -74,9 +74,12 @@ export function DialogoPersona({
     return personas.find((p) => normalizar(p.nombre) === t) ?? null
   }, [nombre, personas])
 
+  // El pastor va como detalle: ayuda a distinguir dos iglesias de nombre
+  // parecido, que es justo cuando uno se equivoca al elegir.
   const opcionesIglesia: Opcion[] = iglesias.map((g) => ({
     id: g.id,
     etiqueta: g.nombre,
+    detalle: g.pastor ? `Pastor ${g.pastor}` : undefined,
     color: colorIglesia(g.color),
   }))
 
@@ -84,6 +87,7 @@ export function DialogoPersona({
     id: c.id,
     etiqueta: c.nombre,
     detalle: formatoRD(c.precio),
+    detalleNumerico: true,
   }))
 
   async function guardar(e: React.FormEvent) {

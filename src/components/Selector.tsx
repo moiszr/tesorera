@@ -5,8 +5,10 @@ import { IconoBuscar, IconoCheque, IconoVolver } from './Iconos'
 export type Opcion = {
   id: number
   etiqueta: string
-  /** Texto secundario que ayuda a decidir (el precio de un cupo, por ejemplo). */
+  /** Texto secundario que ayuda a decidir: el precio de un cupo, el pastor de una iglesia. */
   detalle?: string
+  /** true cuando el detalle es dinero: va tabular, en negrita y a la derecha. */
+  detalleNumerico?: boolean
   /** Punto de color de identidad (las iglesias). */
   color?: string
 }
@@ -126,7 +128,13 @@ export function Selector({
                       />
                     )}
                     <span className="min-w-0 flex-1 truncate">{o.etiqueta}</span>
-                    {o.detalle && <span className="cifra shrink-0 text-menuda text-tinta2">{o.detalle}</span>}
+                    {o.detalle && (
+                      <span
+                        className={`shrink-0 text-menuda text-tinta2 ${o.detalleNumerico ? 'cifra' : ''}`}
+                      >
+                        {o.detalle}
+                      </span>
+                    )}
                     {o.id === valor && <IconoCheque tam={17} className="shrink-0 text-accion" />}
                   </button>
                 </li>
@@ -167,7 +175,11 @@ export function Selector({
               )}
               <span className="min-w-0 flex-1 truncate">{elegida.etiqueta}</span>
               {elegida.detalle && (
-                <span className="cifra shrink-0 text-menuda text-tinta2">{elegida.detalle}</span>
+                <span
+                  className={`shrink-0 truncate text-menuda text-tinta2 ${elegida.detalleNumerico ? 'cifra' : ''}`}
+                >
+                  {elegida.detalle}
+                </span>
               )}
             </>
           ) : (
@@ -214,7 +226,13 @@ function BotonOpcion({
         <span className={`text-menuda font-medium leading-snug ${elegida ? 'text-accion' : 'text-tinta'}`}>
           {opcion.etiqueta}
         </span>
-        <span className={`cifra mt-0.5 font-semibold ${elegida ? 'text-accion' : 'text-tinta2'}`}>
+        <span
+          className={[
+            'mt-0.5 truncate',
+            opcion.detalle && opcion.detalleNumerico ? 'cifra font-semibold' : 'text-menuda',
+            elegida ? 'text-accion' : 'text-tinta2',
+          ].join(' ')}
+        >
           {opcion.detalle}
         </span>
       </button>

@@ -8,8 +8,14 @@ import { beforeEach, describe, expect, it } from 'vitest'
 process.env.TESORERA_DB = ':memory:'
 
 const { conectar, cerrar } = await import('../server/db/conexion')
-const { aplicarPrecioDeCategoria, fichaPersona, inscripcionesAfectadas, listarPersonas, resumen } =
-  await import('../server/db/consultas')
+const {
+  aplicarPrecioDeCategoria,
+  fichaPersona,
+  inscripcionesAfectadas,
+  listarPastores,
+  listarPersonas,
+  resumen,
+} = await import('../server/db/consultas')
 
 let db: ReturnType<typeof conectar>
 let eventoId: number
@@ -48,6 +54,7 @@ beforeEach(() => {
   db.prepare('DELETE FROM personas').run()
   db.prepare('DELETE FROM categorias').run()
   db.prepare('DELETE FROM eventos').run()
+  db.prepare('DELETE FROM iglesias').run()
 
   eventoId = Number(
     db.prepare("INSERT INTO eventos (nombre, activo) VALUES ('Convención de prueba', 1)").run().lastInsertRowid,
@@ -207,6 +214,47 @@ describe('búsqueda y totales', () => {
     expect(r.iglesias.reduce((s, g) => s + g.pendiente, 0)).toBe(r.totales!.pendiente)
     expect(r.categorias.reduce((s, c) => s + c.pendiente, 0)).toBe(r.totales!.pendiente)
     expect(r.iglesias.reduce((s, g) => s + g.recaudado, 0)).toBe(r.totales!.recaudado_real)
+  })
+
+  it('filtrar por pastor junta a la gente de TODAS sus iglesias', () => {
+    // Este es el motivo de que el filtro por pastor exista: si cada pastor
+    // tuviera una sola iglesia, filtrar por pastor sería filtrar por iglesia.
+    const iglesiaA = Number(
+      db
+        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Central', 'Ramón Guzmán', 'ramon guzman')")
+        .run().lastInsertRowid,
+    )
+    const iglesiaB = Number(
+      db
+        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Anexo', 'Ramón Guzmán', 'ramon guzman')")
+        .run().lastInsertRowid,
+    )
+    const otra = Number(
+      db
+        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Monte Sinaí', 'Wilfredo Peña', 'wilfredo pena')")
+        .run().lastInsertRowid,
+    )
+
+    const a = crearPersona('De Central', catNino, 150000)
+    const b = crearPersona('De Anexo', catNino, 150000)
+    const c = crearPersona('De Monte Sinaí', catNino, 150000)
+    db.prepare('UPDATE personas SET iglesia_id = ? WHERE id = ?').run(iglesiaA, a.personaId)
+    db.prepare('UPDATE personas SET iglesia_id = ? WHERE id = ?').run(iglesiaB, b.personaId)
+    db.prepare('UPDATE personas SET iglesia_id = ? WHERE id = ?').run(otra, c.personaId)
+
+    const delPastor = listarPersonas({ pastor: 'Ramón Guzmán' }).map((p) => p.nombre)
+    expect(delPastor.sort()).toEqual(['De Anexo', 'De Central'])
+
+    // Filtrar por una sola de sus iglesias devuelve menos: no son lo mismo.
+    expect(listarPersonas({ iglesia: iglesiaA })).toHaveLength(1)
+
+    // Se agrupa sin importar tildes ni mayúsculas.
+    expect(listarPersonas({ pastor: 'ramon guzman' })).toHaveLength(2)
+    expect(listarPersonas({ pastor: 'RAMÓN GUZMÁN' })).toHaveLength(2)
+
+    const pastores = listarPastores()
+    expect(pastores.find((p) => p.nombre === 'Ramón Guzmán')?.iglesias).toBe(2)
+    expect(pastores.find((p) => p.nombre === 'Wilfredo Peña')?.iglesias).toBe(1)
   })
 
   it('el orden "los que más deben" pone primero al de mayor saldo', () => {

@@ -250,7 +250,7 @@ export function EtiquetaIglesia({
 }) {
   if (!nombre) return <span className="text-menuda text-tinta3">Sin iglesia</span>
   return (
-    <span className={`inline-flex min-w-0 items-center gap-1.5 text-menuda text-tinta2 ${className}`}>
+    <span className={`inline-flex min-w-0 max-w-full items-center gap-1.5 text-menuda text-tinta2 ${className}`}>
       <span
         className="h-2 w-2 shrink-0 rounded-full"
         style={{ background: colorIglesia(color) }}

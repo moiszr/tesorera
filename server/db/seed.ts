@@ -9,9 +9,11 @@ import { conectar } from './conexion'
 import { normalizar } from '../../src/lib/fechas'
 
 const IGLESIAS = [
-  { nombre: 'Iglesia Central de Villa Duarte', color: 'indigo' },
-  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'pizarra' },
-  { nombre: 'Iglesia Monte Sinaí, San Isidro', color: 'arcilla' },
+  { nombre: 'Iglesia Central de Villa Duarte', color: 'indigo', pastor: 'Ramón Emilio Guzmán' },
+  // Mismo pastor que la anterior: así el filtro por pastor agrupa dos iglesias
+  // y se ve para qué sirve.
+  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'pizarra', pastor: 'Ramón Emilio Guzmán' },
+  { nombre: 'Iglesia Monte Sinaí, San Isidro', color: 'arcilla', pastor: 'Wilfredo Antonio Peña' },
 ]
 
 const CATEGORIAS = [
@@ -71,7 +73,12 @@ export function sembrar() {
     db.prepare('DELETE FROM iglesias').run()
 
     const iglesiaIds = IGLESIAS.map(
-      (g) => Number(db.prepare('INSERT INTO iglesias (nombre, color) VALUES (?, ?)').run(g.nombre, g.color).lastInsertRowid),
+      (g) =>
+        Number(
+          db
+            .prepare('INSERT INTO iglesias (nombre, color, pastor, pastor_busqueda) VALUES (?, ?, ?, ?)')
+            .run(g.nombre, g.color, g.pastor, normalizar(g.pastor)).lastInsertRowid,
+        ),
     )
 
     const eventoId = Number(

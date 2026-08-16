@@ -20,6 +20,7 @@ function filtrosDesdeUrl(c: any): FiltrosPersonas {
   return {
     buscar: q.buscar ?? '',
     iglesia: entero(q.iglesia) ?? undefined,
+    pastor: q.pastor || undefined,
     categoria_id: entero(q.categoria_id) ?? undefined,
     estado,
     orden,

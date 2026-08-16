@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '../api/cliente'
-import type { Conteos, Evento, Iglesia, PersonaEnLista } from '../api/tipos'
+import type { Conteos, Evento, Iglesia, Pastor, PersonaEnLista } from '../api/tipos'
 import { NOMBRE_ESTADO, type Estado } from '../lib/estados'
+import { normalizar } from '../lib/fechas'
 import {
   Boton,
   ChipEstado,
@@ -39,20 +40,24 @@ export default function Personas() {
   const [orden, setOrden] = useState<Orden>('nombre')
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
   const [nombreParaCrear, setNombreParaCrear] = useState('')
+  const [pastor, setPastor] = useState<string | undefined>()
+  const [pastores, setPastores] = useState<Pastor[]>([])
 
   const campoBuscar = useRef<HTMLInputElement>(null)
 
   const cargar = useCallback(async () => {
-    const [r, gs, ev] = await Promise.all([
-      api.personas({ buscar, iglesia, categoria_id: categoriaId, estado, orden }),
+    const [r, gs, ev, ps] = await Promise.all([
+      api.personas({ buscar, iglesia, pastor, categoria_id: categoriaId, estado, orden }),
       api.iglesias(),
       api.eventoActivo(),
+      api.pastores(),
     ])
     setPersonas(r.personas)
     setConteos(r.conteos)
     setIglesias(gs.filter((g) => !g.archivada))
     setEvento(ev)
-  }, [buscar, iglesia, categoriaId, estado, orden])
+    setPastores(ps)
+  }, [buscar, iglesia, pastor, categoriaId, estado, orden])
 
   useEffect(() => {
     setCargando(true)
@@ -73,10 +78,11 @@ export default function Personas() {
     (c) => !c.archivada || (conteos?.categoria?.[c.id] ?? 0) > 0,
   )
 
-  const cuantosFiltros = [iglesia, categoriaId, estado].filter(Boolean).length
+  const cuantosFiltros = [iglesia, categoriaId, estado, pastor].filter(Boolean).length
   const hayFiltro = cuantosFiltros > 0 || Boolean(buscar)
 
   function limpiar() {
+    setPastor(undefined)
     setIglesia(undefined)
     setCategoriaId(undefined)
     setEstado(undefined)
@@ -165,6 +171,9 @@ export default function Personas() {
               alQuitar={() => setCategoriaId(undefined)}
             />
           )}
+          {pastor && (
+            <FiltroPuesto texto={`Pastor ${pastor}`} alQuitar={() => setPastor(undefined)} />
+          )}
           {iglesia && (
             <FiltroPuesto
               texto={iglesias.find((g) => g.id === iglesia)?.nombre ?? ''}
@@ -213,6 +222,22 @@ export default function Personas() {
               </FilaChips>
             )}
 
+            {pastores.length > 0 && (
+              <FilaChips rotulo="Pastor">
+                {pastores.map((ps) => (
+                  <Chip
+                    key={ps.nombre}
+                    activo={pastor === ps.nombre}
+                    cuenta={conteos?.pastor?.[normalizar(ps.nombre)] ?? 0}
+                    onClick={() => setPastor(pastor === ps.nombre ? undefined : ps.nombre)}
+                  >
+                    {ps.nombre}
+                    {ps.iglesias > 1 && <span className="text-tinta3"> · {ps.iglesias} iglesias</span>}
+                  </Chip>
+                ))}
+              </FilaChips>
+            )}
+
             {iglesias.length > 0 && (
               <FilaChips rotulo="Iglesia">
                 {iglesias.map((g) => (
@@ -250,10 +275,10 @@ export default function Personas() {
 
       <div className="hoja overflow-hidden">
         <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
-          <span className="rotulo flex-1">Nombre</span>
-          <span className="rotulo w-[248px] shrink-0 pr-4">Iglesia</span>
+          <span className="rotulo min-w-[150px] flex-1">Nombre</span>
+          <span className="rotulo hidden w-[220px] shrink-0 pr-4 xl:block">Iglesia</span>
           <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
-          <span className="rotulo w-[112px] shrink-0 text-right">Su cupo</span>
+          <span className="rotulo hidden w-[112px] shrink-0 text-right md:block">Su cupo</span>
           <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
         </div>
 
@@ -307,12 +332,12 @@ export default function Personas() {
                   to={`/personas/${p.id}`}
                   className="flex min-h-[46px] items-center px-5 py-1.5 transition-colors duration-150 hover:bg-hoja2"
                 >
-                  <span className="min-w-0 flex-1 truncate pr-4 font-medium">{p.nombre}</span>
+                  <span className="min-w-[150px] flex-1 truncate pr-4 font-medium">{p.nombre}</span>
 
                   {/* Solo la iglesia. El tipo de cupo no va aquí: su precio ya
                       está en la columna "Su cupo", y meter los dos truncaba
                       ambos hasta dejarlos ilegibles. */}
-                  <span className="hidden w-[248px] shrink-0 pr-4 sm:block">
+                  <span className="hidden w-[220px] shrink-0 overflow-hidden pr-4 xl:block">
                     <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
                   </span>
 
@@ -324,17 +349,17 @@ export default function Personas() {
                       <span className="w-[112px] shrink-0 text-right">
                         <Monto centavos={p.pagado} className="font-medium" />
                       </span>
-                      <span className="w-[112px] shrink-0 text-right">
+                      <span className="hidden w-[112px] shrink-0 text-right md:block">
                         <Monto centavos={p.precio} tenue />
                       </span>
                     </>
                   ) : (
-                    <span className="w-[224px] shrink-0 text-right text-menuda text-tinta2">
+                    <span className="w-[112px] shrink-0 text-right text-menuda text-tinta2 md:w-[224px]">
                       Sin inscribir
                     </span>
                   )}
 
-                  <span className="hidden w-[128px] shrink-0 pl-5 sm:block">
+                  <span className="w-[128px] shrink-0 pl-5">
                     <ChipEstado estado={p.estado} />
                   </span>
                 </Link>
@@ -399,7 +424,7 @@ function Chip({
       ].join(' ')}
     >
       {color && <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />}
-      <span className="max-w-[24ch] truncate">{children}</span>
+      <span className="max-w-[34ch] truncate">{children}</span>
       {cuenta !== undefined && (
         <span className={`cifra text-micro ${activo ? 'text-accion' : 'text-tinta3'}`}>{cuenta}</span>
       )}

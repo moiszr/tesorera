@@ -25,11 +25,12 @@ rutasDatos.get('/exportar.csv', () => {
   const personas = listarPersonas({}).filter((p) => p.inscripcion_id != null)
 
   const columnas = [
-    'Nombre', 'Iglesia', 'Tipo de cupo', 'Precio', 'Pagado', 'Falta', 'Estado', 'Último pago', 'Teléfono',
+    'Nombre', 'Iglesia', 'Pastor', 'Tipo de cupo', 'Precio', 'Pagado', 'Falta', 'Estado', 'Último pago', 'Teléfono',
   ]
   const filas = personas.map((p) => [
     p.nombre,
     p.iglesia ?? '',
+    p.pastor ?? '',
     p.categoria ?? '',
     (p.precio / 100).toFixed(2),
     (p.pagado / 100).toFixed(2),

@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
 import { conectar } from '../db/conexion'
-import { listarIglesias } from '../db/consultas'
-import { error } from './ayuda'
+import { listarIglesias, listarPastores, normalizar } from '../db/consultas'
+import { error, texto } from './ayuda'
 
 export const rutasIglesias = new Hono()
 
 rutasIglesias.get('/iglesias', (c) => c.json(listarIglesias()))
+rutasIglesias.get('/pastores', (c) => c.json(listarPastores()))
 
 rutasIglesias.post('/iglesias', async (c) => {
   const cuerpo = await c.req.json().catch(() => ({}))
@@ -16,9 +17,10 @@ rutasIglesias.post('/iglesias', async (c) => {
   const repetida = db.prepare('SELECT id FROM iglesias WHERE nombre = ? COLLATE NOCASE').get(nombre)
   if (repetida) return error(c, `Ya existe una iglesia que se llama "${nombre}".`)
 
+  const pastor = texto(cuerpo.pastor)
   const res = db
-    .prepare('INSERT INTO iglesias (nombre, color) VALUES (?, ?)')
-    .run(nombre, String(cuerpo.color ?? 'arcilla'))
+    .prepare('INSERT INTO iglesias (nombre, color, pastor, pastor_busqueda) VALUES (?, ?, ?, ?)')
+    .run(nombre, String(cuerpo.color ?? 'arcilla'), pastor, pastor ? normalizar(pastor) : '')
   return c.json({ id: Number(res.lastInsertRowid) }, 201)
 })
 
@@ -39,9 +41,14 @@ rutasIglesias.patch('/iglesias/:id', async (c) => {
     if (repetida) return error(c, `Ya existe una iglesia que se llama "${nombre}".`)
   }
 
-  db.prepare('UPDATE iglesias SET nombre = ?, color = ?, archivada = ? WHERE id = ?').run(
+  const pastor = cuerpo.pastor !== undefined ? texto(cuerpo.pastor) : actual.pastor
+  db.prepare(
+    'UPDATE iglesias SET nombre = ?, color = ?, pastor = ?, pastor_busqueda = ?, archivada = ? WHERE id = ?',
+  ).run(
     nombre,
     cuerpo.color !== undefined ? String(cuerpo.color) : actual.color,
+    pastor,
+    pastor ? normalizar(pastor) : '',
     cuerpo.archivada !== undefined ? (cuerpo.archivada ? 1 : 0) : actual.archivada,
     id,
   )

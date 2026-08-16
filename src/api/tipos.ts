@@ -4,7 +4,14 @@ export type Iglesia = {
   id: number
   nombre: string
   color: string
+  pastor: string | null
   archivada: number
+  personas: number
+}
+
+export type Pastor = {
+  nombre: string
+  iglesias: number
   personas: number
 }
 
@@ -34,6 +41,7 @@ export type PersonaEnLista = {
   iglesia_id: number | null
   iglesia: string | null
   iglesia_color: string | null
+  pastor: string | null
   inscripcion_id: number | null
   categoria_id: number | null
   categoria: string | null
@@ -50,6 +58,7 @@ export type Conteos = {
   estado: Record<Estado, number>
   categoria: Record<number, number>
   iglesia: Record<number, number>
+  pastor: Record<string, number>
 }
 
 export type Pago = {
@@ -83,6 +92,7 @@ export type Ficha = {
     iglesia_id: number | null
     iglesia: string | null
     iglesia_color: string | null
+    pastor: string | null
   }
   evento: { id: number; nombre: string; fecha_inicio: string | null } | null
   inscripcion: {

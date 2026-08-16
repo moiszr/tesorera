@@ -10,6 +10,7 @@ export type Iglesia = {
   id: number
   nombre: string
   color: string
+  pastor: string | null
   archivada: number
   personas: number
 }
@@ -40,6 +41,7 @@ export type PersonaEnLista = {
   iglesia_id: number | null
   iglesia: string | null
   iglesia_color: string | null
+  pastor: string | null
   inscripcion_id: number | null
   categoria_id: number | null
   categoria: string | null
@@ -146,11 +148,39 @@ export function listarIglesias(db: Database.Database = conectar()): Iglesia[] {
     .all() as Iglesia[]
 }
 
+/**
+ * Los pastores registrados, agrupados sin importar tildes ni mayúsculas.
+ * Se queda con la primera forma escrita para mostrarla tal cual.
+ */
+export function listarPastores(db: Database.Database = conectar()) {
+  const filas = db
+    .prepare(
+      `SELECT g.pastor, g.pastor_busqueda,
+              (SELECT COUNT(*) FROM personas p WHERE p.iglesia_id = g.id AND p.archivada = 0) AS personas
+         FROM iglesias g
+        WHERE g.archivada = 0 AND g.pastor IS NOT NULL AND TRIM(g.pastor) <> ''
+        ORDER BY g.nombre COLLATE NOCASE ASC`,
+    )
+    .all() as any[]
+
+  const porPastor = new Map<string, { nombre: string; iglesias: number; personas: number }>()
+  for (const f of filas) {
+    const clave = f.pastor_busqueda || normalizar(f.pastor)
+    const actual = porPastor.get(clave) ?? { nombre: f.pastor, iglesias: 0, personas: 0 }
+    actual.iglesias += 1
+    actual.personas += f.personas
+    porPastor.set(clave, actual)
+  }
+  return [...porPastor.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+}
+
 // ── Personas ──────────────────────────────────────────────────────────────
 
 export type FiltrosPersonas = {
   buscar?: string
   iglesia?: number
+  /** Agrupa TODAS las iglesias de ese pastor: por eso filtra por nombre y no por id. */
+  pastor?: string
   categoria_id?: number
   estado?: Estado
   orden?: 'nombre' | 'menos_pagado' | 'recientes'
@@ -167,7 +197,7 @@ export function listarPersonas(
   const filas = db
     .prepare(
       `SELECT p.id, p.nombre, p.telefono, p.iglesia_id,
-              g.nombre AS iglesia, g.color AS iglesia_color,
+              g.nombre AS iglesia, g.color AS iglesia_color, g.pastor AS pastor,
               i.id AS inscripcion_id, i.categoria_id,
               c.nombre AS categoria,
               COALESCE(i.precio, 0) AS precio,
@@ -193,6 +223,7 @@ export function listarPersonas(
       iglesia_id: f.iglesia_id,
       iglesia: f.iglesia,
       iglesia_color: f.iglesia_color,
+      pastor: f.pastor,
       inscripcion_id: f.inscripcion_id,
       categoria_id: f.categoria_id,
       categoria: f.categoria,
@@ -213,6 +244,10 @@ export function listarPersonas(
     lista = lista.filter((p) => normalizar(p.nombre).includes(termino))
   }
   if (filtros.iglesia) lista = lista.filter((p) => p.iglesia_id === filtros.iglesia)
+  if (filtros.pastor) {
+    const pastor = normalizar(filtros.pastor)
+    lista = lista.filter((p) => normalizar(p.pastor ?? '') === pastor)
+  }
   if (filtros.categoria_id) lista = lista.filter((p) => p.categoria_id === filtros.categoria_id)
   if (filtros.estado) lista = lista.filter((p) => p.estado === filtros.estado)
 
@@ -238,7 +273,7 @@ function compararNombre(a: { nombre: string }, b: { nombre: string }) {
 export function fichaPersona(id: number, db: Database.Database = conectar()) {
   const persona = db
     .prepare(
-      `SELECT p.*, g.nombre AS iglesia, g.color AS iglesia_color
+      `SELECT p.*, g.nombre AS iglesia, g.color AS iglesia_color, g.pastor AS pastor
          FROM personas p LEFT JOIN iglesias g ON g.id = p.iglesia_id
         WHERE p.id = ?`,
     )
@@ -276,6 +311,7 @@ export function fichaPersona(id: number, db: Database.Database = conectar()) {
       iglesia_id: persona.iglesia_id,
       iglesia: persona.iglesia,
       iglesia_color: persona.iglesia_color,
+      pastor: persona.pastor,
     },
     evento: evento ? { id: evento.id, nombre: evento.nombre, fecha_inicio: evento.fecha_inicio } : null,
     inscripcion: inscripcion
@@ -387,7 +423,10 @@ export function resumen(db: Database.Database = conectar()) {
 
 /** Cuenta de personas por cada filtro, para los contadores de los chips. */
 export function conteos(filtros: FiltrosPersonas = {}, db: Database.Database = conectar()) {
-  const base = listarPersonas({ ...filtros, estado: undefined, categoria_id: undefined, iglesia: undefined }, db)
+  const base = listarPersonas(
+    { ...filtros, estado: undefined, categoria_id: undefined, iglesia: undefined, pastor: undefined },
+    db,
+  )
   const conIglesia = filtros.iglesia ? base.filter((p) => p.iglesia_id === filtros.iglesia) : base
   const conCategoria = filtros.categoria_id
     ? conIglesia.filter((p) => p.categoria_id === filtros.categoria_id)
@@ -402,6 +441,14 @@ export function conteos(filtros: FiltrosPersonas = {}, db: Database.Database = c
     if (p.categoria_id != null) porCategoria[p.categoria_id] = (porCategoria[p.categoria_id] ?? 0) + 1
   }
 
+  const porPastor: Record<string, number> = {}
+  for (const p of conEstado) {
+    if (p.pastor) {
+      const clave = normalizar(p.pastor)
+      porPastor[clave] = (porPastor[clave] ?? 0) + 1
+    }
+  }
+
   const sinIglesiaFiltro = filtros.iglesia ? base : conIglesia
   const filtradas = sinIglesiaFiltro.filter(
     (p) =>
@@ -413,7 +460,13 @@ export function conteos(filtros: FiltrosPersonas = {}, db: Database.Database = c
     if (p.iglesia_id != null) porIglesia[p.iglesia_id] = (porIglesia[p.iglesia_id] ?? 0) + 1
   }
 
-  return { total: base.length, estado: porEstado, categoria: porCategoria, iglesia: porIglesia }
+  return {
+    total: base.length,
+    estado: porEstado,
+    categoria: porCategoria,
+    iglesia: porIglesia,
+    pastor: porPastor,
+  }
 }
 
 export { normalizar }

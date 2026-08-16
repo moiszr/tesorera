@@ -124,6 +124,7 @@ export default function FichaPersona() {
           <h1 className="text-titulo font-semibold">{persona.nombre}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-tinta2">
             <EtiquetaIglesia nombre={persona.iglesia} color={persona.iglesia_color} className="!text-base" />
+            {persona.pastor && <span className="text-menuda">Pastor {persona.pastor}</span>}
             {inscripcion && <span className="text-menuda">{inscripcion.categoria}</span>}
             {persona.telefono && (
               <a href={`tel:${persona.telefono}`} className="cifra text-menuda underline-offset-4 hover:text-accion hover:underline">
@@ -437,6 +438,7 @@ function DialogoEditarPersona({
             opciones={iglesias.map((g) => ({
               id: g.id,
               etiqueta: g.nombre,
+              detalle: g.pastor ? `Pastor ${g.pastor}` : undefined,
               color: colorIglesia(g.color),
             }))}
             valor={iglesiaId}
@@ -486,6 +488,7 @@ function DialogoCupo({
     id: c.id,
     etiqueta: c.nombre,
     detalle: formatoRD(c.precio),
+    detalleNumerico: true,
   }))
   const elegida = categorias.find((c) => c.id === categoriaId)
   const precioActual = aCentavos(precio)
