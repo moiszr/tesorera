@@ -5,6 +5,7 @@ import { api, ErrorDeTesorera } from '../api/cliente'
 import type { PersonaEnLista } from '../api/tipos'
 import { aCentavos, formatoRD } from '../lib/dinero'
 import { fechaLarga, hoyISO, normalizar } from '../lib/fechas'
+import { calcularEstado } from '../lib/estados'
 import { BarraProgreso, Boton, Campo, ChipEstado, EtiquetaIglesia, Monto } from '../components/Piezas'
 import { IconoAdelante, IconoBuscar, IconoCheque, IconoImprimir } from '../components/Iconos'
 
@@ -409,7 +410,7 @@ function PasoNumero({ n }: { n: number }) {
 /** El comprobante del pago que se acaba de guardar. Aquí crece la barra. */
 function ReciboUltimo({ guardado, progreso }: { guardado: Guardado; progreso: number }) {
   const falta = Math.max(0, guardado.precio - guardado.ahora)
-  const estado = guardado.ahora >= guardado.precio ? 'pagado' : guardado.ahora > 0 ? 'abonando' : 'sinpagos'
+  const estado = calcularEstado(guardado.ahora, guardado.precio)
 
   return (
     <div className="hoja entra-hoja overflow-hidden">
@@ -590,7 +591,10 @@ const BuscadorPersona = forwardRef<
                       <Monto centavos={p.balance} tam="guia" />
                     </>
                   ) : (
-                    <ChipEstado estado="pagado" />
+                    // El estado viene calculado: no se asume "pagado" por tener
+                    // balance 0, porque un cupo de precio 0 sin abonos también
+                    // da balance 0 y ahí el estado es "Sin pagos".
+                    <ChipEstado estado={p.estado} />
                   )}
                 </span>
               </button>

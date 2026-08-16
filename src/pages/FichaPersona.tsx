@@ -177,10 +177,13 @@ export default function FichaPersona() {
                 <span className="rotulo">{cuenta.balance > 0 ? 'Le falta' : 'Pagó en total'}</span>
                 <ChipEstado estado={cuenta.estado} />
               </div>
-              <p className="cifra mt-1 text-cifraEnorme font-semibold leading-none tracking-[-0.03em]">
-                <span className="mr-2 align-baseline text-[0.4em] font-medium text-tinta2">RD$</span>
-                {formatoRD(cuenta.balance > 0 ? cuenta.balance : cuenta.pagado).replace('RD$ ', '')}
-              </p>
+              <div className="mt-1">
+                <Monto
+                  centavos={cuenta.balance > 0 ? cuenta.balance : cuenta.pagado}
+                  tam="cifraEnorme"
+                  className="leading-none"
+                />
+              </div>
 
               <div className="mt-4">
                 <BarraProgreso

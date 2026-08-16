@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '../api/cliente'
-import { formatoRD, soloNumero } from '../lib/dinero'
+import { formatoRD } from '../lib/dinero'
 import { fechaLarga } from '../lib/fechas'
 import { NOMBRE_ESTADO } from '../lib/estados'
-import { Boton } from '../components/Piezas'
+import { Boton, Monto } from '../components/Piezas'
 import { IconoImprimir, IconoVolver } from '../components/Iconos'
 
 const NOMBRE_METODO: Record<string, string> = {
@@ -73,10 +73,7 @@ export default function Comprobante() {
             </Renglon>
 
             <Renglon rotulo="La cantidad de">
-              <span className="cifra text-cifra font-semibold leading-none">
-                <span className="mr-1.5 align-baseline text-[0.5em] font-medium text-tinta2">RD$</span>
-                {soloNumero(pago.monto)}
-              </span>
+              <Monto centavos={pago.monto} tam="cifra" />
             </Renglon>
 
             <Renglon rotulo="Fecha">{fechaLarga(pago.fecha)}</Renglon>

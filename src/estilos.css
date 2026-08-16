@@ -20,9 +20,12 @@
   --papel: #f3efe6;          /* la mesa donde reposa el libro */
   --hoja: #fffdf8;           /* la hoja escrita */
   --hoja-2: #faf7f0;         /* renglón alterno, muy tenue */
-  --tinta: #241f1b;          /* texto principal */
-  --tinta-2: #6b6259;        /* texto secundario */
-  --tinta-3: #948a80;        /* texto terciario / marcas de agua */
+  /* Los tres escalones de tinta pasan contraste AA (4.5:1) sobre los tres
+     fondos de la app: la hoja, el renglón alterno y el papel. Ella lee con
+     lentes; un gris "elegante" que no se lee es un gris mal elegido. */
+  --tinta: #241f1b;          /* texto principal      · 14.2–16.1:1 */
+  --tinta-2: #575047;        /* texto secundario     ·  6.9–7.8:1 */
+  --tinta-3: #756b62;        /* texto terciario      ·  4.5–5.1:1 */
   --linea: #e6dfd2;          /* raya fina entre renglones */
   --linea-fuerte: #d3c8b6;   /* raya de encabezado de columna */
 
@@ -52,6 +55,11 @@
   /* Aviso tranquilo (excedente, notas del sistema) */
   --aviso-fondo: #e6eeee;
   --aviso-tinta: #2c5253;
+
+  /* Impresión: en papel el fondo es el papel de verdad, no nuestro tono
+     cálido, y el borde del recibo tiene que verse en una impresora gris. */
+  --papel-impreso: #ffffff;
+  --linea-impresa: #c9c2b6;
 
   /* Curvas: nunca las de fábrica, siempre estas tres */
   --salida: cubic-bezier(0.23, 1, 0.32, 1);
@@ -150,44 +158,31 @@
     font-feature-settings: 'tnum' 1, 'lnum' 1;
   }
 
-  /* Encabezado de columna del libro mayor */
+  /* Rótulo: el que nombra una cifra o una columna.
+     En minúscula y sin tracking a propósito. Las versalitas espaciadas se ven
+     a "libro viejo" y, sobre todo, se leen peor: esto lo mira alguien con
+     lentes, no un tipógrafo. */
   .rotulo {
-    @apply text-micro font-semibold uppercase text-tinta2;
+    @apply text-menuda font-medium text-tinta2;
   }
 
-  /* La hoja: la superficie donde se escribe. Nunca una dentro de otra. */
+  /* La hoja: la superficie donde se escribe. Nunca una dentro de otra.
+     Se define por una raya fina, no por una sombra: la sombra marcada hace que
+     todo flote y se vea recargado. */
   .hoja {
     @apply bg-hoja rounded-hoja;
-    box-shadow:
-      0 1px 2px rgba(58, 42, 28, 0.05),
-      0 8px 24px -12px rgba(58, 42, 28, 0.16);
+    border: 1px solid var(--linea);
+    box-shadow: 0 1px 2px rgba(58, 42, 28, 0.04);
   }
 
-  /* La raya roja de margen del libro mayor. Estructural, no decorativa:
-     marca dónde empieza el cuerpo de la tabla. */
-  .margen-rubrica {
-    position: relative;
-  }
-  .margen-rubrica::before {
-    content: '';
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 44px;
-    width: 1px;
-    background: var(--rubrica);
-    opacity: 0.28;
-    pointer-events: none;
-  }
-
-  /* Renglones del libro: rayas finas, alternancia tenue. Sin tarjetas. */
+  /* Renglones: una raya fina y nada más.
+     Sin trama alterna: raya + trama + columnas a la vez es una hoja de cálculo
+     de los noventa. La fila se separa por el aire y por la raya. */
   .renglon {
     border-bottom: 1px solid var(--linea);
   }
   .renglon:last-child {
     border-bottom: 0;
-  }
-  .renglon:nth-child(even) {
-    background: var(--hoja-2);
   }
 }
 
@@ -299,11 +294,11 @@
 
   html {
     font-size: 12pt;
-    background: #fff;
+    background: var(--papel-impreso);
   }
 
   body {
-    background: #fff;
+    background: var(--papel-impreso);
   }
 
   .no-imprimir {
@@ -316,6 +311,6 @@
 
   .hoja {
     box-shadow: none !important;
-    border: 1px solid #ccc;
+    border: 1px solid var(--linea-impresa);
   }
 }

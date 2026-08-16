@@ -10,7 +10,7 @@ import { normalizar } from '../../src/lib/fechas'
 
 const IGLESIAS = [
   { nombre: 'Iglesia Central de Villa Duarte', color: 'indigo' },
-  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'oliva' },
+  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'pizarra' },
   { nombre: 'Iglesia Monte Sinaí, San Isidro', color: 'arcilla' },
 ]
 

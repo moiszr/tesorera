@@ -359,7 +359,10 @@ export function resumen(db: Database.Database = conectar()) {
          JOIN inscripciones i ON i.id = pg.inscripcion_id
          JOIN personas per ON per.id = i.persona_id
         WHERE i.evento_id = ? AND pg.anulado = 0
-        ORDER BY pg.creado_en DESC, pg.id DESC
+        -- Se ordena por la FECHA DEL PAGO, no por cuándo se digitó: la lista se
+        -- titula "Últimos pagos" y ella la lee como fechas. Ordenar por
+        -- creado_en dejaba "hace 2 días" encima de "1 de agosto".
+        ORDER BY pg.fecha DESC, pg.creado_en DESC, pg.id DESC
         LIMIT 8`,
     )
     .all(evento.id) as any[]

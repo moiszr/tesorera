@@ -21,7 +21,7 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
   return (
     <div className="flex min-h-screen">
       <nav
-        className="no-imprimir sticky top-0 flex h-screen w-[224px] shrink-0 flex-col bg-lomo text-lomoTexto"
+        className="no-imprimir sticky top-0 flex h-screen w-[236px] shrink-0 flex-col bg-lomo text-lomoTexto"
         aria-label="Secciones"
       >
         <div className="px-5 pb-1 pt-6">
@@ -82,7 +82,7 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
         </ul>
 
         <div className="mt-auto px-5 pb-5 pt-4">
-          <p className="text-micro font-medium uppercase text-[rgba(246,233,227,0.45)]">
+          <p className="text-menuda text-[rgba(246,233,227,0.66)]">
             Se respalda sola al abrir
           </p>
         </div>

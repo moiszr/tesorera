@@ -39,8 +39,13 @@ const config: Config = {
       fontSize: {
         // Escala fija (no fluida): esto es una herramienta de trabajo que se
         // mira siempre en la misma laptop. Base 17px por accesibilidad.
-        micro: ['0.6875rem', { lineHeight: '1rem', letterSpacing: '0.08em' }],
-        menuda: ['0.8125rem', { lineHeight: '1.15rem' }],
+        //
+        // Los dos escalones chicos son deliberadamente más grandes de lo que
+        // pide la convención tipográfica: quien usa esto lee con lentes, y un
+        // rótulo de 11px bonito que ella no distingue es un rótulo inservible.
+        // micro = 13.8px, menuda = 15.9px.
+        micro: ['0.8125rem', { lineHeight: '1.15rem', letterSpacing: '0.06em' }],
+        menuda: ['0.9375rem', { lineHeight: '1.35rem' }],
         base: ['1.0625rem', { lineHeight: '1.55' }],
         guia: ['1.1875rem', { lineHeight: '1.45' }],
         titulo: ['1.4375rem', { lineHeight: '1.25', letterSpacing: '-0.011em' }],

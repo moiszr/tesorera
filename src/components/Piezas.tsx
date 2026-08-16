@@ -121,7 +121,7 @@ export function ChipEstado({ estado, className = '' }: { estado: Estado; classNa
   const c = COLOR_ESTADO[estado]
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-menuda font-medium ${className}`}
+      className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-menuda font-medium ${className}`}
       style={{ background: c.fondo, color: c.tinta }}
     >
       <span className="h-[7px] w-[7px] rounded-full" style={{ background: c.marca }} aria-hidden />
@@ -189,18 +189,19 @@ export function Monto({
     cifraGrande: 'text-cifraGrande font-semibold',
     cifraEnorme: 'text-cifraEnorme font-semibold',
   }
-  const grande = tam === 'cifra' || tam === 'cifraGrande' || tam === 'cifraEnorme'
+
+  // El "RD$" se encoge conforme crece la cifra: a tamaño grande, mantener la
+  // misma proporción lo convierte en un segundo número que compite con el
+  // primero. Estos valores viven SOLO aquí; ninguna pantalla los rehace a mano.
+  const SIMBOLO: Record<string, string> = {
+    cifra: 'mr-1.5 align-baseline text-[0.5em] font-medium text-tinta2',
+    cifraGrande: 'mr-2 align-baseline text-[0.46em] font-medium text-tinta2',
+    cifraEnorme: 'mr-2 align-baseline text-[0.42em] font-medium text-tinta2',
+  }
+
   return (
     <span className={`cifra whitespace-nowrap ${clases[tam]} ${tenue ? 'text-tinta2' : ''} ${className}`}>
-      <span
-        className={
-          grande
-            ? 'mr-1.5 align-baseline text-[0.5em] font-medium text-tinta2'
-            : 'mr-1 font-normal text-tinta2'
-        }
-      >
-        RD$
-      </span>
+      <span className={SIMBOLO[tam] ?? 'mr-1 font-normal text-tinta2'}>RD$</span>
       {soloNumero(centavos)}
     </span>
   )
@@ -208,22 +209,30 @@ export function Monto({
 
 // ── Etiqueta de iglesia ───────────────────────────────────────────────────
 
+/**
+ * Colores de etiqueta de iglesia.
+ *
+ * Ninguno es verde ni ámbar A PROPÓSITO: esos dos ya significan "Pagado" y
+ * "Abonando" en toda la app. Un punto verde de identidad al lado de un chip de
+ * estado le enseña a leer el verde de dos maneras distintas, y entonces el
+ * verde deja de querer decir nada.
+ */
 const COLORES_IGLESIA: Record<string, string> = {
   indigo: '#4a5578',
-  oliva: '#5f6b3a',
+  pizarra: '#41525c',
   arcilla: '#8a5a3c',
   ciruela: '#6d4560',
-  mar: '#2f6068',
-  ocre: '#8a6f26',
+  tabaco: '#6b4a2e',
+  humo: '#59555f',
 }
 
 export const NOMBRES_COLOR: { valor: string; nombre: string }[] = [
   { valor: 'indigo', nombre: 'Azul' },
-  { valor: 'oliva', nombre: 'Verde oliva' },
+  { valor: 'pizarra', nombre: 'Pizarra' },
   { valor: 'arcilla', nombre: 'Terracota' },
   { valor: 'ciruela', nombre: 'Ciruela' },
-  { valor: 'mar', nombre: 'Verde mar' },
-  { valor: 'ocre', nombre: 'Mostaza' },
+  { valor: 'tabaco', nombre: 'Tabaco' },
+  { valor: 'humo', nombre: 'Humo' },
 ]
 
 export function colorIglesia(color: string | null | undefined): string {

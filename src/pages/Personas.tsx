@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { api, ErrorDeTesorera } from '../api/cliente'
 import type { Categoria, Conteos, Evento, Iglesia, PersonaEnLista } from '../api/tipos'
 import { formatoRD } from '../lib/dinero'
-import { proporcionPagada, type Estado } from '../lib/estados'
+import type { Estado } from '../lib/estados'
 import {
   Boton,
   Campo,
@@ -186,7 +186,7 @@ export default function Personas() {
                 onClick={() => setOrden(o.valor)}
                 aria-pressed={orden === o.valor}
                 className={[
-                  'min-h-[36px] rounded-full px-3 text-menuda font-medium transition-colors duration-150',
+                  'min-h-[44px] rounded-full px-3.5 text-menuda font-medium transition-colors duration-150',
                   orden === o.valor
                     ? 'bg-[rgba(36,31,27,0.08)] text-tinta'
                     : 'text-tinta2 hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta',
@@ -197,7 +197,7 @@ export default function Personas() {
             ))}
           </div>
           {hayFiltro && (
-            <Boton variante="texto" onClick={limpiar} className="!min-h-[36px] !px-3 text-menuda">
+            <Boton variante="texto" onClick={limpiar} className="!min-h-[44px] !px-3 text-menuda">
               Quitar filtros
             </Boton>
           )}
@@ -205,11 +205,11 @@ export default function Personas() {
       </div>
 
       <div className="hoja overflow-hidden">
-        <div className="margen-rubrica hidden border-b border-lineaFuerte px-5 py-2 sm:flex">
-          <span className="rotulo w-[44px] shrink-0">#</span>
-          <span className="rotulo flex-1 pl-4">Nombre</span>
-          <span className="rotulo w-[178px] shrink-0 text-right">Pagado de</span>
-          <span className="rotulo w-[126px] shrink-0 pl-4">Cómo va</span>
+        <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
+          <span className="rotulo flex-1">Nombre</span>
+          <span className="rotulo w-[116px] shrink-0 text-right">Ha pagado</span>
+          <span className="rotulo w-[116px] shrink-0 text-right">Su cupo</span>
+          <span className="rotulo w-[132px] shrink-0 pl-5">Cómo va</span>
         </div>
 
         {cargando && personas.length === 0 ? (
@@ -233,49 +233,47 @@ export default function Personas() {
             />
           )
         ) : (
-          <ul className="margen-rubrica">
+          <ul>
             {personas.map((p, i) => (
               <li key={p.id} style={{ ['--i' as string]: Math.min(i, 12) }} className="entra-renglon renglon">
                 <Link
                   to={`/personas/${p.id}`}
-                  className="flex min-h-[62px] items-center px-5 py-2.5 transition-colors duration-150 hover:bg-[rgba(138,51,64,0.05)]"
+                  className="flex min-h-[58px] items-center px-5 py-2.5 transition-colors duration-150 hover:bg-hoja2"
                 >
-                  <span className="cifra hidden w-[44px] shrink-0 text-menuda text-tinta3 sm:block">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1 sm:pl-4">
+                  <span className="min-w-0 flex-1 pr-4">
                     <span className="block truncate font-medium">{p.nombre}</span>
-                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+                    <span className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-menuda text-tinta2">
                       <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
-                      {p.categoria && <span className="text-menuda text-tinta3">{p.categoria}</span>}
+                      {p.categoria && (
+                        <>
+                          <span aria-hidden className="text-tinta3">
+                            ·
+                          </span>
+                          <span className="truncate">{p.categoria}</span>
+                        </>
+                      )}
                     </span>
                   </span>
-                  <span className="w-[178px] shrink-0 text-right">
-                    {p.inscripcion_id ? (
-                      <>
-                        <span className="block">
-                          <Monto centavos={p.pagado} className="font-medium" />
-                          <span className="cifra text-menuda text-tinta2"> / {formatoRD(p.precio)}</span>
-                        </span>
-                        <span
-                          className="mt-1.5 ml-auto block h-1 w-[92px] overflow-hidden rounded-full"
-                          style={{ background: 'var(--linea)' }}
-                          aria-hidden
-                        >
-                          <span
-                            className="block h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
-                            style={{
-                              background: `var(--${p.estado}-marca)`,
-                              transform: `scaleX(${proporcionPagada(p.pagado, p.precio)})`,
-                            }}
-                          />
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-menuda text-tinta3">Sin inscribir</span>
-                    )}
-                  </span>
-                  <span className="hidden w-[126px] shrink-0 pl-4 sm:block">
+
+                  {/* Dos columnas de cifras, cada una alineada consigo misma.
+                      Antes iban pegadas en un solo bloque y lo pagado bailaba
+                      de izquierda a derecha según lo largo que fuera el precio. */}
+                  {p.inscripcion_id ? (
+                    <>
+                      <span className="w-[116px] shrink-0 text-right">
+                        <Monto centavos={p.pagado} className="font-medium" />
+                      </span>
+                      <span className="w-[116px] shrink-0 text-right">
+                        <Monto centavos={p.precio} tenue />
+                      </span>
+                    </>
+                  ) : (
+                    <span className="w-[232px] shrink-0 text-right text-menuda text-tinta2">
+                      Sin inscribir
+                    </span>
+                  )}
+
+                  <span className="hidden w-[132px] shrink-0 pl-5 sm:block">
                     <ChipEstado estado={p.estado} />
                   </span>
                 </Link>
@@ -302,7 +300,7 @@ export default function Personas() {
 function FilaChips({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="rotulo mr-1 w-[86px] shrink-0">{rotulo}</span>
+      <span className="rotulo mr-1 w-[104px] shrink-0 leading-tight">{rotulo}</span>
       {children}
     </div>
   )
@@ -327,7 +325,7 @@ function Chip({
       onClick={onClick}
       aria-pressed={activo}
       className={[
-        'inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-menuda font-medium',
+        'inline-flex min-h-[44px] items-center gap-2 rounded-full px-3.5 text-menuda font-medium',
         'border transition-colors duration-150 active:scale-[0.98]',
         activo
           ? 'border-accion bg-[rgba(138,51,64,0.09)] text-accion'

@@ -60,8 +60,28 @@ async function yaEstaAbierta(): Promise<boolean> {
   }
 }
 
-/** Chrome o Edge en modo --app (se ve como una aplicación, no como una página). */
+/**
+ * Abre Tesorera en su propia ventana, no como una pestaña más del navegador.
+ *
+ * Se usa un perfil de navegador aparte (data/ventana) por tres razones:
+ *  - la ventana de Tesorera no se cierra cuando ella cierra su Chrome,
+ *  - no arrastra sus extensiones ni sus sesiones,
+ *  - Chrome trata la ventana como una aplicación propia, así que toma el
+ *    icono y el nombre del manifiesto en vez de los suyos.
+ *
+ * Para que el icono salga en la barra de tareas de Windows hace falta además
+ * instalar la app una vez (ver "Crear acceso directo.bat" y el README).
+ */
 function abrirNavegador() {
+  const perfil = join(RAIZ, 'data', 'ventana')
+  const comunes = [
+    `--app=${DIRECCION}`,
+    `--user-data-dir=${perfil}`,
+    '--no-first-run',
+    '--no-default-browser-check',
+    '--disable-features=Translate,MediaRouter',
+  ]
+
   const candidatos: { cmd: string; args: string[] }[] = []
 
   if (process.platform === 'win32') {
@@ -75,18 +95,18 @@ function abrirNavegador() {
       join(pf86, 'Microsoft\\Edge\\Application\\msedge.exe'),
       join(pf, 'Microsoft\\Edge\\Application\\msedge.exe'),
     ]) {
-      if (existsSync(ruta)) candidatos.push({ cmd: ruta, args: [`--app=${DIRECCION}`] })
+      if (existsSync(ruta)) candidatos.push({ cmd: ruta, args: comunes })
     }
     candidatos.push({ cmd: 'cmd', args: ['/c', 'start', '', DIRECCION] })
   } else if (process.platform === 'darwin') {
     for (const app of ['Google Chrome', 'Microsoft Edge']) {
       if (existsSync(`/Applications/${app}.app`)) {
-        candidatos.push({ cmd: 'open', args: ['-na', app, '--args', `--app=${DIRECCION}`] })
+        candidatos.push({ cmd: 'open', args: ['-na', app, '--args', ...comunes] })
       }
     }
     candidatos.push({ cmd: 'open', args: [DIRECCION] })
   } else {
-    candidatos.push({ cmd: 'google-chrome', args: [`--app=${DIRECCION}`] })
+    candidatos.push({ cmd: 'google-chrome', args: comunes })
     candidatos.push({ cmd: 'xdg-open', args: [DIRECCION] })
   }
 
