@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/*
+!data/.gitkeep
+.DS_Store
+*.local
+.impeccable/config.local.json
+.impeccable/review/
+.impeccable/mocks/

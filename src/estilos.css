@@ -1,0 +1,321 @@
+@import '@fontsource/fira-sans/400.css';
+@import '@fontsource/fira-sans/500.css';
+@import '@fontsource/fira-sans/600.css';
+@import '@fontsource/fira-sans/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   EL LIBRO DE CAJA — sistema visual
+
+   La app es un libro de contabilidad encuadernado: lomo de tela a la
+   izquierda, hoja de papel a la derecha. Nada de tarjetas dentro de
+   tarjetas: las filas se separan con rayas finas, como un libro mayor.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Papel y tinta */
+  --papel: #f3efe6;          /* la mesa donde reposa el libro */
+  --hoja: #fffdf8;           /* la hoja escrita */
+  --hoja-2: #faf7f0;         /* renglón alterno, muy tenue */
+  --tinta: #241f1b;          /* texto principal */
+  --tinta-2: #6b6259;        /* texto secundario */
+  --tinta-3: #948a80;        /* texto terciario / marcas de agua */
+  --linea: #e6dfd2;          /* raya fina entre renglones */
+  --linea-fuerte: #d3c8b6;   /* raya de encabezado de columna */
+
+  /* La encuadernación */
+  --lomo: #47222a;           /* tela del lomo (barra lateral) */
+  --lomo-alto: #5c2f38;      /* pestaña activa / hover */
+  --lomo-texto: #f6e9e3;
+
+  /* Acción: un solo acento en toda la app */
+  --accion: #8a3340;
+  --accion-alto: #71272f;
+  --rubrica: #a8443c;        /* la raya roja de margen del libro mayor */
+
+  /* Estados de pago — mismos colores en toda la app, siempre con texto */
+  --pagado-fondo: #e6efe4;
+  --pagado-tinta: #2c5a31;
+  --pagado-marca: #4d8a53;
+
+  --abonando-fondo: #fbf0d8;
+  --abonando-tinta: #77510e;
+  --abonando-marca: #bf8920;
+
+  --sinpagos-fondo: #eeeae2;
+  --sinpagos-tinta: #5d574d;
+  --sinpagos-marca: #a1988a;
+
+  /* Aviso tranquilo (excedente, notas del sistema) */
+  --aviso-fondo: #e6eeee;
+  --aviso-tinta: #2c5253;
+
+  /* Curvas: nunca las de fábrica, siempre estas tres */
+  --salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --entrasale: cubic-bezier(0.77, 0, 0.175, 1);
+  --gaveta: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  html {
+    /* 17px de base: la usuaria lee con lentes. */
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-papel text-tinta font-sans text-base;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* Las superficies del navegador también llevan el diseño. */
+  ::selection {
+    background: #f0d9cf;
+    color: var(--tinta);
+  }
+
+  :root {
+    caret-color: var(--accion);
+    accent-color: var(--accion);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--linea-fuerte) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--linea-fuerte);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--tinta-3);
+    background-clip: content-box;
+  }
+
+  /* Foco siempre visible; se opera todo con teclado. */
+  :focus-visible {
+    outline: 2px solid var(--accion);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  a {
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Los números de dinero nunca bailan al cambiar. */
+  input[type='text'],
+  input[type='tel'],
+  input[type='date'],
+  input[type='search'],
+  textarea,
+  select {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* Quitamos las flechitas de los campos numéricos: se escribe, no se pulsa. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer components {
+  /* Cifras: tabulares SIEMPRE, para que las columnas cuadren. */
+  .cifra {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  /* Encabezado de columna del libro mayor */
+  .rotulo {
+    @apply text-micro font-semibold uppercase text-tinta2;
+  }
+
+  /* La hoja: la superficie donde se escribe. Nunca una dentro de otra. */
+  .hoja {
+    @apply bg-hoja rounded-hoja;
+    box-shadow:
+      0 1px 2px rgba(58, 42, 28, 0.05),
+      0 8px 24px -12px rgba(58, 42, 28, 0.16);
+  }
+
+  /* La raya roja de margen del libro mayor. Estructural, no decorativa:
+     marca dónde empieza el cuerpo de la tabla. */
+  .margen-rubrica {
+    position: relative;
+  }
+  .margen-rubrica::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 44px;
+    width: 1px;
+    background: var(--rubrica);
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  /* Renglones del libro: rayas finas, alternancia tenue. Sin tarjetas. */
+  .renglon {
+    border-bottom: 1px solid var(--linea);
+  }
+  .renglon:last-child {
+    border-bottom: 0;
+  }
+  .renglon:nth-child(even) {
+    background: var(--hoja-2);
+  }
+}
+
+@layer utilities {
+  /* Entrada de listas: aparecen desde un estado ya casi visible. */
+  .entra-renglon {
+    animation: entra-renglon 260ms var(--salida) both;
+    animation-delay: calc(var(--i, 0) * 26ms);
+  }
+
+  @keyframes entra-renglon {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .entra-hoja {
+    animation: entra-hoja 300ms var(--salida) both;
+  }
+
+  @keyframes entra-hoja {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* El diálogo aparece desde un tamaño casi completo: nada nace de la nada.
+     Se queda centrado (no está anclado a ningún botón). */
+  dialog.dialogo {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    transition:
+      opacity 180ms var(--salida),
+      transform 180ms var(--salida),
+      overlay 180ms allow-discrete,
+      display 180ms allow-discrete;
+  }
+
+  dialog.dialogo::backdrop {
+    opacity: 1;
+    transition:
+      opacity 180ms ease,
+      overlay 180ms allow-discrete,
+      display 180ms allow-discrete;
+  }
+
+  dialog.dialogo:not([open]) {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+
+  dialog.dialogo:not([open])::backdrop {
+    opacity: 0;
+  }
+
+  @starting-style {
+    dialog.dialogo[open] {
+      opacity: 0;
+      transform: scale(0.97) translateY(6px);
+    }
+    dialog.dialogo[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* Movimiento reducido: se mantiene lo que ayuda a entender (opacidad),
+     se quita lo que desplaza. */
+  @media (prefers-reduced-motion: reduce) {
+    .entra-renglon,
+    .entra-hoja {
+      animation: aparece 180ms ease both;
+      animation-delay: 0ms;
+    }
+    @keyframes aparece {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ── Impresión: comprobante y reporte ────────────────────────────────────
+   Se imprime la hoja sola; el lomo y la navegación no existen en papel. */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  html {
+    font-size: 12pt;
+    background: #fff;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .no-imprimir {
+    display: none !important;
+  }
+
+  .solo-imprimir {
+    display: block !important;
+  }
+
+  .hoja {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+}

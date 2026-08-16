@@ -56,7 +56,15 @@ está mal diseñado.
   `"RD$ 1,500"` (sin decimales si es .00) y `aCentavos(texto)` para parsear input.
 - Fechas en ISO 8601 en la DB; helper para mostrarlas en español.
 - Código (variables, funciones, tablas) en español simple y consistente:
-  `personas`, `pagos`, `inscripciones`, `iglesias`, `eventos`.
+  `personas`, `pagos`, `inscripciones`, `iglesias`, `eventos`, `categorias`.
+- **El precio del cupo vive en las categorías, no en el evento.** Cada evento tiene
+  sus propias categorías configurables (tipo de cupo/alojamiento: "Adulto —
+  habitación familiar", "Niño", …), cada una con su precio en centavos. Nunca
+  volver a codificar "adulto" y "niño" como valores fijos: la usuaria puede
+  agregar tipos nuevos hasta el día del evento.
+- La inscripción guarda una **foto del precio** al inscribir. Cambiar el precio de
+  una categoría no reescribe inscripciones existentes en silencio: se ofrece un
+  botón explícito para aplicarlo a quienes no han pagado completo.
 - Frontend: componentes en `src/components/`, pantallas en `src/pages/`,
   cliente API en `src/api/`, helpers en `src/lib/`.
 - Backend: `server/index.ts` (arranque), `server/rutas/`, `server/db/`

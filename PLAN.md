@@ -14,7 +14,10 @@ lo convierte en:
 - Una lista clara de personas con su estado de pago de un vistazo.
 - Un historial confiable por persona: cuándo pagó, cuánto, cuánto le falta.
 - Registrar un abono en menos de 10 segundos.
-- Precios distintos para adultos y niños, configurables por evento.
+- **Categorías de cupo configurables por evento**, cada una con su precio: el
+  precio no depende solo de la edad sino del tipo de alojamiento ("Adulto —
+  habitación familiar", "Adulto — habitación compartida", "Niño", …), y pueden
+  aparecer tipos nuevos antes de octubre sin tocar código.
 - Separación por iglesia (etiqueta + filtro, sin complicar la navegación).
 - Totales del evento: cuánto se ha recaudado y cuánto falta.
 
@@ -66,7 +69,8 @@ tesorera/
 │   └── lib/                # dinero.ts, fechas.ts, estados.ts
 ├── server/
 │   ├── index.ts            # arranque: migrar, respaldar, servir api + dist, abrir navegador
-│   ├── rutas/              # personas.ts, pagos.ts, iglesias.ts, eventos.ts, resumen.ts, exportar.ts
+│   ├── rutas/              # personas.ts, pagos.ts, iglesias.ts, eventos.ts,
+│   │                       # categorias.ts, resumen.ts, exportar.ts
 │   └── db/
 │       ├── conexion.ts
 │       ├── migraciones/    # 001_inicial.sql, ...
@@ -99,9 +103,20 @@ CREATE TABLE eventos (
   nombre         TEXT NOT NULL,                 -- "Convención Octubre 2026"
   fecha_inicio   TEXT,
   fecha_fin      TEXT,
-  precio_adulto  INTEGER NOT NULL,              -- centavos
-  precio_nino    INTEGER NOT NULL,              -- centavos
   activo         INTEGER NOT NULL DEFAULT 0     -- solo uno activo a la vez
+);
+
+-- Los precios viven aquí, no en el evento. Cada evento define sus propios tipos
+-- de cupo (categoría = edad + tipo de alojamiento) y la usuaria puede agregar
+-- tipos nuevos en cualquier momento desde Ajustes.
+CREATE TABLE categorias (
+  id         INTEGER PRIMARY KEY,
+  evento_id  INTEGER NOT NULL REFERENCES eventos(id),
+  nombre     TEXT NOT NULL,                     -- "Adulto — habitación familiar"
+  precio     INTEGER NOT NULL,                  -- centavos
+  orden      INTEGER NOT NULL DEFAULT 0,        -- posición en botones y filtros
+  archivada  INTEGER NOT NULL DEFAULT 0,
+  UNIQUE (evento_id, nombre)
 );
 
 CREATE TABLE personas (
@@ -115,12 +130,12 @@ CREATE TABLE personas (
 );
 
 CREATE TABLE inscripciones (
-  id          INTEGER PRIMARY KEY,
-  persona_id  INTEGER NOT NULL REFERENCES personas(id),
-  evento_id   INTEGER NOT NULL REFERENCES eventos(id),
-  categoria   TEXT NOT NULL CHECK (categoria IN ('adulto','nino')),
-  precio      INTEGER NOT NULL,                 -- foto del precio al inscribir; editable (descuentos/becas)
-  creada_en   TEXT NOT NULL DEFAULT (datetime('now')),
+  id            INTEGER PRIMARY KEY,
+  persona_id    INTEGER NOT NULL REFERENCES personas(id),
+  evento_id     INTEGER NOT NULL REFERENCES eventos(id),
+  categoria_id  INTEGER NOT NULL REFERENCES categorias(id),
+  precio        INTEGER NOT NULL,               -- foto del precio al inscribir; editable (descuentos/becas)
+  creada_en     TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (persona_id, evento_id)
 );
 
@@ -137,6 +152,8 @@ CREATE TABLE pagos (
 
 CREATE INDEX idx_pagos_inscripcion ON pagos(inscripcion_id);
 CREATE INDEX idx_inscripciones_evento ON inscripciones(evento_id);
+CREATE INDEX idx_inscripciones_categoria ON inscripciones(categoria_id);
+CREATE INDEX idx_categorias_evento ON categorias(evento_id);
 CREATE INDEX idx_personas_nombre ON personas(nombre);
 ```
 
@@ -151,12 +168,22 @@ CREATE INDEX idx_personas_nombre ON personas(nombre);
 **Reglas de negocio:**
 
 - Al crear una persona con un evento activo, se crea su inscripción de una vez
-  (categoría elegida → precio del evento se copia como foto).
+  (categoría elegida → **precio de esa categoría** se copia como foto).
 - Cambiar la categoría de una inscripción actualiza el precio SOLO si el precio
-  no fue editado manualmente (marcar con comparación contra precio del evento,
-  o simplemente preguntar: "¿Actualizar el precio a RD$ X?").
-- Cambiar el precio del evento NO cambia inscripciones existentes en silencio;
-  ofrece un botón explícito "Aplicar nuevo precio a quienes no han pagado completo".
+  no fue editado manualmente (comparar contra el precio de la categoría anterior;
+  si difiere, preguntar: "¿Actualizar el precio a RD$ X?").
+- Cambiar el precio de una categoría NO cambia inscripciones existentes en
+  silencio; ofrece un botón explícito "Aplicar a quienes no han pagado completo".
+  El botón vive junto a la categoría que se editó y dice a cuántas personas
+  afectará antes de confirmar.
+- Un evento sin categorías no puede recibir personas. Al crear un evento, la
+  pantalla pide su primera categoría de inmediato en vez de dejar un estado
+  intermedio inservible.
+- **Archivar una categoría** solo la saca de los botones y filtros nuevos; las
+  inscripciones existentes la conservan (siguen mostrando su nombre y su precio
+  foto). No se permite borrarla si tiene inscripciones.
+- Renombrar una categoría cambia el nombre en todos lados: las inscripciones
+  apuntan a la fila, no a una copia del texto.
 - Anular un pago exige confirmación y pide una nota opcional del porqué.
 
 ## 6. API (JSON, prefijo `/api`)
@@ -167,17 +194,23 @@ GET    /iglesias                     → lista (con conteo de personas)
 POST   /iglesias                     → { nombre, color }
 PATCH  /iglesias/:id                 → editar / archivar
 
-GET    /eventos                      → lista
+GET    /eventos                      → lista (cada uno con sus categorías)
 POST   /eventos                      → crear (desactiva el resto si activo=1)
-PATCH  /eventos/:id                  → editar precios / activar
-POST   /eventos/:id/aplicar-precios  → recalcular inscripciones sin pago completo
+PATCH  /eventos/:id                  → editar nombre / fechas / activar
 
-GET    /personas?buscar=&iglesia=&estado=&categoria=&orden=
-       → lista con { pagado, balance, estado } ya calculados
-POST   /personas                     → { nombre, iglesia_id, categoria, telefono?, notas? }
+GET    /eventos/:id/categorias       → lista ordenada por `orden`, con conteo de inscritos
+POST   /eventos/:id/categorias       → { nombre, precio, orden? }
+PATCH  /categorias/:id               → renombrar / cambiar precio / reordenar / archivar
+GET    /categorias/:id/afectadas     → cuántas inscripciones cambiarían de precio (para el aviso)
+POST   /categorias/:id/aplicar-precio → aplica el precio actual a las inscripciones
+                                        de esa categoría que no han pagado completo
+
+GET    /personas?buscar=&iglesia=&estado=&categoria_id=&orden=
+       → lista con { pagado, balance, estado, categoria } ya calculados
+POST   /personas                     → { nombre, iglesia_id, categoria_id, telefono?, notas? }
 GET    /personas/:id                 → ficha completa: datos + inscripción + pagos + totales
 PATCH  /personas/:id                 → editar / archivar
-PATCH  /inscripciones/:id            → cambiar categoría / precio
+PATCH  /inscripciones/:id            → cambiar categoría (categoria_id) / precio
 
 POST   /pagos                        → { inscripcion_id, monto, fecha?, metodo?, nota? }
 POST   /pagos/:id/anular             → { nota? }
@@ -205,12 +238,23 @@ de iglesias vive dentro de Ajustes.
 
 ### 7.2 Personas
 - Búsqueda grande arriba (autofoco), resultados al instante mientras escribe.
-- Filtros como chips: por iglesia, por estado (Pagado/Abonando/Sin pagos),
-  por categoría (Adultos/Niños). Contadores en cada chip.
+- Filtros como chips: por iglesia, por estado (Pagado/Abonando/Sin pagos), y
+  **por categoría — dinámicos, generados desde las categorías del evento activo**
+  (las archivadas solo aparecen si alguien inscrito todavía las usa). Contadores
+  en cada chip. Con 4+ categorías los chips se envuelven en varias líneas sin
+  scroll horizontal: la pantalla objetivo es angosta (~1280px).
 - Cada fila: nombre grande, etiqueta de iglesia con su color, categoría,
   mini barra de progreso, `RD$ pagado / RD$ precio`, chip de estado.
 - Clic en la fila → ficha. Botón "＋ Agregar persona" siempre visible.
 - Orden por defecto: alfabético; alternables "menos pagado primero" y "recientes".
+
+**Agregar persona** (formulario corto, en el mismo lugar):
+nombre → iglesia → **categoría**. La categoría se elige con **botones grandes,
+uno por categoría del evento activo, cada uno mostrando su nombre y su precio**
+("Adulto — habitación familiar · RD$ 4,500"), no un menú desplegable: ella ve
+todas las opciones y su costo a la vez y toca una. Teléfono y notas son
+opcionales y van después. Al guardar, la inscripción queda creada con la foto
+del precio de esa categoría.
 
 ### 7.3 Ficha de persona
 - Encabezado: nombre, iglesia, categoría, teléfono.
@@ -235,7 +279,17 @@ de iglesias vive dentro de Ajustes.
 (porque los pagos llegan en fila los domingos). Enlace "Ver a María".
 
 ### 7.5 Ajustes
-- Evento: nombre, fechas, precio adulto, precio niño (+ botón de aplicar precios).
+- Evento: nombre y fechas.
+- **Categorías del evento** (donde ahora viven los precios): lista ordenada, cada
+  fila con su nombre, su precio y cuántas personas la usan. Acciones por fila:
+  renombrar, cambiar precio, reordenar, archivar. Botón "＋ Agregar categoría".
+  - Al cambiar un precio, nada se aplica solo: aparece un aviso con el botón
+    **"Aplicar a quienes no han pagado completo"** que dice antes de confirmar a
+    cuántas personas afecta ("Le cambiará el precio a 7 personas").
+  - Archivar explica qué pasa en una línea: "No aparecerá al agregar personas.
+    Las 12 personas que ya la tienen no cambian."
+  - Es la única pantalla de la app donde se toca dinero de precios, así que
+    cambiar un precio pide el mismo cuidado que una acción destructiva.
 - Iglesias: lista simple para agregar/renombrar/archivar y elegir color.
 - Datos: botón **Hacer respaldo ahora** (muestra dónde quedó), nota de que la app
   respalda sola al abrir, y botón **Exportar a Excel (CSV)**.
@@ -275,11 +329,16 @@ página Inicio placeholder, `npm run dev` y `npm start` funcionando.
 **Criterio:** clonar → `npm install` → `npm start` abre el navegador con la app.
 
 ### Fase 1 — Datos maestros
-CRUD de iglesias (en Ajustes), crear/editar evento con precios, crear persona
-(nombre, iglesia, adulto/niño → inscripción automática al evento activo),
-lista de Personas con búsqueda sin tildes y filtros.
-**Criterio:** puedo crear 2 iglesias, el evento de octubre con sus 2 precios,
-10 personas mezcladas, y filtrarlas por iglesia y categoría.
+CRUD de iglesias (en Ajustes), crear/editar evento, **CRUD de categorías del
+evento con sus precios** (agregar, renombrar, cambiar precio, reordenar,
+archivar, aplicar precio a quienes no han pagado completo), crear persona
+(nombre, iglesia, categoría por botones grandes → inscripción automática al
+evento activo con foto del precio), lista de Personas con búsqueda sin tildes y
+filtros dinámicos por categoría.
+**Criterio:** puedo crear 2 iglesias, el evento de octubre con 3 categorías de
+precios distintos, agregar una 4ta categoría después y que aparezca sola en los
+botones y en los filtros, inscribir 10 personas mezcladas, y filtrarlas por
+iglesia y por categoría.
 
 ### Fase 2 — Pagos
 Flujo Registrar pago completo (3 pasos), historial en la ficha, estados y
@@ -359,7 +418,20 @@ Escritorio o el Dock con el nombre "Tesorera".
 ## 11. Seed de ejemplo
 
 `npm run seed` crea: 3 iglesias con colores distintos; el evento "Convención
-Octubre 2026" activo (adulto RD$ 3,500 / niño RD$ 1,500); ~60 personas con
-nombres dominicanos realistas repartidas entre iglesias y categorías; pagos
-variados que produzcan los tres estados, incluyendo 2 pagos anulados y una
-persona con excedente. El seed NUNCA corre solo en producción.
+Octubre 2026" activo con **4 categorías realistas** —
+
+| Categoría | Precio de ejemplo |
+|---|---|
+| Adulto — habitación familiar | RD$ 4,500 |
+| Adulto — habitación compartida | RD$ 3,500 |
+| Adulto — sin alojamiento | RD$ 2,000 |
+| Niño | RD$ 1,500 |
+
+— más ~60 personas con nombres dominicanos realistas repartidas entre iglesias y
+las cuatro categorías (ninguna categoría vacía); pagos variados que produzcan los
+tres estados, incluyendo 2 pagos anulados, una persona con excedente y **una
+inscripción con precio editado a mano** (beca) para probar que aplicar un precio
+nuevo no la pisa. El seed NUNCA corre solo en producción.
+
+Los nombres y precios de arriba son **datos de ejemplo**, no los reales del
+evento: los reales los configura la usuaria en Ajustes.
