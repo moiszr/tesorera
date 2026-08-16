@@ -197,3 +197,11 @@ export function IconoAviso({ className, tam = 20 }: Props) {
     </svg>
   )
 }
+
+export function IconoFiltro({ className, tam = 20 }: Props) {
+  return (
+    <svg {...base(tam)} className={className}>
+      <path d="M4.5 6.5h15M7.5 12h9M10.5 17.5h3" />
+    </svg>
+  )
+}

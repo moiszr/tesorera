@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { api, ErrorDeTesorera } from '../api/cliente'
 import type { Categoria, Conteos, Evento, Iglesia, PersonaEnLista } from '../api/tipos'
 import { formatoRD } from '../lib/dinero'
-import type { Estado } from '../lib/estados'
+import { NOMBRE_ESTADO, type Estado } from '../lib/estados'
 import {
   Boton,
   Campo,
@@ -15,7 +15,7 @@ import {
   colorIglesia,
 } from '../components/Piezas'
 import { Dialogo } from '../components/Dialogo'
-import { IconoBuscar, IconoMas } from '../components/Iconos'
+import { IconoBuscar, IconoCerrar, IconoFiltro, IconoMas } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
 
@@ -39,6 +39,7 @@ export default function Personas() {
   const [categoriaId, setCategoriaId] = useState<number | undefined>()
   const [estado, setEstado] = useState<Estado | undefined>()
   const [orden, setOrden] = useState<Orden>('nombre')
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
 
   const campoBuscar = useRef<HTMLInputElement>(null)
 
@@ -73,7 +74,8 @@ export default function Personas() {
     (c) => !c.archivada || (conteos?.categoria?.[c.id] ?? 0) > 0,
   )
 
-  const hayFiltro = Boolean(iglesia || categoriaId || estado || buscar)
+  const cuantosFiltros = [iglesia, categoriaId, estado].filter(Boolean).length
+  const hayFiltro = cuantosFiltros > 0 || Boolean(buscar)
 
   function limpiar() {
     setIglesia(undefined)
@@ -113,8 +115,10 @@ export default function Personas() {
         </Boton>
       </header>
 
-      <div className="hoja mb-4 p-4">
-        <div className="relative">
+      {/* Buscar siempre a la vista; los filtros guardados detrás de un botón.
+          Lo que ella hace veinte veces al día es buscar un nombre, no filtrar. */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[240px] flex-1">
           <IconoBuscar
             tam={20}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta3"
@@ -126,90 +130,125 @@ export default function Personas() {
             onChange={(e) => setBuscar(e.target.value)}
             placeholder="Buscar por nombre…"
             aria-label="Buscar persona por nombre"
-            className="w-full rounded-pieza border border-lineaFuerte bg-hoja2 py-2.5 pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(138,51,64,0.18)]"
+            className="h-[46px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(138,51,64,0.18)]"
           />
         </div>
 
-        <div className="mt-3 space-y-2">
-          <FilaChips rotulo="Cómo va">
-            {(['pagado', 'abonando', 'sinpagos'] as Estado[]).map((e) => (
-              <Chip
-                key={e}
-                activo={estado === e}
-                cuenta={conteos?.estado?.[e]}
-                onClick={() => setEstado(estado === e ? undefined : e)}
-              >
-                {e === 'pagado' ? 'Pagado' : e === 'abonando' ? 'Abonando' : 'Sin pagos'}
-              </Chip>
-            ))}
-          </FilaChips>
-
-          {categoriasVisibles.length > 0 && (
-            <FilaChips rotulo="Tipo de cupo">
-              {categoriasVisibles.map((c) => (
-                <Chip
-                  key={c.id}
-                  activo={categoriaId === c.id}
-                  cuenta={conteos?.categoria?.[c.id] ?? 0}
-                  onClick={() => setCategoriaId(categoriaId === c.id ? undefined : c.id)}
-                >
-                  {c.nombre}
-                </Chip>
-              ))}
-            </FilaChips>
-          )}
-
-          {iglesias.length > 0 && (
-            <FilaChips rotulo="Iglesia">
-              {iglesias.map((g) => (
-                <Chip
-                  key={g.id}
-                  activo={iglesia === g.id}
-                  cuenta={conteos?.iglesia?.[g.id] ?? 0}
-                  color={colorIglesia(g.color)}
-                  onClick={() => setIglesia(iglesia === g.id ? undefined : g.id)}
-                >
-                  {g.nombre}
-                </Chip>
-              ))}
-            </FilaChips>
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-linea pt-3">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="rotulo mr-1">Orden</span>
-            {ORDENES.map((o) => (
-              <button
-                key={o.valor}
-                type="button"
-                onClick={() => setOrden(o.valor)}
-                aria-pressed={orden === o.valor}
-                className={[
-                  'min-h-[44px] rounded-full px-3.5 text-menuda font-medium transition-colors duration-150',
-                  orden === o.valor
-                    ? 'bg-[rgba(36,31,27,0.08)] text-tinta'
-                    : 'text-tinta2 hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta',
-                ].join(' ')}
-              >
-                {o.texto}
-              </button>
-            ))}
-          </div>
-          {hayFiltro && (
-            <Boton variante="texto" onClick={limpiar} className="!min-h-[44px] !px-3 text-menuda">
-              Quitar filtros
-            </Boton>
-          )}
-        </div>
+        <Boton
+          variante={filtrosAbiertos || cuantosFiltros > 0 ? 'suave' : 'contorno'}
+          onClick={() => setFiltrosAbiertos((v) => !v)}
+          aria-expanded={filtrosAbiertos}
+          icono={<IconoFiltro tam={18} />}
+        >
+          Filtros
+          {cuantosFiltros > 0 && <span className="cifra">({cuantosFiltros})</span>}
+        </Boton>
       </div>
+
+      {/* Con los filtros cerrados, lo que está filtrando sigue a la vista y se
+          quita de a uno. Un filtro escondido que ella no ve es una lista que
+          "perdió" gente. */}
+      {!filtrosAbiertos && cuantosFiltros > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
+          {estado && (
+            <FiltroPuesto texto={NOMBRE_ESTADO[estado]} alQuitar={() => setEstado(undefined)} />
+          )}
+          {categoriaId && (
+            <FiltroPuesto
+              texto={categoriasVisibles.find((c) => c.id === categoriaId)?.nombre ?? ''}
+              alQuitar={() => setCategoriaId(undefined)}
+            />
+          )}
+          {iglesia && (
+            <FiltroPuesto
+              texto={iglesias.find((g) => g.id === iglesia)?.nombre ?? ''}
+              color={colorIglesia(iglesias.find((g) => g.id === iglesia)?.color)}
+              alQuitar={() => setIglesia(undefined)}
+            />
+          )}
+          <button
+            type="button"
+            onClick={limpiar}
+            className="ml-1 min-h-[36px] rounded-full px-3 text-menuda font-medium text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
+          >
+            Quitar todos
+          </button>
+        </div>
+      )}
+
+      {filtrosAbiertos && (
+        <div className="hoja entra-hoja mb-3 p-4">
+          <div className="space-y-2">
+            <FilaChips rotulo="Cómo va">
+              {(['pagado', 'abonando', 'sinpagos'] as Estado[]).map((e) => (
+                <Chip
+                  key={e}
+                  activo={estado === e}
+                  cuenta={conteos?.estado?.[e]}
+                  onClick={() => setEstado(estado === e ? undefined : e)}
+                >
+                  {NOMBRE_ESTADO[e]}
+                </Chip>
+              ))}
+            </FilaChips>
+
+            {categoriasVisibles.length > 0 && (
+              <FilaChips rotulo="Tipo de cupo">
+                {categoriasVisibles.map((c) => (
+                  <Chip
+                    key={c.id}
+                    activo={categoriaId === c.id}
+                    cuenta={conteos?.categoria?.[c.id] ?? 0}
+                    onClick={() => setCategoriaId(categoriaId === c.id ? undefined : c.id)}
+                  >
+                    {c.nombre}
+                  </Chip>
+                ))}
+              </FilaChips>
+            )}
+
+            {iglesias.length > 0 && (
+              <FilaChips rotulo="Iglesia">
+                {iglesias.map((g) => (
+                  <Chip
+                    key={g.id}
+                    activo={iglesia === g.id}
+                    cuenta={conteos?.iglesia?.[g.id] ?? 0}
+                    color={colorIglesia(g.color)}
+                    onClick={() => setIglesia(iglesia === g.id ? undefined : g.id)}
+                  >
+                    {g.nombre}
+                  </Chip>
+                ))}
+              </FilaChips>
+            )}
+
+            <FilaChips rotulo="Orden">
+              {ORDENES.map((o) => (
+                <Chip key={o.valor} activo={orden === o.valor} onClick={() => setOrden(o.valor)}>
+                  {o.texto}
+                </Chip>
+              ))}
+            </FilaChips>
+          </div>
+
+          {hayFiltro && (
+            <div className="mt-3 border-t border-linea pt-3">
+              <Boton variante="texto" onClick={limpiar} className="!min-h-[40px] !px-3 text-menuda">
+                Quitar filtros
+              </Boton>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="hoja overflow-hidden">
         <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
           <span className="rotulo flex-1">Nombre</span>
-          <span className="rotulo w-[116px] shrink-0 text-right">Ha pagado</span>
-          <span className="rotulo w-[116px] shrink-0 text-right">Su cupo</span>
-          <span className="rotulo w-[132px] shrink-0 pl-5">Cómo va</span>
+          <span className="rotulo w-[248px] shrink-0 pr-4">Iglesia</span>
+          <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
+          <span className="rotulo w-[112px] shrink-0 text-right">Su cupo</span>
+          <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
         </div>
 
         {cargando && personas.length === 0 ? (
@@ -236,23 +275,19 @@ export default function Personas() {
           <ul>
             {personas.map((p, i) => (
               <li key={p.id} style={{ ['--i' as string]: Math.min(i, 12) }} className="entra-renglon renglon">
+                {/* Un renglón = una línea. Antes eran dos y cabían la mitad
+                    de las personas en pantalla. */}
                 <Link
                   to={`/personas/${p.id}`}
-                  className="flex min-h-[58px] items-center px-5 py-2.5 transition-colors duration-150 hover:bg-hoja2"
+                  className="flex min-h-[46px] items-center px-5 py-1.5 transition-colors duration-150 hover:bg-hoja2"
                 >
-                  <span className="min-w-0 flex-1 pr-4">
-                    <span className="block truncate font-medium">{p.nombre}</span>
-                    <span className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-menuda text-tinta2">
-                      <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
-                      {p.categoria && (
-                        <>
-                          <span aria-hidden className="text-tinta3">
-                            ·
-                          </span>
-                          <span className="truncate">{p.categoria}</span>
-                        </>
-                      )}
-                    </span>
+                  <span className="min-w-0 flex-1 truncate pr-4 font-medium">{p.nombre}</span>
+
+                  {/* Solo la iglesia. El tipo de cupo no va aquí: su precio ya
+                      está en la columna "Su cupo", y meter los dos truncaba
+                      ambos hasta dejarlos ilegibles. */}
+                  <span className="hidden w-[248px] shrink-0 pr-4 sm:block">
+                    <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
                   </span>
 
                   {/* Dos columnas de cifras, cada una alineada consigo misma.
@@ -260,20 +295,20 @@ export default function Personas() {
                       de izquierda a derecha según lo largo que fuera el precio. */}
                   {p.inscripcion_id ? (
                     <>
-                      <span className="w-[116px] shrink-0 text-right">
+                      <span className="w-[112px] shrink-0 text-right">
                         <Monto centavos={p.pagado} className="font-medium" />
                       </span>
-                      <span className="w-[116px] shrink-0 text-right">
+                      <span className="w-[112px] shrink-0 text-right">
                         <Monto centavos={p.precio} tenue />
                       </span>
                     </>
                   ) : (
-                    <span className="w-[232px] shrink-0 text-right text-menuda text-tinta2">
+                    <span className="w-[224px] shrink-0 text-right text-menuda text-tinta2">
                       Sin inscribir
                     </span>
                   )}
 
-                  <span className="hidden w-[132px] shrink-0 pl-5 sm:block">
+                  <span className="hidden w-[128px] shrink-0 pl-5 sm:block">
                     <ChipEstado estado={p.estado} />
                   </span>
                 </Link>
@@ -338,6 +373,32 @@ function Chip({
         <span className={`cifra text-micro ${activo ? 'text-accion' : 'text-tinta3'}`}>{cuenta}</span>
       )}
     </button>
+  )
+}
+
+/** Un filtro que está puesto, con su × para quitarlo de una. */
+function FiltroPuesto({
+  texto,
+  color,
+  alQuitar,
+}: {
+  texto: string
+  color?: string
+  alQuitar: () => void
+}) {
+  return (
+    <span className="inline-flex min-h-[36px] items-center gap-2 rounded-full border border-accion bg-[rgba(138,51,64,0.08)] pl-3 pr-1 text-menuda font-medium text-accion">
+      {color && <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />}
+      <span className="max-w-[26ch] truncate">{texto}</span>
+      <button
+        type="button"
+        onClick={alQuitar}
+        aria-label={`Quitar el filtro ${texto}`}
+        className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-[rgba(138,51,64,0.16)]"
+      >
+        <IconoCerrar tam={14} />
+      </button>
+    </span>
   )
 }
 
