@@ -24,7 +24,7 @@ import {
   IconoPago,
   IconoVolver,
 } from '../components/Iconos'
-import { BotonCategoria } from './Personas'
+import { Selector, type Opcion } from '../components/Selector'
 
 const NOMBRE_METODO: Record<string, string> = {
   efectivo: 'Efectivo',
@@ -113,7 +113,7 @@ export default function FichaPersona() {
     <div className="entra-hoja">
       <Link
         to="/personas"
-        className="mb-3 inline-flex min-h-[36px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
+        className="mb-3 inline-flex min-h-[44px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
       >
         <IconoVolver tam={16} />
         Todas las personas
@@ -432,33 +432,17 @@ function DialogoEditarPersona({
       <form onSubmit={guardar} className="space-y-4">
         <Campo etiqueta="Nombre completo" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus />
         {iglesias.length > 0 && (
-          <div>
-            <span className="mb-1.5 block text-menuda font-medium text-tinta2">Iglesia</span>
-            <div className="flex flex-wrap gap-1.5">
-              {iglesias.map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  onClick={() => setIglesiaId(iglesiaId === g.id ? undefined : g.id)}
-                  aria-pressed={iglesiaId === g.id}
-                  className={[
-                    'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda font-medium',
-                    'border transition-colors duration-150 active:scale-[0.98]',
-                    iglesiaId === g.id
-                      ? 'border-accion bg-[rgba(138,51,64,0.08)] text-accion'
-                      : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
-                  ].join(' ')}
-                >
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ background: colorIglesia(g.color) }}
-                    aria-hidden
-                  />
-                  {g.nombre}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Selector
+            etiqueta="Iglesia"
+            opciones={iglesias.map((g) => ({
+              id: g.id,
+              etiqueta: g.nombre,
+              color: colorIglesia(g.color),
+            }))}
+            valor={iglesiaId}
+            alElegir={setIglesiaId}
+            textoBuscar="Buscar iglesia…"
+          />
         )}
         <Campo etiqueta="Teléfono" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
         <Campo etiqueta="Notas" value={notas} onChange={(e) => setNotas(e.target.value)} />
@@ -498,6 +482,11 @@ function DialogoCupo({
   const [guardando, setGuardando] = useState(false)
 
   const categorias = (evento?.categorias ?? []).filter((c) => !c.archivada || c.id === inscripcion?.categoria_id)
+  const opcionesCupo: Opcion[] = categorias.map((c) => ({
+    id: c.id,
+    etiqueta: c.nombre,
+    detalle: formatoRD(c.precio),
+  }))
   const elegida = categorias.find((c) => c.id === categoriaId)
   const precioActual = aCentavos(precio)
   const difiere = elegida && precioActual !== null && precioActual !== elegida.precio
@@ -546,24 +535,21 @@ function DialogoCupo({
       ancho={520}
     >
       <form onSubmit={guardar} className="space-y-4">
-        <div>
-          <span className="mb-1.5 block text-menuda font-medium text-tinta2">Tipo de cupo</span>
-          <div className="grid gap-1.5 sm:grid-cols-2">
-            {categorias.map((c) => (
-              <BotonCategoria
-                key={c.id}
-                categoria={c}
-                elegida={categoriaId === c.id}
-                onClick={() => {
-                  setCategoriaId(c.id)
-                  // Solo arrastramos el precio si nadie lo había tocado a mano.
-                  if (!inscripcion || inscripcion.precio_a_mano === 0) setPrecio(aTextoEditable(c.precio))
-                  setProblema(null)
-                }}
-              />
-            ))}
-          </div>
-        </div>
+        <Selector
+          etiqueta="Tipo de cupo"
+          opciones={opcionesCupo}
+          valor={categoriaId}
+          alElegir={(id) => {
+            setCategoriaId(id)
+            const c = categorias.find((x) => x.id === id)
+            // Solo arrastramos el precio si nadie lo había tocado a mano.
+            if (c && (!inscripcion || inscripcion.precio_a_mano === 0)) setPrecio(aTextoEditable(c.precio))
+            setProblema(null)
+          }}
+          columnas={2}
+          umbral={4}
+          textoBuscar="Buscar tipo de cupo…"
+        />
 
         <Campo
           etiqueta="Precio para esta persona"

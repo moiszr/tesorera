@@ -2,12 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api, ErrorDeTesorera } from '../api/cliente'
-import type { PersonaEnLista } from '../api/tipos'
+import type { Evento, Iglesia, PersonaEnLista } from '../api/tipos'
 import { aCentavos, formatoRD } from '../lib/dinero'
 import { fechaLarga, hoyISO, normalizar } from '../lib/fechas'
 import { calcularEstado } from '../lib/estados'
 import { BarraProgreso, Boton, Campo, ChipEstado, EtiquetaIglesia, Monto } from '../components/Piezas'
-import { IconoAdelante, IconoBuscar, IconoCheque, IconoImprimir } from '../components/Iconos'
+import { DialogoPersona } from '../components/DialogoPersona'
+import { IconoAdelante, IconoBuscar, IconoCheque, IconoImprimir, IconoMas } from '../components/Iconos'
 
 const METODOS = [
   { valor: 'efectivo', texto: 'Efectivo' },
@@ -50,6 +51,9 @@ export default function RegistrarPago() {
   const [ultimo, setUltimo] = useState<Guardado | null>(null)
   // Arranca en el valor viejo y sube al nuevo: así la barra se ve crecer.
   const [progresoAnimado, setProgresoAnimado] = useState(0)
+  const [creando, setCreando] = useState(false)
+  const [iglesias, setIglesias] = useState<Iglesia[]>([])
+  const [evento, setEvento] = useState<Evento | null>(null)
 
   const campoBusqueda = useRef<HTMLInputElement>(null)
   const campoMonto = useRef<HTMLInputElement>(null)
@@ -57,6 +61,30 @@ export default function RegistrarPago() {
   async function cargar() {
     const { personas } = await api.personas({})
     setTodas(personas.filter((p) => p.inscripcion_id != null))
+  }
+
+  useEffect(() => {
+    Promise.all([api.iglesias(), api.eventoActivo()])
+      .then(([gs, ev]) => {
+        setIglesias(gs.filter((g) => !g.archivada))
+        setEvento(ev)
+      })
+      .catch(() => {})
+  }, [])
+
+  /**
+   * Alguien llegó a pagar y todavía no está inscrito. Se crea desde aquí, con
+   * el nombre que ya se escribió en el buscador, y al guardar queda elegida
+   * con el cursor en el monto: la fila no se detiene.
+   */
+  async function trasCrearPersona(creada: { id: number }) {
+    setCreando(false)
+    const { personas } = await api.personas({})
+    const lista = personas.filter((p) => p.inscripcion_id != null)
+    setTodas(lista)
+    const nueva = lista.find((p) => p.id === creada.id)
+    if (nueva) elegir(nueva)
+    else setBusqueda('')
   }
 
   useEffect(() => {
@@ -99,6 +127,8 @@ export default function RegistrarPago() {
     requestAnimationFrame(() => campoBusqueda.current?.focus())
   }
 
+  const hayPagos = todas.some((p) => p.pagado > 0)
+  const hayPanel = ultimo !== null || !hayPagos
   const centavos = aCentavos(monto)
   const balanceDespues = elegida && centavos !== null ? elegida.balance - centavos : null
 
@@ -146,6 +176,22 @@ export default function RegistrarPago() {
           ficha.cuenta.balance > 0
             ? `Le faltan ${formatoRD(ficha.cuenta.balance)}.`
             : 'Quedó pagado completo.',
+        duration: 8000,
+        action: {
+          label: 'Deshacer',
+          onClick: () => {
+            api
+              .anularPago(id, 'Deshecho al momento de registrarlo')
+              .then(() => {
+                toast.success('Pago deshecho', {
+                  description: 'Quedó tachado en el historial y el saldo se corrigió.',
+                })
+                setUltimo((u) => (u && u.pagoId === id ? null : u))
+                cargar()
+              })
+              .catch(() => toast.error('No pude deshacer el pago. Anúlalo desde su ficha.'))
+          },
+        },
       })
 
       // Listo para el siguiente de la fila, sin tocar nada.
@@ -171,8 +217,14 @@ export default function RegistrarPago() {
         {elegida ? 'Escribe cuánto está abonando.' : 'Escribe el nombre de quien está pagando.'}
       </p>
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="hoja min-h-[420px] overflow-hidden">
+      <div
+        className={
+          hayPanel
+            ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]'
+            : 'max-w-[720px]'
+        }
+      >
+        <div className="hoja overflow-hidden">
           {!elegida ? (
             <BuscadorPersona
               ref={campoBusqueda}
@@ -183,6 +235,7 @@ export default function RegistrarPago() {
               setResaltado={setResaltado}
               alElegir={elegir}
               hayPersonas={todas.length > 0}
+              alCrear={() => setCreando(true)}
             />
           ) : (
             <form onSubmit={guardar} className="p-5">
@@ -322,10 +375,12 @@ export default function RegistrarPago() {
           )}
         </div>
 
+        {hayPanel && (
         <aside className="min-w-0">
           {ultimo ? (
             <ReciboUltimo guardado={ultimo} progreso={progresoAnimado} />
           ) : (
+            hayPagos ? null : (
             <div className="hoja p-5">
               <p className="rotulo mb-2">Cómo se hace</p>
               <ol className="space-y-2.5 text-menuda text-tinta2">
@@ -343,9 +398,21 @@ export default function RegistrarPago() {
                 </li>
               </ol>
             </div>
+            )
           )}
         </aside>
+        )}
       </div>
+
+      <DialogoPersona
+        abierto={creando}
+        alCerrar={() => setCreando(false)}
+        iglesias={iglesias}
+        evento={evento}
+        personas={todas}
+        nombreInicial={busqueda.trim()}
+        alGuardar={trasCrearPersona}
+      />
     </div>
   )
 }
@@ -465,7 +532,7 @@ function ReciboUltimo({ guardado, progreso }: { guardado: Guardado; progreso: nu
           </Link>
           <Link
             to={`/personas/${guardado.personaId}`}
-            className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-pieza px-3 text-menuda text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-pieza px-3 text-menuda text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
           >
             Ver a {primerNombre(guardado.nombre)}
             <IconoAdelante tam={16} />
@@ -494,9 +561,10 @@ const BuscadorPersona = forwardRef<
     setResaltado: (n: number) => void
     alElegir: (p: PersonaEnLista) => void
     hayPersonas: boolean
+    alCrear: () => void
   }
 >(function BuscadorPersona(
-  { busqueda, setBusqueda, resultados, resaltado, setResaltado, alElegir, hayPersonas },
+  { busqueda, setBusqueda, resultados, resaltado, setResaltado, alElegir, hayPersonas, alCrear },
   ref,
 ) {
   return (
@@ -534,7 +602,7 @@ const BuscadorPersona = forwardRef<
           />
         </div>
         <p className="mt-2 text-menuda text-tinta3">
-          No hace falta poner tildes: si escribes “jose” aparece “José”.
+          No hace falta poner tildes.
         </p>
       </div>
 
@@ -545,21 +613,22 @@ const BuscadorPersona = forwardRef<
           ) : (
             <>
               Todavía no hay personas inscritas.{' '}
-              <Link to="/personas" className="font-medium text-accion underline">
+              <button type="button" onClick={alCrear} className="font-medium text-accion underline">
                 Agrega la primera
-              </Link>
+              </button>
               .
             </>
           )}
         </div>
       ) : resultados.length === 0 ? (
-        <div className="px-5 py-12 text-center text-tinta2">
-          <p>
-            No encontré a nadie que se llame “<span className="font-medium text-tinta">{busqueda}</span>”.
+        <div className="px-5 py-12 text-center">
+          <p className="text-tinta2">
+            No hay nadie inscrito que se llame “
+            <span className="font-medium text-tinta">{busqueda}</span>”.
           </p>
-          <Link to="/personas" className="mt-2 inline-block font-medium text-accion underline">
-            Agregar esta persona
-          </Link>
+          <Boton variante="principal" className="mt-4" icono={<IconoMas tam={18} />} onClick={alCrear}>
+            Agregar a “{busqueda.trim()}” y cobrarle
+          </Boton>
         </div>
       ) : (
         <ul role="listbox" aria-label="Personas encontradas">

@@ -1,20 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { api, ErrorDeTesorera } from '../api/cliente'
-import type { Categoria, Conteos, Evento, Iglesia, PersonaEnLista } from '../api/tipos'
-import { formatoRD } from '../lib/dinero'
+import { api } from '../api/cliente'
+import type { Conteos, Evento, Iglesia, PersonaEnLista } from '../api/tipos'
 import { NOMBRE_ESTADO, type Estado } from '../lib/estados'
 import {
   Boton,
-  Campo,
   ChipEstado,
   EstadoVacio,
   EtiquetaIglesia,
   Monto,
   colorIglesia,
 } from '../components/Piezas'
-import { Dialogo } from '../components/Dialogo'
+import { DialogoPersona } from '../components/DialogoPersona'
 import { IconoBuscar, IconoCerrar, IconoFiltro, IconoMas } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
@@ -40,6 +38,7 @@ export default function Personas() {
   const [estado, setEstado] = useState<Estado | undefined>()
   const [orden, setOrden] = useState<Orden>('nombre')
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
+  const [nombreParaCrear, setNombreParaCrear] = useState('')
 
   const campoBuscar = useRef<HTMLInputElement>(null)
 
@@ -110,7 +109,14 @@ export default function Personas() {
             )}
           </p>
         </div>
-        <Boton variante="principal" icono={<IconoMas tam={19} />} onClick={() => setNuevaAbierta(true)}>
+        <Boton
+          variante="principal"
+          icono={<IconoMas tam={19} />}
+          onClick={() => {
+            setNombreParaCrear(buscar.trim())
+            setNuevaAbierta(true)
+          }}
+        >
           Agregar persona
         </Boton>
       </header>
@@ -169,7 +175,7 @@ export default function Personas() {
           <button
             type="button"
             onClick={limpiar}
-            className="ml-1 min-h-[36px] rounded-full px-3 text-menuda font-medium text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
+            className="ml-1 min-h-[44px] rounded-full px-3.5 text-menuda font-medium text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
           >
             Quitar todos
           </button>
@@ -234,7 +240,7 @@ export default function Personas() {
 
           {hayFiltro && (
             <div className="mt-3 border-t border-linea pt-3">
-              <Boton variante="texto" onClick={limpiar} className="!min-h-[40px] !px-3 text-menuda">
+              <Boton variante="texto" onClick={limpiar} className="!min-h-[44px] !px-3 text-menuda">
                 Quitar filtros
               </Boton>
             </div>
@@ -256,9 +262,29 @@ export default function Personas() {
         ) : personas.length === 0 ? (
           hayFiltro ? (
             <EstadoVacio
-              titulo="No encontré a nadie así"
-              explicacion="Prueba con menos filtros, o escribe solo el primer nombre. No hace falta poner tildes."
-              accion={<Boton onClick={limpiar}>Quitar filtros</Boton>}
+              titulo={buscar.trim() ? `No hay nadie llamado “${buscar.trim()}”` : 'No encontré a nadie así'}
+              explicacion={
+                buscar.trim()
+                  ? 'Puedes agregarla ahora mismo con ese nombre, o revisar si está escrito distinto.'
+                  : 'Prueba quitando algún filtro.'
+              }
+              accion={
+                <div className="flex flex-wrap justify-center gap-2">
+                  {buscar.trim() && (
+                    <Boton
+                      variante="principal"
+                      icono={<IconoMas tam={18} />}
+                      onClick={() => {
+                        setNombreParaCrear(buscar.trim())
+                        setNuevaAbierta(true)
+                      }}
+                    >
+                      Agregar a “{buscar.trim()}”
+                    </Boton>
+                  )}
+                  <Boton onClick={limpiar}>Quitar filtros</Boton>
+                </div>
+              }
             />
           ) : (
             <EstadoVacio
@@ -318,13 +344,18 @@ export default function Personas() {
         )}
       </div>
 
-      <DialogoNuevaPersona
+      {/* Si venía buscando un nombre que no existe, el diálogo abre con ese
+          nombre ya escrito: no se escribe dos veces lo mismo. */}
+      <DialogoPersona
         abierto={nuevaAbierta}
         alCerrar={cerrarNueva}
         iglesias={iglesias}
         evento={evento}
+        personas={personas}
+        nombreInicial={nombreParaCrear}
         alGuardar={() => {
           cerrarNueva()
+          setBuscar('')
           cargar()
         }}
       />
@@ -387,14 +418,14 @@ function FiltroPuesto({
   alQuitar: () => void
 }) {
   return (
-    <span className="inline-flex min-h-[36px] items-center gap-2 rounded-full border border-accion bg-[rgba(138,51,64,0.08)] pl-3 pr-1 text-menuda font-medium text-accion">
+    <span className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-accion bg-[rgba(138,51,64,0.08)] pl-3 pr-1 text-menuda font-medium text-accion">
       {color && <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />}
       <span className="max-w-[26ch] truncate">{texto}</span>
       <button
         type="button"
         onClick={alQuitar}
         aria-label={`Quitar el filtro ${texto}`}
-        className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-[rgba(138,51,64,0.16)]"
+        className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgba(138,51,64,0.16)]"
       >
         <IconoCerrar tam={14} />
       </button>
@@ -412,217 +443,5 @@ function ListaEsqueleto() {
         </li>
       ))}
     </ul>
-  )
-}
-
-// ── Agregar persona ───────────────────────────────────────────────────────
-
-function DialogoNuevaPersona({
-  abierto,
-  alCerrar,
-  iglesias,
-  evento,
-  alGuardar,
-}: {
-  abierto: boolean
-  alCerrar: () => void
-  iglesias: Iglesia[]
-  evento: Evento | null
-  alGuardar: () => void
-}) {
-  const [nombre, setNombre] = useState('')
-  const [iglesiaId, setIglesiaId] = useState<number | undefined>()
-  const [categoriaId, setCategoriaId] = useState<number | undefined>()
-  const [telefono, setTelefono] = useState('')
-  const [notas, setNotas] = useState('')
-  const [problema, setProblema] = useState<string | null>(null)
-  const [guardando, setGuardando] = useState(false)
-
-  const categorias = (evento?.categorias ?? []).filter((c) => !c.archivada)
-
-  useEffect(() => {
-    if (!abierto) return
-    setNombre('')
-    setIglesiaId(iglesias.length === 1 ? iglesias[0].id : undefined)
-    setCategoriaId(undefined)
-    setTelefono('')
-    setNotas('')
-    setProblema(null)
-  }, [abierto, iglesias])
-
-  async function guardar(e: React.FormEvent) {
-    e.preventDefault()
-    if (!nombre.trim()) {
-      setProblema('Escribe el nombre completo de la persona.')
-      return
-    }
-    if (evento && categorias.length > 0 && !categoriaId) {
-      setProblema('Elige el tipo de cupo.')
-      return
-    }
-
-    setGuardando(true)
-    try {
-      const r = await api.crearPersona({
-        nombre: nombre.trim(),
-        iglesia_id: iglesiaId,
-        categoria_id: categoriaId,
-        telefono: telefono || undefined,
-        notas: notas || undefined,
-      })
-      toast.success(`${nombre.trim()} quedó agregada`, {
-        description: r.aviso_repetida
-          ? `Ojo: ya había alguien llamado "${r.aviso_repetida}". Revisa que no esté repetida.`
-          : 'Ya puedes registrarle un pago.',
-      })
-      alGuardar()
-    } catch (err) {
-      const mensaje = err instanceof ErrorDeTesorera ? err.message : 'No pude guardar la persona.'
-      setProblema(mensaje)
-    } finally {
-      setGuardando(false)
-    }
-  }
-
-  const sinCategorias = Boolean(evento) && categorias.length === 0
-
-  return (
-    <Dialogo abierto={abierto} alCerrar={alCerrar} titulo="Agregar persona" ancho={520}>
-      <form onSubmit={guardar} className="space-y-4">
-        <Campo
-          etiqueta="Nombre completo"
-          value={nombre}
-          onChange={(e) => {
-            setNombre(e.target.value)
-            setProblema(null)
-          }}
-          placeholder="María Altagracia Pérez"
-          autoFocus
-        />
-
-        {iglesias.length > 0 && (
-          <div>
-            <span className="mb-1.5 block text-menuda font-medium text-tinta2">¿De qué iglesia es?</span>
-            <div className="flex flex-wrap gap-1.5">
-              {iglesias.map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  onClick={() => setIglesiaId(iglesiaId === g.id ? undefined : g.id)}
-                  aria-pressed={iglesiaId === g.id}
-                  className={[
-                    'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda font-medium',
-                    'border transition-colors duration-150 active:scale-[0.98]',
-                    iglesiaId === g.id
-                      ? 'border-accion bg-[rgba(138,51,64,0.08)] text-accion'
-                      : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
-                  ].join(' ')}
-                >
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: colorIglesia(g.color) }}
-                    aria-hidden
-                  />
-                  {g.nombre}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {sinCategorias ? (
-          <p className="rounded-pieza bg-[var(--abonando-fondo)] px-3 py-2.5 text-menuda text-[var(--abonando-tinta)]">
-            Este evento todavía no tiene tipos de cupo. Créalos en Ajustes y después vuelve aquí.
-          </p>
-        ) : (
-          categorias.length > 0 && (
-            <div>
-              <span className="mb-1.5 block text-menuda font-medium text-tinta2">¿Qué tipo de cupo?</span>
-              <div className="grid gap-1.5 sm:grid-cols-2">
-                {categorias.map((c) => (
-                  <BotonCategoria
-                    key={c.id}
-                    categoria={c}
-                    elegida={categoriaId === c.id}
-                    onClick={() => {
-                      setCategoriaId(c.id)
-                      setProblema(null)
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )
-        )}
-
-        <details className="group">
-          <summary className="cursor-pointer list-none text-menuda font-medium text-tinta2 transition-colors hover:text-tinta">
-            <span className="inline-flex min-h-[36px] items-center gap-1.5">
-              <span className="text-tinta3 transition-transform duration-150 group-open:rotate-90">›</span>
-              Teléfono y notas (opcional)
-            </span>
-          </summary>
-          <div className="mt-2 space-y-3">
-            <Campo
-              etiqueta="Teléfono"
-              type="tel"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              placeholder="809-000-0000"
-            />
-            <Campo
-              etiqueta="Notas"
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              placeholder="Lo que quieras recordar de esta persona"
-            />
-          </div>
-        </details>
-
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
-
-        <div className="flex justify-end gap-2 border-t border-linea pt-4">
-          <Boton type="button" variante="texto" onClick={alCerrar}>
-            Cancelar
-          </Boton>
-          <Boton type="submit" variante="principal" cargando={guardando}>
-            Guardar persona
-          </Boton>
-        </div>
-      </form>
-    </Dialogo>
-  )
-}
-
-/** Botón grande de tipo de cupo: se ve el nombre y el precio a la vez. */
-export function BotonCategoria({
-  categoria,
-  elegida,
-  onClick,
-}: {
-  categoria: Categoria
-  elegida: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={elegida}
-      className={[
-        'flex min-h-[62px] flex-col justify-center rounded-pieza px-3.5 py-2.5 text-left',
-        'border transition-colors duration-150 active:scale-[0.99]',
-        elegida
-          ? 'border-accion bg-[rgba(138,51,64,0.07)]'
-          : 'border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
-      ].join(' ')}
-    >
-      <span className={`text-menuda font-medium leading-snug ${elegida ? 'text-accion' : 'text-tinta'}`}>
-        {categoria.nombre}
-      </span>
-      <span className={`cifra mt-0.5 font-semibold ${elegida ? 'text-accion' : 'text-tinta2'}`}>
-        {formatoRD(categoria.precio)}
-      </span>
-    </button>
   )
 }

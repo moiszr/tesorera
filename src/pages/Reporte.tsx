@@ -47,7 +47,7 @@ export default function Reporte() {
       <div className="no-imprimir mb-4 flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/ajustes"
-          className="inline-flex min-h-[36px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
+          className="inline-flex min-h-[44px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
         >
           <IconoVolver tam={16} />
           Volver a Ajustes

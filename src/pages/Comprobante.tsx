@@ -41,7 +41,7 @@ export default function Comprobante() {
       <div className="no-imprimir mx-auto mb-4 flex max-w-[560px] flex-wrap items-center justify-between gap-3">
         <Link
           to={`/personas/${pago.persona_id}`}
-          className="inline-flex min-h-[36px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
+          className="inline-flex min-h-[44px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
         >
           <IconoVolver tam={16} />
           Volver a {pago.persona.split(' ')[0]}

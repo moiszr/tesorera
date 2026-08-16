@@ -345,7 +345,7 @@ function SeccionCategorias({ evento, alCambiar }: { evento: Evento; alCambiar: (
                 <span className="text-tinta3">
                   {c.inscritos} {c.inscritos === 1 ? 'persona' : 'personas'}
                 </span>
-                <Boton variante="texto" className="!min-h-[34px] !px-2" onClick={() => setAArchivar(c)}>
+                <Boton variante="texto" className="!min-h-[44px] !px-3" onClick={() => setAArchivar(c)}>
                   Devolver
                 </Boton>
               </li>
