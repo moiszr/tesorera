@@ -36,11 +36,21 @@ cd C:\Tesorera
 npm install
 ```
 
-Después, crear un **acceso directo en el Escritorio** a
-`launchers\Tesorera.bat` y llamarlo **Tesorera**. Con eso, doble clic y abre.
+Después, doble clic en `launchers\Crear acceso directo.bat` **una sola vez**.
+Deja en el Escritorio un icono llamado **Tesorera**, con el icono propio de la
+app, que apunta a `Tesorera.vbs` — no al `.bat`. Esa es la diferencia entre que
+ella vea una ventana negra al abrir o no la vea: el `.vbs` corre el `.bat`
+escondido y, si algo falla, le enseña un mensaje en español en vez de dejarla
+mirando una consola.
 
 El launcher hace `git pull` silencioso (si hay internet), `npm install` si
 cambió `package.json`, y `npm start`.
+
+> **El repo es privado.** El `git clone` inicial te va a pedir tu cuenta de
+> GitHub: hazlo tú desde su laptop la primera vez. Windows guarda la credencial
+> y a partir de ahí el `git pull` del launcher corre solo. Si prefieres no dejar
+> tu cuenta en su máquina, copia la carpeta por USB — la app funciona igual,
+> solo pierde la actualización automática.
 
 > `.gitattributes` fuerza CRLF en los `.bat`. No lo quites: un `.bat` con
 > finales de línea LF no corre en Windows.

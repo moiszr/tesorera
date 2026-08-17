@@ -9,8 +9,8 @@ Todo se guarda en esta laptop. No hace falta internet.
 
 Haz **doble clic en el ícono "Tesorera"** del Escritorio.
 
-Se abre una ventana negra por un momento (es normal, no la cierres) y enseguida
-aparece Tesorera. La primera vez tarda un minuto; después abre rápido.
+La primera vez tarda como un minuto en abrir; después abre rápido. Si ves una
+ventana negra un momento, es normal — no la cierres, se va sola.
 
 **Para cerrarla:** cierra la ventana de Tesorera como cualquier otra ventana.
 
