@@ -17,6 +17,7 @@ import {
 } from '../components/Piezas'
 import { Confirmacion, Dialogo } from '../components/Dialogo'
 import {
+  IconoAviso,
   IconoAnular,
   IconoArchivar,
   IconoImprimir,
@@ -157,172 +158,178 @@ export default function FichaPersona() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-        {/* La cuenta: lo que falta es el número más grande. */}
-        <div className="hoja h-fit p-5">
-          {!inscripcion ? (
-            <div className="text-center">
-              <p className="text-tinta2">Esta persona no está inscrita en el evento activo.</p>
-              {evento && evento.categorias.filter((c) => !c.archivada).length > 0 && (
-                <Boton variante="principal" className="mt-4" onClick={() => setCambiandoCupo(true)}>
-                  Inscribir en {evento.nombre}
-                </Boton>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* Mientras deba algo, lo que falta es el número más grande de la
-                  pantalla. Cuando ya pagó, "le falta RD$ 0" se lee raro: pasa a
-                  mandar el total que pagó, que es lo que ella va a querer decir. */}
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="rotulo">{cuenta.balance > 0 ? 'Le falta' : 'Pagó en total'}</span>
-                <ChipEstado estado={cuenta.estado} />
-              </div>
-              <div className="mt-1">
-                <Monto
-                  centavos={cuenta.balance > 0 ? cuenta.balance : cuenta.pagado}
-                  tam="cifraEnorme"
-                  className="leading-none"
-                />
+      {/* Una sola hoja: la cuenta como franja de cabecera y el historial a todo
+          el ancho debajo. Antes era una tarjeta estrecha más una columna medio
+          vacía, y con muchos pagos la columna se hacía un cordón interminable
+          mientras al lado sobraba media pantalla. */}
+      <div className="hoja overflow-hidden">
+        {!inscripcion ? (
+          <div className="px-6 py-12 text-center">
+            <p className="text-tinta2">Esta persona no está inscrita en el evento activo.</p>
+            {evento && evento.categorias.filter((c) => !c.archivada).length > 0 && (
+              <Boton variante="principal" className="mt-4" onClick={() => setCambiandoCupo(true)}>
+                Inscribir en {evento.nombre}
+              </Boton>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="px-6 pb-5 pt-6">
+              <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
+                <div>
+                  {/* Mientras deba algo, lo que falta manda. Cuando ya pagó,
+                      "le falta RD$ 0" se lee raro: pasa a mandar el total. */}
+                  <div className="mb-1 flex items-center gap-3">
+                    <span className="rotulo">{cuenta.balance > 0 ? 'Le falta' : 'Pagó en total'}</span>
+                    <ChipEstado estado={cuenta.estado} />
+                  </div>
+                  <Monto
+                    centavos={cuenta.balance > 0 ? cuenta.balance : cuenta.pagado}
+                    tam="cifraEnorme"
+                    className="leading-none"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
+                  <Dato rotulo="Precio del cupo" valor={formatoRD(cuenta.precio)} />
+                  <Dato rotulo="Ha pagado" valor={formatoRD(cuenta.pagado)} />
+                  <Dato rotulo={pagosVivos.length === 1 ? 'Abono' : 'Abonos'} valor={String(pagosVivos.length)} />
+                </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-5">
                 <BarraProgreso
                   pagado={cuenta.pagado}
                   precio={cuenta.precio}
                   estado={cuenta.estado}
-                  alto={10}
+                  alto={8}
                 />
               </div>
 
-              <dl className="mt-4 space-y-2 border-t border-linea pt-4 text-menuda">
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt className="text-tinta2">Precio del cupo</dt>
-                  <dd>
-                    <Monto centavos={cuenta.precio} className="font-medium" />
-                  </dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt className="text-tinta2">Ha pagado</dt>
-                  <dd>
-                    <Monto centavos={cuenta.pagado} className="font-medium" />
-                  </dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt className="text-tinta2">Abonos</dt>
-                  <dd className="cifra font-medium">{pagosVivos.length}</dd>
-                </div>
-              </dl>
-
-              {cuenta.excedente > 0 && (
-                <div className="mt-3">
-                  <Aviso>
-                    Pagó <span className="cifra font-medium">{formatoRD(cuenta.excedente)}</span> de más.
-                  </Aviso>
+              {(cuenta.excedente > 0 || inscripcion.precio_a_mano === 1) && (
+                <div className="mt-3 space-y-1.5">
+                  {cuenta.excedente > 0 && (
+                    <Nota>
+                      Pagó <span className="cifra font-medium text-tinta">{formatoRD(cuenta.excedente)}</span>{' '}
+                      de más.
+                    </Nota>
+                  )}
+                  {inscripcion.precio_a_mano === 1 && (
+                    <Nota>
+                      Este precio se puso a mano, así que no cambia cuando actualizas el precio del tipo de
+                      cupo.
+                    </Nota>
+                  )}
                 </div>
               )}
 
-              {inscripcion.precio_a_mano === 1 && (
-                <div className="mt-3">
-                  <Aviso>
-                    Este precio se puso a mano, así que no cambia cuando actualizas el precio del tipo de
-                    cupo.
-                  </Aviso>
-                </div>
-              )}
-
-              <Link to={`/registrar-pago?persona=${persona.id}`} className="mt-4 block">
-                <Boton variante="principal" grande className="w-full" icono={<IconoPago tam={19} />}>
-                  Registrar abono
-                </Boton>
-              </Link>
-              <Boton variante="texto" className="mt-1.5 w-full" onClick={() => setCambiandoCupo(true)}>
-                Cambiar tipo de cupo o precio
-              </Boton>
-            </>
-          )}
-        </div>
-
-        {/* Historial */}
-        <div className="hoja overflow-hidden">
-          <div className="border-b border-linea px-5 py-3.5">
-            <h2 className="font-semibold">Historial de pagos</h2>
-            {pagos.length > 0 && (
-              <p className="mt-0.5 text-menuda text-tinta2">
-                Los pagos anulados quedan tachados; nunca se borran.
-              </p>
-            )}
-          </div>
-
-          {pagos.length === 0 ? (
-            <div className="px-5 py-12 text-center">
-              <p className="font-medium">Todavía no ha abonado nada</p>
-              <p className="mx-auto mt-1 max-w-[36ch] text-menuda text-tinta2">
-                Cuando registres su primer abono aparecerá aquí, con la fecha y la forma de pago.
-              </p>
-              {inscripcion && (
+              <div className="mt-5 flex flex-wrap gap-2">
                 <Link to={`/registrar-pago?persona=${persona.id}`}>
-                  <Boton variante="principal" className="mt-4">
-                    Registrar su primer abono
+                  <Boton variante="principal" grande icono={<IconoPago tam={19} />}>
+                    Registrar abono
                   </Boton>
                 </Link>
+                <Boton variante="contorno" grande onClick={() => setCambiandoCupo(true)}>
+                  Cambiar cupo o precio
+                </Boton>
+              </div>
+            </div>
+
+            {/* Historial */}
+            <div className="flex items-baseline justify-between gap-3 border-t border-linea px-6 pb-2 pt-5">
+              <h2 className="font-semibold">Historial de pagos</h2>
+              {pagos.some((p) => p.anulado) && (
+                <p className="text-menuda text-tinta2">Los anulados quedan tachados; nunca se borran.</p>
               )}
             </div>
-          ) : (
-            <ul>
-              {pagos.map((p, i) => (
-                <li key={p.id} style={{ ['--i' as string]: Math.min(i, 10) }} className="entra-renglon renglon">
-                  <div className="flex min-h-[64px] items-center gap-3 px-5 py-3">
-                    <div className="min-w-0 flex-1">
-                      <p className={`font-medium ${p.anulado ? 'text-tinta3' : ''}`}>
-                        <span className={p.anulado ? 'line-through' : ''}>
-                          <Monto centavos={p.monto} tam="guia" className={p.anulado ? 'opacity-70' : ''} />
-                        </span>
-                        {p.anulado === 1 && (
-                          <span className="ml-2 rounded-full bg-[var(--sinpagos-fondo)] px-2 py-0.5 text-micro font-semibold uppercase text-[var(--sinpagos-tinta)]">
-                            Anulado
-                          </span>
-                        )}
-                      </p>
-                      <p className="mt-0.5 text-menuda text-tinta2">
-                        {fechaLarga(p.fecha)} · {NOMBRE_METODO[p.metodo] ?? 'Otro'}
-                        <span className="text-tinta3"> · {fechaRelativa(p.fecha)}</span>
-                      </p>
-                      {p.nota && <p className="mt-1 text-menuda text-tinta2">“{p.nota}”</p>}
-                      {p.anulado === 1 && (
-                        <p className="mt-1 text-menuda text-tinta3">
-                          Anulado{p.nota_anulacion ? `: ${p.nota_anulacion}` : ' sin nota'}
-                        </p>
-                      )}
-                    </div>
 
-                    {p.anulado === 0 && (
-                      <div className="flex shrink-0 gap-1">
-                        <Link
-                          to={`/comprobante/${p.id}`}
-                          aria-label={`Comprobante de ${formatoRD(p.monto)}`}
-                          title="Comprobante"
-                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.06)] hover:text-tinta"
-                        >
-                          <IconoImprimir tam={18} />
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => setAAnular(p)}
-                          aria-label={`Anular el pago de ${formatoRD(p.monto)}`}
-                          title="Anular este pago"
-                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(138,51,64,0.09)] hover:text-accion"
-                        >
-                          <IconoAnular tam={18} />
-                        </button>
+            {pagos.length === 0 ? (
+              <div className="px-6 pb-10 pt-4 text-center">
+                <p className="text-tinta2">
+                  Todavía no ha abonado nada. Su primer abono aparecerá aquí con la fecha y la forma de pago.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="hidden border-b border-linea px-6 py-2.5 sm:flex">
+                  <span className="rotulo w-[132px] shrink-0 text-right">Monto</span>
+                  <span className="rotulo flex-1 pl-6">Fecha</span>
+                  <span className="rotulo hidden w-[132px] shrink-0 md:block">Forma de pago</span>
+                  <span className="rotulo w-[104px] shrink-0 text-right">Acciones</span>
+                </div>
+
+                <ul>
+                  {pagos.map((p, i) => (
+                    <li
+                      key={p.id}
+                      style={{ ['--i' as string]: Math.min(i, 10) }}
+                      className="entra-renglon renglon"
+                    >
+                      <div className="flex min-h-[52px] items-center px-6 py-2">
+                        <span className="w-[132px] shrink-0 text-right">
+                          <span className={p.anulado ? 'line-through' : ''}>
+                            <Monto
+                              centavos={p.monto}
+                              className={p.anulado ? 'text-tinta3' : 'font-medium'}
+                            />
+                          </span>
+                        </span>
+
+                        <span className="min-w-0 flex-1 pl-6">
+                          <span className={`block truncate ${p.anulado ? 'text-tinta3' : ''}`}>
+                            {fechaLarga(p.fecha)}
+                            <span className="text-tinta3"> · {fechaRelativa(p.fecha)}</span>
+                          </span>
+                          {(p.nota || p.anulado === 1) && (
+                            <span className="block truncate text-menuda text-tinta2">
+                              {p.anulado === 1
+                                ? `Anulado${p.nota_anulacion ? `: ${p.nota_anulacion}` : ' sin nota'}`
+                                : `“${p.nota}”`}
+                            </span>
+                          )}
+                        </span>
+
+                        <span className="hidden w-[132px] shrink-0 text-menuda text-tinta2 md:block">
+                          {p.anulado === 1 ? (
+                            <span className="rounded-full bg-[var(--sinpagos-fondo)] px-2 py-0.5 text-menuda font-medium text-[var(--sinpagos-tinta)]">
+                              Anulado
+                            </span>
+                          ) : (
+                            (NOMBRE_METODO[p.metodo] ?? 'Otro')
+                          )}
+                        </span>
+
+                        <span className="flex w-[104px] shrink-0 justify-end gap-1">
+                          {p.anulado === 0 && (
+                            <>
+                              <Link
+                                to={`/comprobante/${p.id}`}
+                                aria-label={`Comprobante de ${formatoRD(p.monto)}`}
+                                title="Comprobante"
+                                className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.06)] hover:text-tinta"
+                              >
+                                <IconoImprimir tam={18} />
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => setAAnular(p)}
+                                aria-label={`Anular el pago de ${formatoRD(p.monto)}`}
+                                title="Anular este pago"
+                                className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(138,51,64,0.09)] hover:text-accion"
+                              >
+                                <IconoAnular tam={18} />
+                              </button>
+                            </>
+                          )}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </>
+        )}
       </div>
 
       {/* Anular un pago: confirmación clara y nota opcional del porqué. */}
@@ -370,6 +377,27 @@ export default function FichaPersona() {
           cargar()
         }}
       />
+    </div>
+  )
+}
+
+/** Nota al margen: informa sin gritar. Una caja de color aquí compite con la
+    cifra, que es lo que tiene que mandar en la pantalla. */
+function Nota({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-start gap-1.5 text-menuda text-tinta2">
+      <IconoAviso tam={15} className="mt-0.5 shrink-0 text-tinta3" />
+      <span>{children}</span>
+    </p>
+  )
+}
+
+/** Un dato de la franja de cuenta: rótulo arriba, cifra debajo. */
+function Dato({ rotulo, valor }: { rotulo: string; valor: string }) {
+  return (
+    <div>
+      <p className="rotulo mb-0.5">{rotulo}</p>
+      <p className="cifra text-guia font-medium">{valor}</p>
     </div>
   )
 }
@@ -549,8 +577,6 @@ function DialogoCupo({
             if (c && (!inscripcion || inscripcion.precio_a_mano === 0)) setPrecio(aTextoEditable(c.precio))
             setProblema(null)
           }}
-          columnas={2}
-          umbral={4}
           textoBuscar="Buscar tipo de cupo…"
         />
 

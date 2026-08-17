@@ -166,8 +166,6 @@ export function DialogoPersona({
                 setCategoriaId(id)
                 setProblema(null)
               }}
-              columnas={2}
-              umbral={4}
               textoBuscar="Buscar tipo de cupo…"
             />
           )

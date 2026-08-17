@@ -212,16 +212,18 @@ export default function RegistrarPago() {
 
   return (
     <div className="entra-hoja">
-      <h1 className="mb-1 text-titulo font-semibold">Registrar pago</h1>
-      <p className="mb-5 text-tinta2">
-        {elegida ? 'Escribe cuánto está abonando.' : 'Escribe el nombre de quien está pagando.'}
-      </p>
+      <div className={hayPanel ? 'mb-5' : 'mx-auto mb-5 max-w-[680px]'}>
+        <h1 className="text-titulo font-semibold">Registrar pago</h1>
+        <p className="mt-0.5 text-tinta2">
+          {elegida ? 'Escribe cuánto está abonando.' : 'Escribe el nombre de quien está pagando.'}
+        </p>
+      </div>
 
       <div
         className={
           hayPanel
             ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]'
-            : 'max-w-[720px]'
+            : 'mx-auto max-w-[680px]'
         }
       >
         <div className="hoja overflow-hidden">

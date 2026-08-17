@@ -52,6 +52,8 @@ const config: Config = {
         cifra: ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.018em' }],
         cifraGrande: ['2.5rem', { lineHeight: '1', letterSpacing: '-0.024em' }],
         cifraEnorme: ['3.5rem', { lineHeight: '1', letterSpacing: '-0.03em' }],
+        // El titular de Inicio: la única cifra de la app a este tamaño.
+        cifraTitular: ['4.25rem', { lineHeight: '0.95', letterSpacing: '-0.035em' }],
       },
       borderRadius: {
         hoja: '10px',

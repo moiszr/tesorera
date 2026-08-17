@@ -47,7 +47,7 @@ export function Dialogo({
   return (
     <dialog
       ref={ref}
-      className="dialogo m-auto flex max-h-[86vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-hoja bg-hoja p-0 text-tinta shadow-dialogo backdrop:bg-[rgba(40,28,18,0.42)]"
+      className="dialogo m-auto max-h-[86vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-hoja bg-hoja p-0 text-tinta shadow-dialogo backdrop:bg-[rgba(40,28,18,0.42)]"
       style={{ maxWidth: ancho }}
       onClick={(e) => {
         if (e.target === ref.current) alCerrar()

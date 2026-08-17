@@ -221,6 +221,13 @@
 
   /* El diálogo aparece desde un tamaño casi completo: nada nace de la nada.
      Se queda centrado (no está anclado a ningún botón). */
+  /* El display va SOLO aquí. Si se pone como clase de Tailwind, esa regla de
+     autor le gana al display:none que el navegador aplica al dialog cerrado, y
+     entonces cada diálogo cerrado sigue ocupando su altura en la página. */
+  dialog.dialogo[open] {
+    display: flex;
+  }
+
   dialog.dialogo {
     opacity: 1;
     transform: scale(1) translateY(0);

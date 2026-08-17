@@ -1,37 +1,36 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { normalizar } from '../lib/fechas'
-import { IconoBuscar, IconoCheque, IconoVolver } from './Iconos'
+import { IconoBajar, IconoBuscar, IconoCheque } from './Iconos'
 
 export type Opcion = {
   id: number
   etiqueta: string
-  /** Texto secundario que ayuda a decidir: el precio de un cupo, el pastor de una iglesia. */
+  /** Texto de apoyo: el precio de un cupo, el pastor de una iglesia. */
   detalle?: string
-  /** true cuando el detalle es dinero: va tabular, en negrita y a la derecha. */
+  /** true cuando el detalle es dinero: va tabular y a la derecha. */
   detalleNumerico?: boolean
-  /** Punto de color de identidad (las iglesias). */
   color?: string
 }
 
 /**
- * Selector de una opción que se ADAPTA a cuántas opciones hay.
+ * Elegir una opción dentro de un formulario.
  *
- * Con pocas, se muestran todas: elegir es un solo toque y se ven los precios
- * de un vistazo. Pasado el umbral eso deja de caber —quince iglesias en
- * botones son cinco filas— así que cambia a un campo con buscador que ocupa
- * siempre lo mismo, haya tres opciones o cincuenta.
+ * Es un campo de una línea que abre un menú, no una rejilla de botones. Con
+ * botones, tres iglesias y cuatro cupos ya se comían 500px de diálogo, y la
+ * cosa empeoraba con cada iglesia nueva. Así el formulario mide lo mismo tenga
+ * tres opciones o cincuenta, y se lee de arriba abajo como cualquier formulario.
  *
- * El panel se abre EN LÍNEA, empujando lo de abajo, en vez de flotar encima:
- * dentro de un diálogo con scroll un panel flotante se recorta solo.
+ * El menú usa la API `popover`: se dibuja sobre todo sin que lo recorte el
+ * scroll del diálogo, y cierra con Escape y al tocar afuera por su cuenta.
  */
 export function Selector({
   etiqueta,
   opciones,
   valor,
   alElegir,
-  umbral = 6,
-  textoBuscar = 'Buscar…',
-  columnas = 1,
+  textoBuscar,
+  umbralBusqueda = 7,
+  marcador = 'Elegir…',
   ayuda,
   problema,
 }: {
@@ -39,18 +38,21 @@ export function Selector({
   opciones: Opcion[]
   valor: number | undefined
   alElegir: (id: number) => void
-  umbral?: number
   textoBuscar?: string
-  columnas?: 1 | 2
+  umbralBusqueda?: number
+  marcador?: string
   ayuda?: string
   problema?: string | null
 }) {
+  const id = useId().replace(/:/g, '')
+  const boton = useRef<HTMLButtonElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+  const campo = useRef<HTMLInputElement>(null)
   const [abierto, setAbierto] = useState(false)
   const [busqueda, setBusqueda] = useState('')
-  const campo = useRef<HTMLInputElement>(null)
 
-  const muchas = opciones.length > umbral
   const elegida = opciones.find((o) => o.id === valor)
+  const conBuscador = opciones.length > umbralBusqueda
 
   const filtradas = useMemo(() => {
     const t = normalizar(busqueda)
@@ -58,31 +60,94 @@ export function Selector({
     return opciones.filter((o) => normalizar(o.etiqueta).includes(t))
   }, [busqueda, opciones])
 
-  useEffect(() => {
-    if (abierto) requestAnimationFrame(() => campo.current?.focus())
-    else setBusqueda('')
-  }, [abierto])
+  function abrir() {
+    const p = panel.current
+    const b = boton.current
+    if (!p || !b) return
+    const r = b.getBoundingClientRect()
+    p.style.left = `${r.left}px`
+    p.style.width = `${r.width}px`
+    // Si abajo no cabe, se abre hacia arriba.
+    const altoFila = opciones.some((o) => o.detalle && !o.detalleNumerico) ? 58 : 44
+    const alto = Math.min(320, opciones.length * altoFila + (conBuscador ? 44 : 0) + 16)
+    const cabeAbajo = r.bottom + 6 + alto < window.innerHeight - 12
+    p.style.top = cabeAbajo ? `${r.bottom + 6}px` : `${Math.max(12, r.top - alto - 6)}px`
+    p.showPopover()
+  }
 
-  function elegir(id: number) {
-    alElegir(id)
-    setAbierto(false)
+  useEffect(() => {
+    const p = panel.current
+    if (!p) return
+    const alCambiar = () => {
+      const visible = p.matches(':popover-open')
+      setAbierto(visible)
+      if (visible) requestAnimationFrame(() => campo.current?.focus())
+      else setBusqueda('')
+    }
+    p.addEventListener('toggle', alCambiar)
+    return () => p.removeEventListener('toggle', alCambiar)
+  }, [])
+
+  function elegir(v: number) {
+    alElegir(v)
+    panel.current?.hidePopover()
   }
 
   return (
     <div>
-      <span className="mb-2 block text-menuda font-medium text-tinta2">{etiqueta}</span>
+      <span className="mb-1.5 block text-menuda font-medium text-tinta2">{etiqueta}</span>
 
-      {!muchas ? (
-        <div className={columnas === 2 ? 'grid gap-1.5 sm:grid-cols-2' : 'flex flex-wrap gap-1.5'}>
-          {opciones.map((o) => (
-            <BotonOpcion key={o.id} opcion={o} elegida={o.id === valor} onClick={() => alElegir(o.id)} />
-          ))}
-        </div>
-      ) : abierto ? (
-        <div className="rounded-pieza border border-accion bg-hoja">
+      <button
+        ref={boton}
+        type="button"
+        onClick={() => (abierto ? panel.current?.hidePopover() : abrir())}
+        aria-expanded={abierto}
+        aria-haspopup="listbox"
+        aria-invalid={problema ? true : undefined}
+        className={[
+          'flex min-h-[46px] w-full items-center gap-2.5 rounded-pieza bg-hoja px-3 text-left',
+          'border transition-colors duration-150',
+          problema
+            ? 'border-accion'
+            : abierto
+              ? 'border-accion ring-2 ring-[rgba(138,51,64,0.18)]'
+              : 'border-lineaFuerte hover:border-tinta3',
+        ].join(' ')}
+      >
+        {elegida?.color && (
+          <span
+            className="h-2.5 w-2.5 shrink-0 rounded-full"
+            style={{ background: elegida.color }}
+            aria-hidden
+          />
+        )}
+        {elegida ? (
+          <>
+            <span className="min-w-0 flex-1 truncate">{elegida.etiqueta}</span>
+            {/* En el campo solo se repite el detalle si es dinero: el precio
+                confirma lo que va a pagar. Un detalle de texto (el pastor) sirve
+                para ELEGIR, no para confirmar, así que vive solo en el menú y
+                aquí solo le robaría sitio al nombre. */}
+            {elegida.detalle && elegida.detalleNumerico && (
+              <span className="cifra shrink-0 font-medium text-tinta2">{elegida.detalle}</span>
+            )}
+          </>
+        ) : (
+          <span className="flex-1 text-tinta3">{marcador}</span>
+        )}
+        <IconoBajar tam={16} className="shrink-0 text-tinta3" />
+      </button>
+
+      <div
+        ref={panel}
+        id={id}
+        {...({ popover: 'auto' } as Record<string, string>)}
+        className="menu-filtro fixed m-0 overflow-hidden rounded-hoja bg-hoja p-0 shadow-dialogo"
+      >
+        {conBuscador && (
           <div className="relative border-b border-linea">
             <IconoBuscar
-              tam={18}
+              tam={17}
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tinta3"
             />
             <input
@@ -90,104 +155,70 @@ export function Selector({
               type="search"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder={textoBuscar}
-              aria-label={textoBuscar}
+              placeholder={textoBuscar ?? `Buscar ${etiqueta.toLowerCase()}…`}
+              aria-label={textoBuscar ?? `Buscar ${etiqueta.toLowerCase()}`}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  e.preventDefault()
-                  setAbierto(false)
-                } else if (e.key === 'Enter' && filtradas.length > 0) {
+                if (e.key === 'Enter' && filtradas.length > 0) {
                   e.preventDefault()
                   elegir(filtradas[0].id)
                 }
               }}
-              className="h-[44px] w-full rounded-t-pieza bg-transparent pl-10 pr-3 placeholder:text-tinta3 focus:outline-none"
+              className="h-[44px] w-full bg-transparent pl-9 pr-3 text-menuda placeholder:text-tinta3 focus:outline-none"
             />
           </div>
+        )}
 
-          <ul className="max-h-[220px] overflow-y-auto py-1" role="listbox">
-            {filtradas.length === 0 ? (
-              <li className="px-3 py-4 text-center text-menuda text-tinta2">
-                Nada coincide con “{busqueda}”.
-              </li>
-            ) : (
-              filtradas.map((o) => (
-                <li key={o.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={o.id === valor}
-                    onClick={() => elegir(o.id)}
-                    className="flex min-h-[44px] w-full items-center gap-2.5 px-3 text-left transition-colors duration-150 hover:bg-hoja2"
-                  >
-                    {o.color && (
-                      <span
-                        className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ background: o.color }}
-                        aria-hidden
-                      />
-                    )}
-                    <span className="min-w-0 flex-1 truncate">{o.etiqueta}</span>
-                    {o.detalle && (
-                      <span
-                        className={`shrink-0 text-menuda text-tinta2 ${o.detalleNumerico ? 'cifra' : ''}`}
-                      >
-                        {o.detalle}
-                      </span>
-                    )}
-                    {o.id === valor && <IconoCheque tam={17} className="shrink-0 text-accion" />}
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-
-          <div className="border-t border-linea px-2 py-1.5">
-            <button
-              type="button"
-              onClick={() => setAbierto(false)}
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-pieza px-3 text-menuda text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
-            >
-              <IconoVolver tam={15} />
-              Cerrar
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setAbierto(true)}
-          aria-invalid={problema ? true : undefined}
-          className={[
-            'flex min-h-[46px] w-full items-center gap-2.5 rounded-pieza px-3 text-left',
-            'border transition-colors duration-150 active:scale-[0.995]',
-            problema ? 'border-accion' : 'border-lineaFuerte hover:border-tinta3',
-          ].join(' ')}
-        >
-          {elegida ? (
-            <>
-              {elegida.color && (
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ background: elegida.color }}
-                  aria-hidden
-                />
-              )}
-              <span className="min-w-0 flex-1 truncate">{elegida.etiqueta}</span>
-              {elegida.detalle && (
-                <span
-                  className={`shrink-0 truncate text-menuda text-tinta2 ${elegida.detalleNumerico ? 'cifra' : ''}`}
-                >
-                  {elegida.detalle}
-                </span>
-              )}
-            </>
+        <ul className="max-h-[280px] overflow-y-auto py-1" role="listbox">
+          {filtradas.length === 0 ? (
+            <li className="px-3 py-4 text-center text-menuda text-tinta2">Nada coincide.</li>
           ) : (
-            <span className="flex-1 text-tinta3">Elegir…</span>
+            filtradas.map((o) => (
+              <li key={o.id}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={o.id === valor}
+                  onClick={() => elegir(o.id)}
+                  className={[
+                    'flex min-h-[44px] w-full items-center gap-2.5 px-3 py-1.5 text-left',
+                    'transition-colors duration-150',
+                    o.id === valor ? 'bg-[rgba(138,51,64,0.08)] text-accion' : 'hover:bg-hoja2',
+                  ].join(' ')}
+                >
+                  {o.color && (
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: o.color }}
+                      aria-hidden
+                    />
+                  )}
+                  {/* El precio va a la derecha, porque se compara en columna.
+                      Un detalle de texto va debajo, porque compitiendo en la
+                      misma línea trunca el nombre, que es lo que ella lee. */}
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate ${o.id === valor ? 'font-medium' : ''}`}>
+                      {o.etiqueta}
+                    </span>
+                    {o.detalle && !o.detalleNumerico && (
+                      <span className="block truncate text-menuda text-tinta2">{o.detalle}</span>
+                    )}
+                  </span>
+                  {o.detalle && o.detalleNumerico && (
+                    <span
+                      className={`cifra shrink-0 font-medium text-menuda ${
+                        o.id === valor ? 'text-accion' : 'text-tinta2'
+                      }`}
+                    >
+                      {o.detalle}
+                    </span>
+                  )}
+                  {o.id === valor && <IconoCheque tam={16} className="shrink-0 text-accion" />}
+                </button>
+              </li>
+            ))
           )}
-          <span className="shrink-0 text-menuda text-tinta2">Cambiar</span>
-        </button>
-      )}
+        </ul>
+      </div>
 
       {problema ? (
         <p className="mt-1.5 text-menuda text-accion">{problema}</p>
@@ -195,67 +226,5 @@ export function Selector({
         <p className="mt-1.5 text-menuda text-tinta2">{ayuda}</p>
       ) : null}
     </div>
-  )
-}
-
-function BotonOpcion({
-  opcion,
-  elegida,
-  onClick,
-}: {
-  opcion: Opcion
-  elegida: boolean
-  onClick: () => void
-}) {
-  // Con detalle (un precio) el botón crece a dos líneas para que el número se
-  // lea igual de bien que el nombre: elegir el cupo ES elegir el precio.
-  if (opcion.detalle) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        aria-pressed={elegida}
-        className={[
-          'flex min-h-[58px] flex-col justify-center rounded-pieza px-3.5 py-2 text-left',
-          'border transition-colors duration-150 active:scale-[0.99]',
-          elegida
-            ? 'border-accion bg-[rgba(138,51,64,0.07)]'
-            : 'border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
-        ].join(' ')}
-      >
-        <span className={`text-menuda font-medium leading-snug ${elegida ? 'text-accion' : 'text-tinta'}`}>
-          {opcion.etiqueta}
-        </span>
-        <span
-          className={[
-            'mt-0.5 truncate',
-            opcion.detalle && opcion.detalleNumerico ? 'cifra font-semibold' : 'text-menuda',
-            elegida ? 'text-accion' : 'text-tinta2',
-          ].join(' ')}
-        >
-          {opcion.detalle}
-        </span>
-      </button>
-    )
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={elegida}
-      className={[
-        'inline-flex min-h-[46px] items-center gap-2 rounded-pieza px-3 text-menuda font-medium',
-        'border transition-colors duration-150 active:scale-[0.98]',
-        elegida
-          ? 'border-accion bg-[rgba(138,51,64,0.08)] text-accion'
-          : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
-      ].join(' ')}
-    >
-      {opcion.color && (
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: opcion.color }} aria-hidden />
-      )}
-      {opcion.etiqueta}
-    </button>
   )
 }
