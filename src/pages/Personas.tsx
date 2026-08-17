@@ -15,7 +15,7 @@ import {
 } from '../components/Piezas'
 import { DialogoPersona } from '../components/DialogoPersona'
 import { FiltroMenu } from '../components/FiltroMenu'
-import { IconoBuscar, IconoMas, IconoPago } from '../components/Iconos'
+import { IconoBuscar, IconoMas } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
 
@@ -323,19 +323,22 @@ export default function Personas() {
                     <ChipEstado estado={p.estado} />
                   </span>
 
-                  {/* Cobrar desde la fila. Siempre visible, en todas: un botón
-                      que solo aparece al pasar por encima es un botón que no se
-                      sabe que existe, y con trackpad ni siquiera hay hover
-                      fiable. Fondo suave del acento para que 64 de ellos formen
-                      una columna tranquila y no un muro de botones. */}
+                  {/* Cobrar desde la fila, en todas y siempre visible.
+                      Contorno blanco en vez de relleno: 64 botones con fondo de
+                      color forman una columna que le grita más fuerte que los
+                      propios números. Sin icono —el billete a 16px se leía como
+                      un rectangulito sucio y la palabra ya lo dice todo—, y el
+                      relleno del acento se reserva para el hover, que es cuando
+                      hay UN botón mirándote y no sesenta y cuatro.
+                      El ::before le devuelve los 46px de zona de clic que la
+                      caja de 34px no tiene, sin deformarla ni salirse de la fila. */}
                   <span className="pointer-events-auto flex w-[112px] shrink-0 justify-end pl-3">
                     {p.inscripcion_id && (
                       <Link
                         to={`/registrar-pago?persona=${p.id}`}
                         aria-label={`Registrar un abono de ${p.nombre}`}
-                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-pieza bg-accionSuave px-3 text-menuda font-semibold text-accionTexto transition-colors duration-150 hover:bg-accion hover:text-white active:scale-[0.97]"
+                        className="relative inline-flex h-[34px] items-center rounded-pieza border border-linea bg-hoja px-3.5 text-menuda font-medium text-tinta shadow-[0_1px_1px_rgba(24,24,27,0.04)] transition-colors duration-150 before:absolute before:inset-x-0 before:-inset-y-[6px] before:content-[''] group-hover:border-lineaFuerte hover:!border-accion hover:!bg-accion hover:!text-white active:scale-[0.97]"
                       >
-                        <IconoPago tam={16} />
                         Cobrar
                       </Link>
                     )}
