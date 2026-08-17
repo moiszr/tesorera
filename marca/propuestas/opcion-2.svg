@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Tesorera — opción 2: lo abonado y lo que falta</title>
+  <!--
+    Dirección: el progreso del abono, que es literalmente de lo que va la app.
+
+    Es la barra de progreso del sistema —canal en {linea-fuerte}, relleno en el
+    acento, remates redondos— cerrada sobre sí misma para que quepa en un
+    cuadrado. El tramo lleno es lo pagado; el gris que queda es lo que falta.
+    Arranca a las 12 y gira a favor del reloj, como se lee un reloj y como se
+    lee una meta.
+
+    El campo es la hoja blanca del sistema, definida por una raya y no por una
+    sombra. En una barra de tareas clara el cuadrado casi desaparece y el
+    anillo queda flotando: da igual, el anillo es la marca — la silueta la
+    carga la figura, no el fondo.
+
+    El relleno usa {accion} (#635bff) y no {accion-texto} porque aquí el morado
+    es superficie, no letra: la regla del acento en dos tonos. Es la única de
+    las tres que se queda con el morado exacto de la interfaz.
+
+    Trazo del anillo: 80px = 2,5px a 16. Diámetro exterior 384px = 12px a 16.
+  -->
+  <rect width="512" height="512" rx="112" fill="#FFFFFF" />
+  <rect x="3" y="3" width="506" height="506" rx="110" fill="none" stroke="#D4D4D8" stroke-width="6" />
+
+  <!-- Canal: lo que falta -->
+  <circle cx="256" cy="256" r="152" fill="none" stroke="#D4D4D8" stroke-width="80" />
+  <!-- Relleno: lo abonado (≈74% contando los remates redondos) -->
+  <circle cx="256" cy="256" r="152" fill="none" stroke="#635BFF" stroke-width="80"
+          stroke-linecap="round" stroke-dasharray="630 955"
+          transform="rotate(-90 256 256)" />
+</svg>

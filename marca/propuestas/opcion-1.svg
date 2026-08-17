@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Tesorera — opción 1: la T con su raya de total</title>
+  <!--
+    Dirección: monograma.
+
+    La inicial del nombre, dibujada como se dibuja un encabezado de columna: una
+    raya ancha arriba y el asta bajando desde su centro. Debajo, más corta, la
+    raya de total — la que se traza bajo una columna de cifras antes de escribir
+    la suma. Se lee "T" de Tesorera y se lee "una cuenta cerrada"; son la misma
+    forma.
+
+    Sin papel, sin lomo, sin nostalgia: tres rectángulos y un campo de color.
+    Tres formas es lo máximo que sobrevive a 16px, y ninguna baja de 52px de
+    grosor (1,6px cuando el icono mide 16). El hueco entre el asta y la raya es
+    de 44px: a 16px sigue midiendo 1,4px, que es lo que hace falta para que no
+    se peguen.
+
+    El campo es violeta profundo (#6D28D9), vecino de tono del acento de la app
+    pero un paso más oscuro y más cálido — no es el azul-violeta de Stripe.
+  -->
+  <rect width="512" height="512" rx="112" fill="#6D28D9" />
+
+  <!-- Encabezado de columna -->
+  <rect x="76" y="80" width="360" height="84" rx="28" fill="#FFFFFF" />
+  <!-- Asta -->
+  <rect x="214" y="80" width="84" height="256" rx="28" fill="#FFFFFF" />
+  <!-- Raya de total: más corta que el encabezado, para que se lea como suma y no como subrayado -->
+  <rect x="140" y="380" width="232" height="52" rx="26" fill="#C7B8FF" />
+</svg>
