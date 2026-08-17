@@ -53,8 +53,13 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
                   [
                     'flex min-h-[44px] items-center gap-2.5 rounded-pieza px-2.5 text-menuda',
                     'transition-colors duration-150',
+                    // Píldora sólida en el acento. Fondo suave + borde + texto
+                    // de color eran tres señales para decir una cosa y se veía
+                    // recargado; y el blanco sobre gris no se distinguía. Una
+                    // píldora llena no deja duda y es lo que hacen las
+                    // herramientas actuales.
                     isActive
-                      ? 'bg-accionSuave font-semibold text-accionTexto ring-1 ring-accionBorde'
+                      ? 'bg-accion font-semibold text-white shadow-[0_1px_2px_rgba(99,91,255,0.35)]'
                       : 'font-medium text-tinta2 hover:bg-[rgba(24,24,27,0.05)] hover:text-tinta',
                   ].join(' ')
                 }

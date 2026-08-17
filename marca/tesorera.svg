@@ -14,13 +14,13 @@
 
   <g clip-path="url(#cubierta)">
     <!-- Cubierta de tela -->
-    <rect width="512" height="512" fill="#0070f3" />
+    <rect width="512" height="512" fill="#635bff" />
 
     <!-- El lomo: banda más oscura con los dos nervios de la encuadernación -->
-    <rect x="0" y="0" width="104" height="512" fill="#005ed1" />
-    <rect x="96" y="0" width="8" height="512" fill="#01458f" />
-    <rect x="30" y="150" width="44" height="14" rx="7" fill="#7cc0fd" />
-    <rect x="30" y="348" width="44" height="14" rx="7" fill="#7cc0fd" />
+    <rect x="0" y="0" width="104" height="512" fill="#544aeb" />
+    <rect x="96" y="0" width="8" height="512" fill="#3f34a8" />
+    <rect x="30" y="150" width="44" height="14" rx="7" fill="#a5a0ff" />
+    <rect x="30" y="348" width="44" height="14" rx="7" fill="#a5a0ff" />
 
     <!-- La hoja -->
     <rect x="152" y="96" width="296" height="320" rx="16" fill="#fffdf8" />
@@ -30,7 +30,7 @@
     <rect x="194" y="96" width="12" height="320" fill="#f59e0b" />
 
     <!-- Los renglones escritos, y el último más corto: una cuenta a medias -->
-    <rect x="236" y="164" width="176" height="22" rx="11" fill="#0070f3" />
+    <rect x="236" y="164" width="176" height="22" rx="11" fill="#635bff" />
     <rect x="236" y="234" width="176" height="22" rx="11" fill="#c9c0b2" />
     <rect x="236" y="304" width="104" height="22" rx="11" fill="#c9c0b2" />
   </g>

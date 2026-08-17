@@ -262,14 +262,15 @@ function Metrica({
   apoyo: string
   fuerte?: boolean
 }) {
+  // Las cuatro son idénticas. La jerarquía la da el orden y el tamaño de la
+  // cifra, no pintar una de color: una tarjeta de color entre tres blancas se
+  // lee como "seleccionada", no como "la más importante".
   return (
-    <div
-      className={`hoja p-4 ${fuerte ? '!border-accionBorde bg-accionSuave' : ''}`}
-    >
+    <div className="hoja p-4">
       <p className="rotulo">{rotulo}</p>
       <p
         className={`cifra mt-1.5 font-semibold leading-none ${
-          fuerte ? 'text-cifraGrande text-accionTexto' : 'text-cifra'
+          fuerte ? 'text-cifraGrande' : 'text-cifra'
         }`}
       >
         {valor}

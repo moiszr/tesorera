@@ -282,7 +282,7 @@ export default function RegistrarPago() {
                     'cifra w-full rounded-pieza bg-hoja2 py-3 pl-[4.2rem] pr-4 text-cifraGrande font-semibold',
                     'border transition-colors duration-150',
                     problema ? 'border-accion' : 'border-lineaFuerte',
-                    'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(0,112,243,0.18)]',
+                    'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(99,91,255,0.18)]',
                     'placeholder:text-tinta3',
                   ].join(' ')}
                 />
@@ -333,7 +333,7 @@ export default function RegistrarPago() {
                           'min-h-[46px] flex-1 rounded-pieza px-2 text-menuda font-medium',
                           'border transition-colors duration-150 active:scale-[0.98]',
                           metodo === m.valor
-                            ? 'border-accion bg-[rgba(0,112,243,0.09)] text-accionTexto'
+                            ? 'border-accion bg-[rgba(99,91,255,0.10)] text-accionTexto'
                             : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
                         ].join(' ')}
                       >
@@ -446,7 +446,7 @@ function CampoFecha({ fecha, setFecha }: { fecha: string; setFecha: (v: string) 
             }
           }}
           aria-label="Fecha del pago"
-          className="w-full min-h-[46px] rounded-pieza border border-accion bg-hoja px-3 focus:outline-none focus:ring-2 focus:ring-[rgba(0,112,243,0.18)]"
+          className="w-full min-h-[46px] rounded-pieza border border-accion bg-hoja px-3 focus:outline-none focus:ring-2 focus:ring-[rgba(99,91,255,0.18)]"
         />
       ) : (
         <button
@@ -600,7 +600,7 @@ const BuscadorPersona = forwardRef<
               }
             }}
             placeholder="Escribe el nombre…"
-            className="w-full rounded-pieza border border-lineaFuerte bg-hoja2 py-3 pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(0,112,243,0.18)]"
+            className="w-full rounded-pieza border border-lineaFuerte bg-hoja2 py-3 pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(99,91,255,0.18)]"
           />
         </div>
         <p className="mt-2 text-menuda text-tinta3">

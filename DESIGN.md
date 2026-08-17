@@ -14,11 +14,11 @@ colors:
   linea-impresa: "#c9c9cf"
   lomo: "#f1f1f3"
   lomo-texto: "#52525b"
-  lomo-activo: "#ffffff"
-  accion: "#2563eb"
-  accion-alto: "#1d4ed8"
-  accion-suave: "#eff6ff"
-  accion-borde: "#bfdbfe"
+  accion: "#635bff"
+  accion-texto: "#5a4fe8"
+  accion-alto: "#544aeb"
+  accion-suave: "#eeedff"
+  accion-borde: "#c5c2ff"
   pagado-fondo: "#dcfce7"
   pagado-tinta: "#166534"
   pagado-marca: "#16a34a"
@@ -28,8 +28,8 @@ colors:
   sinpagos-fondo: "#f4f4f5"
   sinpagos-tinta: "#52525b"
   sinpagos-marca: "#d4d4d8"
-  aviso-fondo: "#eff6ff"
-  aviso-tinta: "#1e40af"
+  aviso-fondo: "#eeedff"
+  aviso-tinta: "#3f34a8"
   iglesia-indigo: "#4a5578"
   iglesia-pizarra: "#41525c"
   iglesia-arcilla: "#8a5a3c"
@@ -139,7 +139,7 @@ components:
     padding: "0 16px"
     height: "44px"
   boton-suave:
-    backgroundColor: "rgba(37, 99, 235, 0.08)"
+    backgroundColor: "rgba(99, 91, 255, 0.09)"
     textColor: "{colors.accion}"
     rounded: "{rounded.pieza}"
     padding: "0 16px"
@@ -196,7 +196,7 @@ components:
     width: "280px"
     typography: "{typography.menuda}"
   filtro-boton-activo:
-    backgroundColor: "rgba(37, 99, 235, 0.09)"
+    backgroundColor: "rgba(99, 91, 255, 0.10)"
     textColor: "{colors.accion}"
     rounded: "{rounded.pieza}"
     padding: "0 12px"
@@ -221,7 +221,7 @@ components:
     height: "44px"
     typography: "{typography.menuda}"
   menu-opcion-elegida:
-    backgroundColor: "rgba(37, 99, 235, 0.09)"
+    backgroundColor: "rgba(99, 91, 255, 0.10)"
     textColor: "{colors.accion}"
     padding: "0 12px"
     height: "44px"
@@ -238,7 +238,7 @@ components:
     height: "44px"
     typography: "{typography.menuda}"
   lomo-entrada-activa:
-    backgroundColor: "{colors.lomo-activo}"
+    backgroundColor: "{colors.accion-suave}"
     textColor: "{colors.accion}"
     rounded: "{rounded.pieza}"
     padding: "0 10px"
@@ -274,19 +274,22 @@ consigo misma, y la disciplina de no meter ornamento entre la usuaria y el núme
 
 Hoy la identidad la cargan tres cosas y ninguna es una textura: **neutros fríos**
 (lienzo `{colors.fondo}`, superficies blancas, rayas `{colors.linea}`), **un solo
-acento azul vivo** (`{colors.accion}`) reservado a las acciones, a la entrada activa
+acento morado** (`{colors.accion}`) reservado a las acciones, a la entrada activa
 de la navegación y al progreso agregado, y **las cifras tabulares**. La barra lateral
 es clara, del tono del lienzo y separada por una raya: el bloque de color saturado a
 la izquierda era lo que más envejecía la pantalla —pesa mucho, compite con el
 contenido y no lo hace ninguna herramienta actual—.
 
-El acento **no** es el vino oxblood de las primeras versiones: el usuario pidió
-expresamente color vivo tirando a azul, *tipo Notion*, y el oxblood se retiró con el
-resto de la paleta cálida. El azul se eligió con un dato, no por gusto: a 5.2:1 sobre
-blanco sirve **igual de fondo de botón que de texto**, que es justo lo que necesita un
-acento que tiene que funcionar en un botón sólido, en la entrada activa de la lateral
-y en una cifra destacada. Los estados de pago también subieron de saturación en el
-mismo movimiento: un verde y un ámbar lavados se leían a documento viejo.
+El acento **no** es el vino oxblood de las primeras versiones: el usuario pidió color
+vivo, y el oxblood se retiró con el resto de la paleta cálida. El morado actual lo
+eligió él directamente. Lo que sí es decisión de sistema —y hay que respetarla— es que
+el acento viene en **dos tonos del mismo morado**, porque uno solo no da: el brillante
+mide 4.70:1 sobre blanco puro pero **cae a 4.16 sobre la lateral y a 4.07 sobre su
+propio fondo lavado**, es decir, no llega a AA como texto sobre las superficies donde
+la app lo usa. Por eso el brillante es de **superficie** y el oscuro es de **texto**
+(ver *La regla del acento en dos tonos*). Los estados de pago también subieron de
+saturación en el mismo movimiento: un verde y un ámbar lavados se leían a documento
+viejo.
 
 La densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre
 raíz de 17px, renglones de 44–66px, barras de herramientas de 44px, todo dentro de
@@ -315,7 +318,7 @@ siempre acompañados de su texto.
   sin raya de margen, sin ornamento de época**: se retiró y no vuelve.
 - Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y
   rótulos en minúscula (nunca versalitas espaciadas).
-- Un solo acento (azul vivo) para acciones, entrada activa, progreso agregado y la
+- Un solo acento (morado) para acciones, entrada activa, progreso agregado y la
   métrica que manda; verde/ámbar/gris solo para estado de pago.
 - Toda cifra vive sobre una hoja y va acompañada de un rótulo arriba y una línea de
   apoyo debajo: un número sin contexto no se publica.
@@ -329,12 +332,12 @@ siempre acompañados de su texto.
 ## Colors
 
 Neutros fríos de producto de datos —lienzo, blanco y dos grises de raya— con un
-único azul vivo que carga todas las acciones y tres colores de estado que solo dicen
+único morado que carga todas las acciones y tres colores de estado que solo dicen
 cómo va un pago.
 
 ### Primary
 
-- **Azul de acción** (`{colors.accion}`): el único acento de la app. Elegido con un
+- **Morado de acción** (`{colors.accion}`): el único acento de la app. Elegido con un
   dato: a **5.2:1 sobre blanco** funciona igual de fondo de botón que de texto, que
   es exactamente lo que se le pide. Botón sólido principal, texto de la entrada
   activa de la lateral, cifra de la métrica destacada, relleno de la barra de
@@ -378,8 +381,8 @@ app.
 
 ### Tertiary
 
-- **Aviso tranquilo** (`{colors.aviso-fondo}` / `{colors.aviso-tinta}`): azul lavado
-  —el mismo fondo que `{colors.accion-suave}`, con una tinta azul más oscura. Es el
+- **Aviso tranquilo** (`{colors.aviso-fondo}` / `{colors.aviso-tinta}`): morado lavado
+  —el mismo fondo que `{colors.accion-suave}`, con una tinta morada más oscura. Es el
   tono del componente `Aviso` neutro, que se usa donde hay que
   interrumpir o explicar un número que no cuadra: los avisos de Ajustes al cambiar
   precios, y en la cuenta de la ficha el excedente pagado de más y el precio puesto a
@@ -407,8 +410,8 @@ app.
   archivados de Ajustes, el fondo del campo de monto y del buscador del cobro, y el
   número de paso.
 - **Lateral** (`{colors.lomo}`): el gris de la barra de navegación, medio escalón por
-  debajo del lienzo. `{colors.lomo-activo}` (blanco) es la entrada activa y
-  `{colors.lomo-texto}` la tinta en reposo de las entradas.
+  debajo del lienzo; `{colors.lomo-texto}` es la tinta en reposo de las entradas. La
+  entrada activa **no** usa un neutro propio: usa el registro lavado del acento.
 - **Tinta** (`{colors.tinta}`): texto principal, 16.6–17.7:1 sobre los fondos.
   **Tinta segunda** (`{colors.tinta-2}`): rótulos, bajadas, texto de apoyo y el "RD$"
   que precede a una cifra, 7.2–7.7:1. **Tinta tercera** (`{colors.tinta-3}`):
@@ -430,7 +433,7 @@ app.
 ### Named Rules
 
 **La regla del acento único.** Hay un solo color de acción en toda la app y es la
-familia azul. Si una pantalla nueva necesita "otro color para destacar algo", la
+familia morada. Si una pantalla nueva necesita "otro color para destacar algo", la
 respuesta es jerarquía tipográfica, un rótulo o el acento — nunca un color nuevo.
 Prueba concreta: en cualquier captura debe haber **un solo botón sólido**.
 
@@ -712,9 +715,6 @@ Los botones no se levantan al hover: cambian de color y se hunden un 2% al presi
 - **hoja** (`border: 1px solid var(--linea)` + `box-shadow: 0 1px 2px rgba(24,28,27,0.04)`,
   en el código `rgba(24,24,27,0.04)`): el reposo de toda superficie de contenido. El
   borde es lo que la define; la sombra solo evita que se vea pegada como una calcomanía.
-- **entrada activa** (`0 1px 2px rgba(24,24,27,0.07)`): el único filo de la lateral.
-  Levanta apenas la entrada activa sobre el gris de la barra, para que se lea como una
-  pastilla blanca y no como un cambio de color.
 - **dialogo** (`0 1px 2px rgba(24,24,27,0.06), 0 12px 28px -8px rgba(24,24,27,0.16), 0 32px 64px -24px rgba(24,24,27,0.22)`):
   la sombra de la capa superior. La usan el `<dialog>` **y los menús de popover** de
   `FiltroMenu` y `Selector`. Es la misma sombra a propósito: las dos cosas están al mismo
@@ -723,9 +723,10 @@ Los botones no se levantan al hover: cambian de color y se hunden un 2% al presi
 ### Named Rules
 
 **La regla del trazo antes que la luz.** Una superficie se delimita con una raya; la
-sombra solo se usa cuando algo está de verdad por encima (diálogo, menú, toast, entrada
-activa). Si un bloque nuevo pide sombra para verse separado, lo que le falta es una raya
-o aire.
+sombra solo se usa cuando algo está de verdad por encima (diálogo, menú, toast). Todo lo
+que solo está *señalado* —la entrada activa de la lateral, la métrica destacada— se marca
+con color y anillo, no con sombra. Si un bloque nuevo pide sombra para verse separado, lo
+que le falta es una raya o aire.
 
 **La regla del velo, no de la sombra.** Lo que separa un menú de un diálogo no es cuánto
 flota sino si oscurece la pantalla: el diálogo interrumpe y lleva velo; el menú es un
@@ -776,7 +777,7 @@ Carácter: piezas compactas. Cambian de color, no de altura.
   borde sube a `{colors.tinta-3}` y el fondo a `{colors.hoja-2}`. La acción secundaria de
   igual peso ("Agregar persona" junto a "Registrar pago" en Inicio, "Cambiar cupo o
   precio", los montos rápidos del cobro).
-- **suave:** fondo `rgba(37,99,235,0.08)` (0.12 al hover), texto de acción, sin borde.
+- **suave:** fondo `rgba(99,91,255,0.09)` (0.12 al hover), texto de acción, sin borde.
   Para un atajo sugerido ("Saldar: RD$ 1,200").
 - **texto:** sin fondo ni borde, texto `{colors.tinta-2}`, hover con un lavado neutro
   `rgba(24,24,27,0.05)`. Para salidas, cancelaciones y las acciones de cabecera de la
@@ -822,7 +823,7 @@ Carácter: la línea donde se escribe, no una caja hundida.
   `{colors.linea-fuerte}`, placeholder en `{colors.tinta-3}`. Etiqueta encima en `menuda`,
   peso 500, `{colors.tinta-2}`.
 - **Hover:** el borde sube a `{colors.tinta-3}`.
-- **Foco:** borde `{colors.accion}` más un anillo de 2px `rgba(37,99,235,0.18)`. El
+- **Foco:** borde `{colors.accion}` más un anillo de 2px `rgba(99,91,255,0.18)`. El
   `:focus-visible` global es un contorno de 2px del color de acción con 2px de separación
   y radio 4px, y nunca se anula.
 - **Error:** borde `{colors.accion}`, `aria-invalid`, y bajo el campo un mensaje en
@@ -935,12 +936,17 @@ Al guardar un pago, el recibo monta la barra con el valor **anterior** y en el s
 frame la sube al nuevo: la usuaria ve entrar su abono. Es la única animación de la app que
 dura más de 250ms, y es deliberada.
 
-El color del relleno **siempre sale de `calcularEstado(pagado, precio)`**, incluso en las
-barras agregadas. La barra de Inicio no es verde por ser un total: es verde solo cuando de
-verdad está cobrado completo, ámbar mientras se abona y gris cuando no hay nada. Las dos
-barras que no pasan por el componente —la de 8px de Inicio y la de 4px de cada iglesia—
-están escritas a mano para poder fijar su alto, pero respetan el mismo canal, el mismo
-`scaleX` de 420ms y el mismo origen del color.
+Hay **dos** reglas de color de relleno y no se mezclan:
+
+- **Barra de una persona** (el componente `BarraProgreso`, en la ficha y en el recibo
+  del cobro): el color sale **siempre** de `calcularEstado(pagado, precio)` — verde
+  cuando cerró, ámbar mientras abona, gris cuando no hay nada. Es un diagnóstico.
+- **Barra agregada** (la de 8px de Inicio y la de 4px de cada renglón de "Por
+  iglesia"): se rellena con **el acento** mientras falte algo y pasa a
+  `{colors.pagado-marca}` solo al llegar al total. No es el estado de nadie, es el
+  avance de una meta, y pintarlo de ámbar sugería que la convención entera "va
+  atrasada". Las dos están escritas a mano para poder fijar su alto, pero respetan el
+  mismo canal, el mismo `scaleX` de 420ms y el mismo origen izquierdo.
 
 ### Nota y Aviso
 
@@ -1013,14 +1019,16 @@ posible antes de tener que ir a la ficha a anular.
 - **Do** definir cualquier superficie nueva con una raya de 1px, no con una sombra.
 - **Do** poner toda cifra sobre una hoja, con su rótulo encima y su línea de apoyo debajo;
   sobre el lienzo solo van el `h1` con su bajada y el enlace de volver.
-- **Do** dejar exactamente una métrica destacada por fila, y destacarla con el acento y el
-  anillo, no agrandando todas.
+- **Do** dejar exactamente una métrica destacada por fila, y destacarla con el registro
+  lavado del acento (fondo `{colors.accion-suave}` + borde `{colors.accion-borde}` +
+  cifra en `{colors.accion}`), no agrandando todas.
 - **Do** mantener la lateral del tono del lienzo, separada por una raya, con el acento
-  reservado a la entrada activa.
+  reservado a la entrada activa y en su registro lavado.
 - **Do** usar el componente `Monto` para cualquier cantidad de dinero, y `.cifra` para
   cualquier número comparable.
-- **Do** derivar el color de toda barra de progreso —incluidas las agregadas— de
-  `calcularEstado(pagado, precio)`.
+- **Do** derivar de `calcularEstado(pagado, precio)` el color de toda barra **de una
+  persona**, y pintar con el acento (verde solo al llegar al total) toda barra
+  **agregada**.
 - **Do** dejar exactamente un botón sólido `principal` por pantalla, y que su texto diga la
   acción concreta ("Guardar pago", no "Aceptar").
 - **Do** acompañar todo color de estado con su texto y su `aria-valuetext`.
@@ -1062,7 +1070,10 @@ posible antes de tener que ir a la ficha a anular.
   Se retiró a propósito y el encargo del usuario es explícito y repetido: **moderno, no
   "hecho para viejitos"**.
 - **Don't** devolver un bloque de color saturado a la izquierda. La lateral clara con una
-  raya es la decisión; el panel oxblood es lo que hacía ver vieja la pantalla.
+  raya es la decisión; el panel de color lleno es lo que hacía ver vieja la pantalla.
+- **Don't** apagar ni desaturar los tres colores de estado para que “combinen” con los
+  neutros: un verde y un ámbar lavados se leen a documento viejo, que es el defecto que
+  esta app lleva tres intentos corrigiendo.
 - **Don't** agrandar una cifra por encima de `cifraEnorme` (38px) para darle importancia:
   ya se probó a 56px y se retiró por desproporcionada. La jerarquía la dan el rótulo, el
   acento y el peso.

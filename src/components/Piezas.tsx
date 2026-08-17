@@ -18,7 +18,7 @@ type PropsBoton = ButtonHTMLAttributes<HTMLButtonElement> & {
 const VARIANTES: Record<TipoBoton, string> = {
   principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(58,42,28,0.12)]',
   contorno: 'bg-hoja text-tinta border border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
-  suave: 'bg-[rgba(0,112,243,0.08)] text-accionTexto hover:bg-[rgba(0,112,243,0.14)]',
+  suave: 'bg-[rgba(99,91,255,0.09)] text-accionTexto hover:bg-[rgba(99,91,255,0.15)]',
   texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(24,24,27,0.05)]',
 }
 
@@ -89,7 +89,7 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
             'w-full min-h-[46px] rounded-pieza bg-hoja px-3 py-2 text-tinta',
             'border transition-colors duration-150',
             problema ? 'border-accion' : 'border-lineaFuerte hover:border-tinta3',
-            'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(0,112,243,0.18)]',
+            'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(99,91,255,0.18)]',
             'placeholder:text-tinta3',
             adorno ? 'pl-10' : '',
             className,
