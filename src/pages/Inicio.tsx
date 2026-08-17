@@ -148,7 +148,7 @@ export default function Inicio() {
       </header>
 
       {/* ── Las dos listas ──────────────────────────────────────────────── */}
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
         <section className="hoja overflow-hidden">
           <div className="flex items-baseline justify-between gap-3 px-5 py-3.5">
             <h2 className="font-semibold">Últimos pagos</h2>
@@ -203,8 +203,8 @@ export default function Inicio() {
             <>
               <div className="flex border-y border-linea px-5 py-2">
                 <span className="rotulo flex-1">Iglesia</span>
-                <span className="rotulo w-[100px] shrink-0 text-right">Recaudado</span>
-                <span className="rotulo w-[100px] shrink-0 text-right">Falta</span>
+                <span className="rotulo w-[92px] shrink-0 text-right">Recaudado</span>
+                <span className="rotulo w-[92px] shrink-0 text-right">Falta</span>
               </div>
               <ul>
                 {iglesias.map((g, i) => (
@@ -222,9 +222,9 @@ export default function Inicio() {
                       </span>
                       <Monto
                         centavos={g.recaudado}
-                        className="w-[100px] shrink-0 text-right font-medium"
+                        className="w-[92px] shrink-0 text-right font-medium"
                       />
-                      <Monto centavos={g.pendiente} className="w-[100px] shrink-0 text-right" tenue />
+                      <Monto centavos={g.pendiente} className="w-[92px] shrink-0 text-right" tenue />
                     </div>
                   </li>
                 ))}
