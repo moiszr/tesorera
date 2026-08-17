@@ -7,7 +7,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        papel: 'var(--papel)',
+        fondo: 'var(--fondo)',
         hoja: 'var(--hoja)',
         hoja2: 'var(--hoja-2)',
         tinta: 'var(--tinta)',
@@ -16,11 +16,11 @@ const config: Config = {
         linea: 'var(--linea)',
         lineaFuerte: 'var(--linea-fuerte)',
         lomo: 'var(--lomo)',
-        lomoAlto: 'var(--lomo-alto)',
+        lomoActivo: 'var(--lomo-activo)',
         lomoTexto: 'var(--lomo-texto)',
         accion: 'var(--accion)',
         accionAlto: 'var(--accion-alto)',
-        rubrica: 'var(--rubrica)',
+        accionSuave: 'var(--accion-suave)',
         pagadoFondo: 'var(--pagado-fondo)',
         pagadoTinta: 'var(--pagado-tinta)',
         pagadoMarca: 'var(--pagado-marca)',
@@ -48,22 +48,19 @@ const config: Config = {
         menuda: ['0.9375rem', { lineHeight: '1.35rem' }],
         base: ['1.0625rem', { lineHeight: '1.55' }],
         guia: ['1.1875rem', { lineHeight: '1.45' }],
-        titulo: ['1.4375rem', { lineHeight: '1.25', letterSpacing: '-0.011em' }],
-        cifra: ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.018em' }],
-        cifraGrande: ['2.5rem', { lineHeight: '1', letterSpacing: '-0.024em' }],
-        cifraEnorme: ['3.5rem', { lineHeight: '1', letterSpacing: '-0.03em' }],
-        // El titular de Inicio: la única cifra de la app a este tamaño.
-        cifraTitular: ['4.25rem', { lineHeight: '0.95', letterSpacing: '-0.035em' }],
+        titulo: ['1.375rem', { lineHeight: '1.3', letterSpacing: '-0.014em' }],
+        cifra: ['1.5rem', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+        cifraGrande: ['1.875rem', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
+        cifraEnorme: ['2.25rem', { lineHeight: '1.05', letterSpacing: '-0.028em' }],
       },
       borderRadius: {
-        hoja: '10px',
-        pieza: '8px',
+        hoja: '8px',
+        pieza: '6px',
       },
       boxShadow: {
         // Sombras con desplazamiento real y difusión suave; nunca un halo plano.
-        pliego: '0 1px 2px rgba(58, 42, 28, 0.05), 0 8px 24px -12px rgba(58, 42, 28, 0.16)',
-        levanta: '0 2px 4px rgba(58, 42, 28, 0.06), 0 14px 32px -14px rgba(58, 42, 28, 0.22)',
-        dialogo: '0 12px 24px -8px rgba(40, 28, 18, 0.18), 0 32px 64px -24px rgba(40, 28, 18, 0.32)',
+        dialogo:
+          '0 1px 2px rgba(24, 24, 27, 0.06), 0 12px 28px -8px rgba(24, 24, 27, 0.16), 0 32px 64px -24px rgba(24, 24, 27, 0.22)',
       },
       transitionTimingFunction: {
         salida: 'cubic-bezier(0.23, 1, 0.32, 1)',

@@ -9,12 +9,6 @@ import { calcularEstado, proporcionPagada } from '../lib/estados'
 import { Boton, EstadoVacio, EtiquetaIglesia, Monto } from '../components/Piezas'
 import { IconoAdelante, IconoAviso, IconoMas, IconoPago } from '../components/Iconos'
 
-const NOMBRE_METODO: Record<string, string> = {
-  efectivo: 'Efectivo',
-  transferencia: 'Transferencia',
-  otro: 'Otro',
-}
-
 /**
  * Inicio es UNA hoja del libro, abierta: el encabezado con lo recaudado, la
  * línea de resumen, y debajo dos columnas regladas separadas por el doblez.
@@ -73,199 +67,212 @@ export default function Inicio() {
         </p>
       </header>
 
-      <div className="hoja overflow-hidden">
-        {/* ── Cabecera de la página ───────────────────────────────────── */}
-        <div className="px-6 pb-5 pt-6">
-          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-            <div>
-              <p className="rotulo mb-1">Recaudado</p>
-              <Monto centavos={totales.recaudado_real} tam="cifraEnorme" className="leading-none" />
-            </div>
-            <div className="text-right">
-              <p className="rotulo mb-1">Falta por cobrar</p>
-              <Monto centavos={totales.pendiente} tam="cifra" />
-            </div>
-          </div>
+      {/* Fila de métricas: cuatro tarjetas iguales, que es como se lee un
+          panel de datos actual. Antes era un bloque con una cifra de 56px y
+          un renglón de conteos; la cifra gigante no se leía mejor, solo se
+          veía desproporcionada. */}
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Metrica
+          rotulo="Recaudado"
+          valor={formatoRD(totales.recaudado_real)}
+          apoyo={`${porciento}% de la meta`}
+          fuerte
+        />
+        <Metrica
+          rotulo="Falta por cobrar"
+          valor={formatoRD(totales.pendiente)}
+          apoyo={`Meta ${formatoRD(totales.meta)}`}
+        />
+        <Metrica
+          rotulo="Inscritos"
+          valor={String(totales.inscritos)}
+          apoyo={`${totales.pagados} pagaron completo`}
+        />
+        <Metrica
+          rotulo="Por cobrar"
+          valor={String(totales.abonando + totales.sinpagos)}
+          apoyo={`${totales.abonando} abonando · ${totales.sinpagos} sin pagos`}
+        />
+      </div>
 
-          <div className="mt-5">
-            <div
-              className="h-3 w-full overflow-hidden rounded-full"
-              style={{ background: 'var(--linea)' }}
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={porciento}
-              aria-valuetext={`${porciento} por ciento de ${formatoRD(totales.meta)}`}
+      {/* Progreso y acciones */}
+      <div className="hoja mb-4 p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <p className="text-menuda font-medium">
+            <span className="cifra text-tinta">{porciento}%</span>{' '}
+            <span className="text-tinta2">de lo que suman todos los cupos</span>
+          </p>
+          <p className="text-menuda text-tinta2">
+            <span className="cifra">{formatoRD(totales.recaudado)}</span> de{' '}
+            <span className="cifra">{formatoRD(totales.meta)}</span>
+          </p>
+        </div>
+
+        <div
+          className="mt-2.5 h-2 w-full overflow-hidden rounded-full"
+          style={{ background: 'var(--linea)' }}
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={porciento}
+          aria-valuetext={`${porciento} por ciento de ${formatoRD(totales.meta)}`}
+        >
+          <div
+            className="h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
+            style={{
+              background: `var(--${calcularEstado(totales.recaudado, totales.meta)}-marca)`,
+              transform: `scaleX(${proporcion})`,
+            }}
+          />
+        </div>
+
+        {excedente > 0 && (
+          <p className="mt-2.5 flex items-start gap-1.5 text-menuda text-tinta2">
+            <IconoAviso tam={15} className="mt-0.5 shrink-0 text-tinta3" />
+            <span>
+              Incluye <span className="cifra font-medium text-tinta">{formatoRD(excedente)}</span> de pagos
+              de más, por eso lo recaudado y lo que falta no suman justo la meta.
+            </span>
+          </p>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to="/registrar-pago">
+            <Boton variante="principal" icono={<IconoPago tam={18} />}>
+              Registrar pago
+            </Boton>
+          </Link>
+          <Link to="/personas?nueva=1">
+            <Boton variante="contorno" icono={<IconoMas tam={18} />}>
+              Agregar persona
+            </Boton>
+          </Link>
+        </div>
+      </div>
+
+      {/* Las dos listas */}
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+        <section className="hoja overflow-hidden">
+          <div className="flex items-baseline justify-between gap-3 border-b border-linea px-4 py-3">
+            <h2 className="text-menuda font-semibold">Últimos pagos</h2>
+            <Link
+              to="/personas"
+              className="inline-flex items-center gap-1 text-menuda text-tinta2 underline-offset-4 transition-colors hover:text-accion hover:underline"
             >
-              <div
-                className="h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
-                style={{
-                  // El color sale del mismo cálculo de estado que todo lo demás:
-                  // verde solo cuando de verdad está cobrado completo.
-                  background: `var(--${calcularEstado(totales.recaudado, totales.meta)}-marca)`,
-                  transform: `scaleX(${proporcion})`,
-                }}
-              />
-            </div>
-            <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 text-menuda text-tinta2">
-              <span>
-                <span className="cifra font-medium text-tinta">{porciento}%</span> de lo que suman todos los
-                cupos
-              </span>
-              <span className="cifra">Meta: {formatoRD(totales.meta)}</span>
-            </div>
-          </div>
-
-          {/* Nota al pie, no alerta: una caja de color aquí compite con la cifra
-              que tiene que mandar en la pantalla. */}
-          {excedente > 0 && (
-            <p className="mt-2.5 flex items-start gap-1.5 text-menuda text-tinta2">
-              <IconoAviso tam={15} className="mt-0.5 shrink-0 text-tinta3" />
-              <span>
-                Incluye <span className="cifra font-medium text-tinta">{formatoRD(excedente)}</span> de pagos
-                de más, por eso lo recaudado y lo que falta no suman justo la meta.
-              </span>
-            </p>
-          )}
-
-          <div className="mt-6 flex flex-wrap gap-2.5">
-            <Link to="/registrar-pago">
-              <Boton variante="principal" grande icono={<IconoPago tam={19} />}>
-                Registrar pago
-              </Boton>
-            </Link>
-            <Link to="/personas?nueva=1">
-              <Boton variante="contorno" grande icono={<IconoMas tam={19} />}>
-                Agregar persona
-              </Boton>
+              Ver todas
+              <IconoAdelante tam={14} />
             </Link>
           </div>
-        </div>
 
-        {/* ── Línea de resumen, como el renglón de totales de una libreta ── */}
-        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2 border-y border-linea bg-hoja2 px-6 py-3">
-          <Cuenta n={totales.inscritos} rotulo="inscritos" />
-          <Cuenta n={totales.pagados} rotulo="pagaron completo" tono="var(--pagado-tinta)" />
-          <Cuenta n={totales.abonando} rotulo="abonando" tono="var(--abonando-tinta)" />
-          <Cuenta n={totales.sinpagos} rotulo="sin pagos" tono="var(--sinpagos-tinta)" />
-        </div>
-
-        {/* ── El doblez del libro: dos columnas regladas ──────────────── */}
-        <div className="grid lg:grid-cols-2 lg:divide-x lg:divide-linea">
-          <section className="min-w-0">
-            <div className="flex items-baseline justify-between gap-3 px-6 pb-2 pt-4">
-              <h2 className="font-semibold">Últimos pagos</h2>
-              <Link
-                to="/personas"
-                className="inline-flex items-center gap-1 text-menuda text-tinta2 underline-offset-4 hover:text-accion hover:underline"
-              >
-                Ver todas
-                <IconoAdelante tam={15} />
+          {ultimos_pagos.length === 0 ? (
+            <div className="px-4 py-8 text-center">
+              <p className="text-menuda text-tinta2">Cuando alguien abone, aparecerá aquí.</p>
+              <Link to="/registrar-pago">
+                <Boton variante="principal" className="mt-3">
+                  Registrar el primero
+                </Boton>
               </Link>
             </div>
-
-            {ultimos_pagos.length === 0 ? (
-              <EstadoVacio
-                titulo="Todavía no hay ningún pago"
-                explicacion="Cuando alguien abone, aquí aparecerán los ocho más recientes."
-                accion={
-                  <Link to="/registrar-pago">
-                    <Boton variante="principal">Registrar el primero</Boton>
+          ) : (
+            <ul>
+              {ultimos_pagos.map((p, i) => (
+                <li key={p.id} style={{ ['--i' as string]: i }} className="entra-renglon renglon">
+                  <Link
+                    to={`/personas/${p.persona_id}`}
+                    className="flex min-h-[46px] items-center gap-3 px-4 py-1.5 transition-colors duration-150 hover:bg-hoja2"
+                  >
+                    <span className="min-w-0 flex-1 truncate font-medium">{p.persona}</span>
+                    <span className="shrink-0 text-menuda text-tinta3">
+                      {fechaRelativa(p.fecha)}
+                    </span>
+                    <Monto centavos={p.monto} className="w-[96px] shrink-0 text-right font-medium" />
                   </Link>
-                }
-              />
-            ) : (
-              <>
-                <div className="flex border-b border-linea px-6 py-2">
-                  <span className="rotulo flex-1">Quién</span>
-                  <span className="rotulo">Abonó</span>
-                </div>
-                <ul >
-                  {ultimos_pagos.map((p, i) => (
-                    <li key={p.id} style={{ ['--i' as string]: i }} className="entra-renglon renglon">
-                      <Link
-                        to={`/personas/${p.persona_id}`}
-                        className="flex min-h-[52px] items-center gap-3 px-6 py-2 transition-colors duration-150 hover:bg-[rgba(138,51,64,0.05)]"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-medium">{p.persona}</span>
-                          <span className="text-menuda text-tinta2">
-                            {fechaRelativa(p.fecha)} · {NOMBRE_METODO[p.metodo] ?? 'Otro'}
-                          </span>
-                        </span>
-                        <Monto centavos={p.monto} tam="guia" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-          <section className="min-w-0 border-t border-linea lg:border-t-0">
-            <div className="px-6 pb-2 pt-4">
-              <h2 className="font-semibold">Por iglesia</h2>
-            </div>
-            {iglesias.length === 0 ? (
-              <p className="px-6 py-8 text-tinta2">
-                Cuando agregues personas con su iglesia, aquí verás cuánto lleva cada una.
-              </p>
-            ) : (
-              <>
-                <div className="flex border-b border-linea px-6 py-2">
-                  <span className="rotulo flex-1">Iglesia</span>
-                  <span className="rotulo w-[104px] text-right">Recaudado</span>
-                  <span className="rotulo w-[104px] text-right">Falta</span>
-                </div>
-                {/* Sin barras: dos columnas de cifras dicen lo mismo y no dejan
-                    nada colgando debajo del renglón. */}
-                <ul>
-                  {iglesias.map((g, i) => (
-                    <li key={g.nombre} style={{ ['--i' as string]: i }} className="entra-renglon renglon">
-                      <div className="flex min-h-[58px] items-center px-6 py-2.5">
-                        <span className="min-w-0 flex-1 pr-4">
-                          <EtiquetaIglesia
-                            nombre={g.nombre}
-                            color={g.color}
-                            className="!text-base !text-tinta"
-                          />
-                          <span className="mt-0.5 block text-menuda text-tinta2">
-                            {g.personas} {g.personas === 1 ? 'persona' : 'personas'}
-                          </span>
-                        </span>
-                        <Monto
-                          centavos={g.recaudado}
-                          tam="base"
-                          className="w-[104px] shrink-0 text-right font-medium"
+        <section className="hoja overflow-hidden">
+          <div className="border-b border-linea px-4 py-3">
+            <h2 className="text-menuda font-semibold">Por iglesia</h2>
+          </div>
+          {iglesias.length === 0 ? (
+            <p className="px-4 py-8 text-center text-menuda text-tinta2">
+              Cuando agregues personas con su iglesia, aquí verás cuánto lleva cada una.
+            </p>
+          ) : (
+            <ul>
+              {iglesias.map((g, i) => (
+                <li key={g.nombre} style={{ ['--i' as string]: i }} className="entra-renglon renglon">
+                  <div className="px-4 py-2.5">
+                    <div className="flex items-baseline gap-3">
+                      <span className="min-w-0 flex-1 overflow-hidden">
+                        <EtiquetaIglesia
+                          nombre={g.nombre}
+                          color={g.color}
+                          className="!text-base !text-tinta"
                         />
-                        <Monto
-                          centavos={g.pendiente}
-                          tam="base"
-                          className="w-[104px] shrink-0 text-right"
-                          tenue
+                      </span>
+                      <Monto centavos={g.recaudado} className="shrink-0 font-medium" />
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-3">
+                      <span
+                        className="h-1 flex-1 overflow-hidden rounded-full"
+                        style={{ background: 'var(--linea)' }}
+                        aria-hidden
+                      >
+                        <span
+                          className="block h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
+                          style={{
+                            background: `var(--${calcularEstado(g.meta - g.pendiente, g.meta)}-marca)`,
+                            transform: `scaleX(${proporcionPagada(g.meta - g.pendiente, g.meta)})`,
+                          }}
                         />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-        </div>
+                      </span>
+                      <span className="shrink-0 text-menuda text-tinta3">
+                        <span className="cifra">{g.personas}</span> personas · falta{' '}
+                        <span className="cifra">{formatoRD(g.pendiente)}</span>
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   )
 }
 
-/** Un dato del renglón de resumen: la cifra manda, el rótulo la acompaña. */
-function Cuenta({ n, rotulo, tono }: { n: number; rotulo: string; tono?: string }) {
+/**
+ * Una métrica del panel. Rótulo arriba, cifra en el medio, apoyo debajo: el
+ * apoyo es lo que evita que la cifra sea un número sin contexto.
+ */
+function Metrica({
+  rotulo,
+  valor,
+  apoyo,
+  fuerte,
+}: {
+  rotulo: string
+  valor: string
+  apoyo: string
+  fuerte?: boolean
+}) {
   return (
-    <span className="flex items-baseline gap-1.5">
-      <span className="cifra text-cifra font-semibold leading-none" style={tono ? { color: tono } : undefined}>
-        {n}
-      </span>
-      <span className="text-menuda text-tinta2">{rotulo}</span>
-    </span>
+    <div className={`hoja p-4 ${fuerte ? 'ring-1 ring-accion/15' : ''}`}>
+      <p className="rotulo">{rotulo}</p>
+      <p
+        className={`cifra mt-1.5 font-semibold leading-none ${
+          fuerte ? 'text-cifraGrande text-accion' : 'text-cifra'
+        }`}
+      >
+        {valor}
+      </p>
+      <p className="mt-1.5 truncate text-menuda text-tinta3">{apoyo}</p>
+    </div>
   )
 }
 

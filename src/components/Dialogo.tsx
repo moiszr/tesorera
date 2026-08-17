@@ -59,7 +59,7 @@ export function Dialogo({
           type="button"
           onClick={alCerrar}
           aria-label="Cerrar"
-          className="-mr-1.5 -mt-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.06)] hover:text-tinta"
+          className="-mr-1.5 -mt-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(24,24,27,0.06)] hover:text-tinta"
         >
           <IconoCerrar tam={18} />
         </button>

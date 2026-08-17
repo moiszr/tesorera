@@ -19,7 +19,7 @@ const VARIANTES: Record<TipoBoton, string> = {
   principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(58,42,28,0.12)]',
   contorno: 'bg-hoja text-tinta border border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
   suave: 'bg-[rgba(138,51,64,0.07)] text-accion hover:bg-[rgba(138,51,64,0.12)]',
-  texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(36,31,27,0.05)]',
+  texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(24,24,27,0.05)]',
 }
 
 export const Boton = forwardRef<HTMLButtonElement, PropsBoton>(function Boton(
@@ -283,13 +283,17 @@ export function EstadoVacio({
   )
 }
 
-/** Un pedacito de hoja reglada en blanco: dice "aquí todavía no se ha escrito". */
+/** Una lista vacía dibujada: dice "aquí todavía no hay nada escrito". */
 function RayasDecorativas() {
   return (
-    <svg width="72" height="52" viewBox="0 0 72 52" aria-hidden className="text-linea">
-      <rect x="0.5" y="0.5" width="71" height="51" rx="4" fill="var(--hoja-2)" stroke="currentColor" />
-      <path d="M14 0v52" stroke="var(--rubrica)" strokeOpacity="0.3" />
-      <path d="M22 14h38M22 24h30M22 34h22" stroke="currentColor" strokeLinecap="round" />
+    <svg width="64" height="48" viewBox="0 0 64 48" aria-hidden className="text-linea">
+      <rect x="0.75" y="0.75" width="62.5" height="46.5" rx="5" fill="var(--hoja-2)" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M14 16h36M14 25h26M14 34h18"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
     </svg>
   )
 }

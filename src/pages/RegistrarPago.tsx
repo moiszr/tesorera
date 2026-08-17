@@ -534,7 +534,7 @@ function ReciboUltimo({ guardado, progreso }: { guardado: Guardado; progreso: nu
           </Link>
           <Link
             to={`/personas/${guardado.personaId}`}
-            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-pieza px-3 text-menuda text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-pieza px-3 text-menuda text-tinta2 transition-colors hover:bg-[rgba(24,24,27,0.05)] hover:text-tinta"
           >
             Ver a {primerNombre(guardado.nombre)}
             <IconoAdelante tam={16} />

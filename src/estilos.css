@@ -8,58 +8,62 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────────────
-   EL LIBRO DE CAJA — sistema visual
+   TESORERA — sistema visual
 
-   La app es un libro de contabilidad encuadernado: lomo de tela a la
-   izquierda, hoja de papel a la derecha. Nada de tarjetas dentro de
-   tarjetas: las filas se separan con rayas finas, como un libro mayor.
+   Herramienta de trabajo moderna, no un facsímil de cuaderno. La identidad la
+   dan el acento oxblood, las cifras tabulares y la disciplina de las rayas
+   finas; NO el papel crema ni el ornamento de época, que es justo lo que hacía
+   que la app se leyera vieja.
+
+   Neutros fríos y superficies blancas: es lo que hace que un producto de datos
+   se vea actual. El color se reserva para lo que significa algo.
    ───────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Papel y tinta */
-  --papel: #f3efe6;          /* la mesa donde reposa el libro */
-  --hoja: #fffdf8;           /* la hoja escrita */
-  --hoja-2: #faf7f0;         /* renglón alterno, muy tenue */
-  /* Los tres escalones de tinta pasan contraste AA (4.5:1) sobre los tres
-     fondos de la app: la hoja, el renglón alterno y el papel. Ella lee con
-     lentes; un gris "elegante" que no se lee es un gris mal elegido. */
-  --tinta: #241f1b;          /* texto principal      · 14.2–16.1:1 */
-  --tinta-2: #575047;        /* texto secundario     ·  6.9–7.8:1 */
-  --tinta-3: #756b62;        /* texto terciario      ·  4.5–5.1:1 */
-  --linea: #e6dfd2;          /* raya fina entre renglones */
-  --linea-fuerte: #d3c8b6;   /* raya de encabezado de columna */
+  /* Superficies */
+  --fondo: #f7f7f8;          /* el lienzo */
+  --hoja: #ffffff;           /* donde vive el contenido */
+  --hoja-2: #fafafa;         /* franjas y cabeceras dentro de una hoja */
 
-  /* La encuadernación */
-  --lomo: #47222a;           /* tela del lomo (barra lateral) */
-  --lomo-alto: #5c2f38;      /* pestaña activa / hover */
-  --lomo-texto: #f6e9e3;
+  /* Tinta — los tres escalones pasan AA sobre fondo y sobre hoja */
+  --tinta: #18181b;          /* 16.6–17.7:1 */
+  --tinta-2: #52525b;        /*  7.2–7.7:1 */
+  --tinta-3: #6b6b76;        /*  4.9–5.3:1 */
 
-  /* Acción: un solo acento en toda la app */
+  --linea: #e8e8ea;          /* separador de renglón */
+  --linea-fuerte: #d4d4d8;   /* contorno de control de formulario */
+
+  /* Barra lateral: clara, como Linear o Notion. Un bloque de color saturado
+     a la izquierda es lo que más envejecía la pantalla. */
+  --lomo: #f2f2f3;
+  --lomo-texto: #52525b;
+  --lomo-activo: #ffffff;
+
+  /* Acento: lo único de color. Es la identidad que sobrevive al rediseño. */
   --accion: #8a3340;
   --accion-alto: #71272f;
-  --rubrica: #a8443c;        /* la raya roja de margen del libro mayor */
+  --accion-suave: #f7eef0;
 
   /* Estados de pago — mismos colores en toda la app, siempre con texto */
-  --pagado-fondo: #e6efe4;
-  --pagado-tinta: #2c5a31;
-  --pagado-marca: #4d8a53;
+  --pagado-fondo: #e7f6ef;
+  --pagado-tinta: #116149;
+  --pagado-marca: #15866a;
 
-  --abonando-fondo: #fbf0d8;
-  --abonando-tinta: #77510e;
-  --abonando-marca: #bf8920;
+  --abonando-fondo: #fdf3e0;
+  --abonando-tinta: #8a5308;
+  --abonando-marca: #d08b1c;
 
-  --sinpagos-fondo: #eeeae2;
-  --sinpagos-tinta: #5d574d;
-  --sinpagos-marca: #a1988a;
+  --sinpagos-fondo: #f0f0f2;
+  --sinpagos-tinta: #52525b;
+  --sinpagos-marca: #a1a1aa;
 
   /* Aviso tranquilo (excedente, notas del sistema) */
-  --aviso-fondo: #e6eeee;
-  --aviso-tinta: #2c5253;
+  --aviso-fondo: #e6f2f4;
+  --aviso-tinta: #1f5f6b;
 
-  /* Impresión: en papel el fondo es el papel de verdad, no nuestro tono
-     cálido, y el borde del recibo tiene que verse en una impresora gris. */
+  /* Impresión: en papel el fondo es el papel de verdad. */
   --papel-impreso: #ffffff;
-  --linea-impresa: #c9c2b6;
+  --linea-impresa: #c9c9cf;
 
   /* Curvas: nunca las de fábrica, siempre estas tres */
   --salida: cubic-bezier(0.23, 1, 0.32, 1);
@@ -77,14 +81,14 @@
   }
 
   body {
-    @apply bg-papel text-tinta font-sans text-base;
+    @apply bg-fondo text-tinta font-sans text-base;
     margin: 0;
     min-height: 100vh;
   }
 
   /* Las superficies del navegador también llevan el diseño. */
   ::selection {
-    background: #f0d9cf;
+    background: var(--accion-suave);
     color: var(--tinta);
   }
 
@@ -172,7 +176,7 @@
   .hoja {
     @apply bg-hoja rounded-hoja;
     border: 1px solid var(--linea);
-    box-shadow: 0 1px 2px rgba(58, 42, 28, 0.04);
+    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.04);
   }
 
   /* Renglones: una raya fina y nada más.

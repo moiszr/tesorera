@@ -298,7 +298,7 @@ export default function FichaPersona() {
                           to={`/comprobante/${p.id}`}
                           aria-label={`Comprobante de ${formatoRD(p.monto)}`}
                           title="Comprobante"
-                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.06)] hover:text-tinta"
+                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(24,24,27,0.06)] hover:text-tinta"
                         >
                           <IconoImprimir tam={18} />
                         </Link>

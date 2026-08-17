@@ -415,7 +415,7 @@ function BotonIcono({
       disabled={deshabilitado}
       aria-label={etiqueta}
       title={etiqueta}
-      className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors duration-150 hover:bg-[rgba(36,31,27,0.06)] hover:text-tinta disabled:pointer-events-none disabled:opacity-30"
+      className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors duration-150 hover:bg-[rgba(24,24,27,0.06)] hover:text-tinta disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
     </button>

@@ -12,8 +12,10 @@ const ENTRADAS = [
 ]
 
 /**
- * El marco es el libro: lomo de tela a la izquierda, hoja a la derecha.
- * La navegación son las cuatro pestañas del libro; nunca hay más de cuatro.
+ * Barra lateral clara, del mismo tono que el lienzo y separada por una raya
+ * fina. Un bloque de color saturado a la izquierda es lo que más envejecía la
+ * pantalla: pesa mucho, compite con el contenido y no lo hace ninguna
+ * herramienta actual. El acento se guarda para la entrada activa.
  */
 export function Marco({ evento, children }: { evento: Evento | null; children: ReactNode }) {
   const { pathname } = useLocation()
@@ -21,31 +23,27 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
   return (
     <div className="flex min-h-screen">
       <nav
-        className="no-imprimir sticky top-0 flex h-screen w-[236px] shrink-0 flex-col bg-lomo text-lomoTexto"
+        className="no-imprimir sticky top-0 flex h-screen w-[236px] shrink-0 flex-col border-r border-linea bg-lomo"
         aria-label="Secciones"
       >
-        <div className="px-5 pb-1 pt-6">
-          <p className="text-titulo font-semibold tracking-[-0.015em] text-white">Tesorera</p>
+        <div className="px-5 pb-2 pt-5">
+          <p className="text-[1.0625rem] font-semibold tracking-[-0.012em] text-tinta">Tesorera</p>
           {evento ? (
-            <p className="mt-1 text-menuda leading-snug text-[rgba(246,233,227,0.72)]">
+            <p className="mt-0.5 text-menuda leading-snug text-tinta3">
               {evento.nombre}
               {evento.fecha_inicio && (
                 <>
                   <br />
-                  <span className="text-[rgba(246,233,227,0.58)]">
-                    {cuentaRegresiva(evento.fecha_inicio)}
-                  </span>
+                  {cuentaRegresiva(evento.fecha_inicio)}
                 </>
               )}
             </p>
           ) : (
-            <p className="mt-1 text-menuda text-[rgba(246,233,227,0.72)]">Sin evento todavía</p>
+            <p className="mt-0.5 text-menuda text-tinta3">Sin evento todavía</p>
           )}
         </div>
 
-        <div className="mx-5 my-4 h-px bg-[rgba(246,233,227,0.16)]" />
-
-        <ul className="flex flex-col gap-0.5 px-3">
+        <ul className="mt-4 flex flex-col gap-0.5 px-3">
           {ENTRADAS.map(({ a, texto, Icono }) => (
             <li key={a}>
               <NavLink
@@ -53,38 +51,23 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
                 end={a === '/'}
                 className={({ isActive }) =>
                   [
-                    'group relative flex min-h-[46px] items-center gap-3 rounded-pieza px-3 text-[1rem]',
+                    'flex min-h-[44px] items-center gap-2.5 rounded-pieza px-2.5 text-menuda',
                     'transition-colors duration-150',
                     isActive
-                      ? 'bg-lomoAlto font-semibold text-white'
-                      : 'text-[rgba(246,233,227,0.82)] hover:bg-[rgba(255,255,255,0.07)] hover:text-white',
+                      ? 'bg-lomoActivo font-semibold text-accion shadow-[0_1px_2px_rgba(24,24,27,0.07)]'
+                      : 'font-medium text-tinta2 hover:bg-[rgba(24,24,27,0.045)] hover:text-tinta',
                   ].join(' ')
                 }
               >
-                {({ isActive }) => (
-                  <>
-                    {/* La pestaña marcada del libro */}
-                    <span
-                      aria-hidden
-                      className={[
-                        'absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-[#e8b4a0]',
-                        'transition-opacity duration-150',
-                        isActive ? 'opacity-100' : 'opacity-0',
-                      ].join(' ')}
-                    />
-                    <Icono tam={20} className="shrink-0 opacity-90" />
-                    {texto}
-                  </>
-                )}
+                <Icono tam={18} className="shrink-0" />
+                {texto}
               </NavLink>
             </li>
           ))}
         </ul>
 
-        <div className="mt-auto px-5 pb-5 pt-4">
-          <p className="text-menuda text-[rgba(246,233,227,0.66)]">
-            Se respalda sola al abrir
-          </p>
+        <div className="mt-auto px-5 pb-4 pt-4">
+          <p className="text-menuda text-tinta3">Se respalda sola al abrir</p>
         </div>
       </nav>
 

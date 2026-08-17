@@ -88,13 +88,6 @@ typography:
     lineHeight: 1
     letterSpacing: "-0.03em"
     fontFeature: "tnum 1, lnum 1"
-  cifraTitular:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "4.25rem"
-    fontWeight: 600
-    lineHeight: 0.95
-    letterSpacing: "-0.035em"
-    fontFeature: "tnum 1, lnum 1"
 rounded:
   foco: "4px"
   pieza: "8px"
@@ -270,14 +263,14 @@ vertical junto a una tabla ni a rayar los renglones para que "parezca contabilid
 Lo que sí quedó del libro es la estructura, y esa es la parte útil: una hoja por
 bloque, renglones de una sola línea separados por una raya de 1px, columnas de
 cifras alineadas consigo mismas. Donde un panel de control genérico pondría una
-retícula de tarjetitas, aquí hay una hoja con renglones. Y donde una tarjeta
-serviría solo para dibujar un borde alrededor de un número, no hay tarjeta: la
-cifra recaudada de Inicio vive **directamente sobre el papel de la mesa**, sin
-caja, porque es el objeto de la pantalla y meterla en una ficha la degradaba a
-campo de formulario.
+retícula de tarjetitas, aquí hay **una hoja con renglones**. Inicio es el caso
+extremo y la prueba de la idea: no son cuatro tarjetas de resumen, es **una sola
+hoja abierta** —cabecera con lo recaudado, renglón de totales y el doblez con dos
+columnas regladas—, exactamente como se abre un libro de caja por la página del
+mes.
 
 La densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre
-raíz de 17px, renglones de 46–52px, barras de herramientas de 44px, todo dentro de
+raíz de 17px, renglones de 46–58px, barras de herramientas de 44px, todo dentro de
 1366×768 sin scroll horizontal. La escala es **fija, no fluida**: hay un solo
 dispositivo de destino y la estabilidad de las columnas vale más que la
 adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px,
@@ -286,7 +279,7 @@ falta de refinamiento.
 
 El contenido son los números. Toda la dramaturgia tipográfica está reservada al
 dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las
-cifras saltan a 30, 42, 59 y 72px. El color se administra con avaricia: un solo
+cifras saltan a 30, 42 y 59px. El color se administra con avaricia: un solo
 acento (la familia oxblood) reservado para acciones, y tres colores de estado que
 existen únicamente para decir cómo va un pago, siempre acompañados de su texto.
 
@@ -294,8 +287,11 @@ existen únicamente para decir cómo va un pago, siempre acompañados de su text
 
 - Lomo de tela a la izquierda (236px) + hoja de papel a la derecha; una sola hoja
   por bloque, nunca una hoja dentro de otra.
-- La hoja se define por un hairline, no por una sombra; y cuando el contenido no
-  necesita hoja (el titular de Inicio), no lleva hoja.
+- La hoja se define por un hairline, no por una sombra, y **todo dato vive sobre
+  una hoja**. Sobre el papel de la mesa solo van el `h1` de la pantalla con su
+  bajada y el enlace de volver.
+- Una hoja grande se subdivide por dentro con hairlines, con `{colors.hoja-2}` y
+  con el doblez (`lg:divide-x`) — nunca partiéndola en varias superficies.
 - Renglones de una sola línea separados por una raya fina. Sin trama alterna, sin
   raya de margen: el adorno de época se retiró y no vuelve.
 - Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y
@@ -358,9 +354,11 @@ app.
 
 - **Aviso tranquilo** (`{colors.aviso-fondo}` / `{colors.aviso-tinta}`): verde
   azulado apagado. Es el tono del componente `Aviso` neutro, que solo se usa donde
-  hay que interrumpir de verdad (los avisos de Ajustes al cambiar precios). Nunca
-  es un error. Para notas que solo informan, el sistema ya **no** usa caja de
-  color: usa el patrón `Nota` (ver Components).
+  hay que interrumpir o explicar un número que no cuadra: los avisos de Ajustes al
+  cambiar precios, y en la cuenta de la ficha el excedente pagado de más y el
+  precio puesto a mano. Nunca es un error. Para notas que solo informan al pie de
+  un total, el sistema **no** usa caja de color: usa el patrón `Nota` (ver
+  Components).
 - **Colores de iglesia** (`{colors.iglesia-indigo}`, `{colors.iglesia-pizarra}`,
   `{colors.iglesia-arcilla}`, `{colors.iglesia-ciruela}`,
   `{colors.iglesia-tabaco}`, `{colors.iglesia-humo}`): seis opciones cerradas,
@@ -371,15 +369,17 @@ app.
 
 ### Neutral
 
-- **Papel de la mesa** (`{colors.papel}`): el fondo del documento. Ya no es solo
-  el hueco entre hojas: el titular de Inicio y sus rótulos se escriben
-  directamente sobre él, así que tiene que sostener texto con contraste AA.
+- **Papel de la mesa** (`{colors.papel}`): el fondo del documento y el hueco entre
+  hojas. **Ningún dato se escribe sobre él**: lo único que lleva encima es el `h1`
+  de cada pantalla con su bajada y el enlace de volver de la ficha. Aun así tiene
+  que sostener texto con contraste AA, porque esos rótulos son texto de verdad.
 - **Hoja** (`{colors.hoja}`): la superficie escrita de las listas y los
   formularios. También el fondo de campos, diálogos y menús.
 - **Hoja segunda** (`{colors.hoja-2}`): la superficie recesiva dentro de una hoja.
-  No es alternancia de filas: viste el hover de renglón, el pie del diálogo, el
-  estado de cuenta del comprobante, la franja de archivados de Ajustes, el fondo
-  del campo de monto y del buscador del cobro, y el número de paso.
+  No es alternancia de filas: viste el hover de renglón, **el renglón de resumen de
+  Inicio** (entre dos hairlines), el pie del diálogo, el estado de cuenta del
+  comprobante, la franja de archivados de Ajustes, el fondo del campo de monto y
+  del buscador del cobro, y el número de paso.
 - **Tinta** (`{colors.tinta}`): texto principal, 14.2–16.1:1 sobre los tres
   fondos. **Tinta segunda** (`{colors.tinta-2}`): rótulos, bajadas, texto de apoyo
   y el "RD$" que precede a una cifra, 6.9–7.8:1. **Tinta tercera**
@@ -452,21 +452,21 @@ siempre lo mismo.
 
 ### Hierarchy
 
-- **cifraTitular** (600, 4.25rem ≈ 72px, interlineado 0.95): el titular de Inicio
-  —lo recaudado— y **nada más**. Es el único escalón que se escribe sobre el papel
-  de la mesa en vez de sobre una hoja, y existe precisamente para eso: cuando la
-  cifra manda la pantalla, no necesita una caja que la señale.
-- **cifraEnorme** (600, 3.5rem ≈ 59px, interlineado 1): el saldo en la ficha de una
-  persona ("Le falta" mientras deba, "Pagó en total" cuando ya cerró). Una sola
-  por pantalla.
+- **cifraEnorme** (600, 3.5rem ≈ 59px, interlineado 1): la cifra que manda la
+  pantalla, **una sola por pantalla y siempre dentro de una hoja**: lo recaudado en
+  la cabecera de Inicio y el saldo en la ficha de una persona ("Le falta" mientras
+  deba, "Pagó en total" cuando ya cerró). Es el techo de la escala; no hay ningún
+  escalón por encima.
 - **cifraGrande** (600, 2.5rem ≈ 42px): el campo donde se escribe el monto del
   abono. Es el único *input* de este tamaño en la app.
-- **cifra** (600, 1.75rem ≈ 30px): cifras de segundo nivel — "Le falta" del cobro,
-  "Abonó" del recibo, las cifras de apoyo de Inicio y del reporte.
+- **cifra** (600, 1.75rem ≈ 30px): cifras de segundo nivel — "Falta por cobrar" y
+  las cuatro cuentas del renglón de resumen de Inicio, "Le falta" del cobro,
+  "Abonó" del recibo, las cifras del reporte.
 - **titulo** (600, 1.4375rem ≈ 24px, tracking −0.011em): el `h1` de cada pantalla.
   Uno por pantalla; también es el rótulo "Tesorera" del lomo.
 - **guia** (500, 1.1875rem ≈ 20px): nombre de la persona elegida, título de
-  diálogo, campos de búsqueda, datos de la franja de cuenta, botón grande.
+  diálogo, campos de búsqueda, el monto de cada renglón de "Últimos pagos", botón
+  grande.
 - **base** (400, 1.0625rem ≈ 18px, interlineado 1.55): el texto de lectura y el
   cuerpo de las filas. Es el mínimo de lectura de la app.
 - **menuda** (400, 0.9375rem ≈ 16px): rótulos, metadatos de fila, ayudas bajo los
@@ -496,18 +496,18 @@ porcentajes, teléfonos, números de paso. Si una columna de números no cuadra 
 scrollear, es que alguien olvidó `.cifra`.
 
 **La regla del "RD$" pequeño.** El símbolo de moneda nunca compite con el número, y
-se encoge conforme la cifra crece. El componente `Monto` es el dueño de esa
-proporción y la ajusta por escalón: `0.5em` en `cifra`, `0.46em` en `cifraGrande`,
-`0.42em` en `cifraEnorme`, y tamaño pleno en los escalones de texto — siempre en
-tinta segunda, peso 500, alineado a la línea base. El titular de Inicio continúa la
-escalera con `0.34em`, y es hoy el **único** sitio donde la proporción se escribe
-fuera de `Monto`, porque `Monto` todavía no tiene el escalón `cifraTitular`. Eso es
-una deuda a saldar dentro de `Monto`, no permiso para volver a escribir el símbolo
-a mano en otra pantalla.
+se encoge conforme la cifra crece. El componente `Monto` es el dueño **único** de
+esa proporción y la ajusta por escalón: `0.5em` en `cifra`, `0.46em` en
+`cifraGrande`, `0.42em` en `cifraEnorme`, y tamaño pleno en los escalones de texto
+— siempre en tinta segunda, peso 500, alineado a la línea base. Hoy no queda una
+sola excepción: todo monto de la app, incluido el de la cabecera de Inicio, sale de
+`Monto`, y `cifraEnorme` es el escalón más grande que `Monto` acepta. Si una cifra
+nueva necesita otra proporción, se agrega un escalón a `Monto`, no se escribe el
+símbolo a mano en la pantalla.
 
 **La regla del drama reservado.** Los escalones de texto son vecinos (16 → 18 →
-20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59 → 72px). Si
-un título de sección quiere ser enorme, la respuesta es no: el número es el
+20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59px). Si un
+título de sección quiere ser enorme, la respuesta es no: el número es el
 contenido.
 
 ## Layout
@@ -517,22 +517,38 @@ contenido.
 cuerpo, que ocupa el resto con 28px de padding horizontal (36px a partir de `xl`)
 y 24px vertical. El contenido del cuerpo se centra con un ancho máximo de 1120px.
 
-**La hoja como unidad — y como decisión.** Cada bloque de contenido *que agrupa
-datos* es una `.hoja`: fondo `{colors.hoja}`, radio de 10px, borde de 1px
-`{colors.linea}` y un filo de sombra casi imperceptible. Las hojas se separan
-entre sí con 20px (`gap-5` / `space-y-5`). El padding interior es de 20px (24px en
-la franja de cuenta de la ficha, 28px en comprobante y reporte); las hojas con
-lista llevan `overflow-hidden` y trasladan el padding a cada renglón para que las
-rayas lleguen de borde a borde. Lo nuevo de esta revisión es lo contrario: **un
-titular no lleva hoja**. El encabezado de Inicio (cifra, barra, frase de reparto,
-botones) se escribe sobre el papel de la mesa, sin borde.
+**La hoja como unidad.** Todo dato vive sobre una `.hoja`: fondo `{colors.hoja}`,
+radio de 10px, borde de 1px `{colors.linea}` y un filo de sombra casi
+imperceptible. Las hojas se separan entre sí con 20px (`gap-5` / `space-y-5`). El
+padding interior es de 20px (24px en la hoja de Inicio, 28px en comprobante y
+reporte); las hojas con lista llevan `overflow-hidden` y trasladan el padding a
+cada renglón para que las rayas lleguen de borde a borde.
+
+**La hoja abierta de Inicio.** Inicio es **una sola hoja** con `overflow-hidden`
+que contiene la pantalla entera, dividida por dentro en tres franjas:
+
+1. **Cabecera** (`px-6 pb-5 pt-6`): "Recaudado" en `cifraEnorme` a la izquierda y
+   "Falta por cobrar" en `cifra` alineado a la derecha, sobre la misma línea base
+   (`items-end`, `justify-between`); debajo la barra de progreso a todo el ancho;
+   bajo ella, en una sola línea de `menuda`, el porcentaje a la izquierda y la
+   meta a la derecha; después la nota al pie del excedente cuando lo hay; y al
+   final los dos botones ("Registrar pago" sólido + "Agregar persona" de contorno).
+2. **Renglón de resumen**: franja de `{colors.hoja-2}` entre dos hairlines
+   (`border-y`, `px-6 py-3`) con las cuatro cuentas —inscritos, pagaron completo,
+   abonando, sin pagos— como **cifras grandes** (`cifra`, 30px, peso 600) con su
+   rótulo en `menuda` al lado. Las tres últimas llevan la tinta de su estado. Es el
+   renglón de totales de una libreta, no una fila de tarjetitas.
+3. **El doblez**: `grid lg:grid-cols-2 lg:divide-x lg:divide-linea` — "Últimos
+   pagos" a la izquierda y "Por iglesia" a la derecha, separadas por una raya
+   vertical que es literalmente el pliegue del libro. Por debajo de `lg` se apilan
+   y la raya vertical se convierte en el `border-t` de la segunda sección.
 
 **El renglón, no la tarjeta.** Las listas son `<ul>` cuyos `<li>` llevan
 `.renglon`: una raya inferior de `{colors.linea}` y nada más — sin raya en el
 último, **sin trama alterna**. La altura mínima la fija lo que el renglón carga:
-46px en la lista de personas (una línea), 50px en las dos listas de Inicio, 52px
-en el historial de pagos, 62px en el buscador del cobro y en las iglesias de
-Ajustes, 66px en los tipos de cupo.
+46px en la lista de personas (una línea), 52px en "Últimos pagos" y 58px en "Por
+iglesia" (Inicio), 54px en el historial de pagos, 62px en el buscador del cobro y
+en las iglesias de Ajustes, 66px en los tipos de cupo.
 
 **La barra de herramientas de una línea.** En Personas, filtrar ocupa **una fila de
 44px**: buscador flexible (mínimo 220px) + un `FiltroMenu` por criterio (Cómo va ·
@@ -553,26 +569,41 @@ todas a la vez: Iglesia aparece desde `xl`, "Su cupo" desde `md`, y el encabezad
 de columnas desde `sm`. Nombre, "Ha pagado" y "Cómo va" no se caen nunca — son la
 respuesta a "¿cuánto pagó fulano?".
 
-**Rejillas confirmadas.** Solo existen cuatro formas:
+**Rejillas confirmadas.** Solo existen cinco formas:
 1. Pantalla de una columna (Ajustes, Comprobante a 560px, Reporte).
-2. Contenido + rail auxiliar de 340px (`lg:grid-cols-[minmax(0,1fr)_340px]` en
-   Registrar pago, **solo cuando hay algo que poner en el rail**: el recibo del
-   último pago o el instructivo de tres pasos la primera vez).
+2. Contenido + rail auxiliar de 340px **a la derecha**
+   (`lg:grid-cols-[minmax(0,1fr)_340px]` en Registrar pago, **solo cuando hay algo
+   que poner en el rail**: el recibo del último pago o el instructivo de tres pasos
+   la primera vez).
 3. Registrar pago sin rail: **centrado a 680px** (`mx-auto max-w-[680px]`), título
    incluido. Una columna sola pegada a la izquierda con medio ancho vacío al lado
    se lee como un error de maquetación.
-4. Inicio: encabezado a todo el ancho sin hoja + dos hojas con lista
-   (`lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]`, "Últimos pagos" algo más
-   ancha que "Por iglesia"), con **`items-start`** para que cada hoja mida lo que
-   necesite en vez de estirarse a la altura de la vecina.
+4. Rail de 340px **a la izquierda** + contenido
+   (`lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]` en la ficha de persona).
+5. Inicio no usa rejilla de pantalla: es **una hoja** y la rejilla vive *dentro*
+   de ella (`lg:grid-cols-2` con `lg:divide-x`).
 
-**La ficha de persona es una sola hoja.** La cuenta es una franja de cabecera
-horizontal (el saldo en `cifraEnorme` con su chip a la izquierda; Precio del cupo,
-Ha pagado y Abonos como datos en línea a la derecha; barra de progreso debajo), y
-el historial de pagos ocupa el ancho completo en columnas: Monto (132px, derecha) ·
-Fecha (flexible) · Forma de pago (132px, desde `md`) · Acciones (104px, derecha).
-Antes eran una tarjeta estrecha y una columna medio vacía: con muchos pagos, la
-columna se hacía un cordón interminable mientras al lado sobraba media pantalla.
+Las formas 2 y 4 llevan siempre **`items-start`** y `gap-5`, para que cada columna
+mida lo que necesite en vez de estirarse a la altura de la vecina.
+
+**La ficha de persona: cuenta a la izquierda, historial a la derecha.** Es la
+rejilla 4. A la izquierda, una hoja angosta de 340px (`.hoja h-fit p-5`) con la
+cuenta: rótulo ("Le falta" mientras deba, "Pagó en total" cuando ya cerró) y
+`ChipEstado` en la misma línea, el saldo en `cifraEnorme`, la barra de progreso de
+10px, y un `dl` en `menuda` separado por un hairline con Precio del cupo, Ha pagado
+y Abonos —dato a la izquierda, valor a la derecha—; debajo, los avisos que
+correspondan y las dos acciones apiladas a todo el ancho ("Registrar abono" sólido
+y "Cambiar tipo de cupo o precio" de texto). A la derecha, la hoja del historial.
+
+**El renglón del historial es compacto.** Un pago es **una sola fila** de 54px
+(`px-5 py-2`): columna de monto de 108px alineada a la derecha (tachado y en tinta
+tercera si está anulado), y a su lado, en la columna flexible, la fecha larga
+arriba —con la fecha relativa detrás en tinta tercera— y la forma de pago, la nota
+o el motivo de la anulación debajo en `menuda`. Cierran la fila la píldora
+"Anulado" (par `sinpagos`) cuando lo está, o los dos botones de icono de 44px
+(comprobante y anular) cuando el pago está vivo. La versión anterior repartía lo
+mismo en cuatro columnas fijas y una fila más alta; con un historial largo, apilar
+menos aire por pago es lo que deja ver la cuenta completa de un vistazo.
 
 **Comportamiento responsivo: estructural, no tipográfico.** Los únicos cambios por
 ancho son colapsar rejillas a una columna y esconder columnas secundarias por
@@ -588,12 +619,19 @@ el documento.
 
 **La regla de la hoja sola.** Nunca una `.hoja` dentro de otra `.hoja`. Si un
 bloque necesita subdividirse, se subdivide con hairlines, con `{colors.hoja-2}` o
-con espacio — nunca con una superficie nueva.
+con espacio — nunca con una superficie nueva. La hoja de Inicio es el ejemplo
+mayor: tres franjas muy distintas y **una sola superficie**.
 
-**La regla de la hoja que se gana.** Una hoja existe para *agrupar* varias cosas
-que se leen juntas. Un solo número, por importante que sea, no se mete en una
-caja: la caja lo convierte en un campo de formulario. Si al quitarle el borde a un
-bloque no se pierde nada, no llevaba borde.
+**La regla de la hoja que sostiene.** La hoja no es un marco decorativo alrededor
+de un número: es el suelo sobre el que el número se apoya. **Una cifra, por grande
+que sea, va sobre una hoja.** Se intentó justo lo contrario —sacar lo recaudado de
+Inicio a la mesa desnuda, sin superficie, con el argumento de que un solo número no
+se gana una caja— y el usuario lo revirtió: sin la hoja debajo, la cifra quedaba
+flotando y la pantalla se descosía, porque perdía lo único que ataba el titular,
+el resumen y las dos listas a un mismo objeto. El contrato de dirección lo deja
+escrito: quitar la superficie de la hoja **fue un paso de más y se revirtió**. No
+se vuelve a intentar. Lo que sí se quitó para siempre es el ornamento de época
+(raya de margen, trama alterna, folio), no el papel.
 
 **La regla de la raya y el aire.** Una fila se separa de la siguiente con una raya
 de 1px y con espacio, no con relleno de fondo. Raya + trama alterna + columnas a la
@@ -670,10 +708,9 @@ regla de las dos rayas*: `{colors.linea}` para estructura y cromo,
 nunca decoración.
 
 Las barras de progreso son la silueta recurrente del sistema: cápsula de 8px de
-alto por defecto y en la ficha, 10px en el recibo del cobro (el único sitio donde
-la barra es protagonista), y 8px en la barra grande de Inicio — que adelgazó a
-propósito cuando la cifra creció a `cifraTitular`: dos elementos gritando compiten,
-y el que tiene que ganar es el número. Canal `{colors.linea}`, relleno con la
+alto por defecto (`BarraProgreso`), 10px en la ficha de persona y en el recibo del
+cobro, y 12px en la barra a todo el ancho de la cabecera de Inicio, que es la más
+gruesa porque es la única que cruza la hoja entera. Canal `{colors.linea}`, relleno con la
 *marca* del estado, y crecimiento por `transform: scaleX()` desde el origen
 izquierdo. Las listas no llevan barras: dos columnas de cifras dicen lo mismo y no
 dejan nada colgando debajo del renglón.
@@ -727,7 +764,7 @@ chips de filtro y los "filtros puestos" se eliminaron con el panel de filtros.
 
 No hay tarjetas: hay **hojas**. Radio de 10px, fondo `{colors.hoja}`, borde de 1px
 `{colors.linea}` y un filo de sombra. El padding interior es de 20px (24px en la
-franja de cuenta, 28px en los documentos imprimibles); las hojas con lista usan
+hoja de Inicio, 28px en los documentos imprimibles); las hojas con lista usan
 `overflow-hidden` y llevan el padding a cada renglón. La cabecera de una hoja con
 lista es una franja de 44–50px con título en peso 600 y, a la derecha, un enlace en
 `menuda` con el icono de avance; debajo puede ir una fila de rótulos de columna
@@ -862,25 +899,34 @@ siguiente frame la sube al nuevo: la usuaria ve entrar su abono. Es la única
 animación de la app que dura más de 250ms, y es deliberada.
 
 El color del relleno **siempre sale de `calcularEstado(pagado, precio)`**, incluso
-en las barras agregadas. La barra grande de Inicio no es verde por ser un total:
-es verde solo cuando de verdad está cobrado completo, ámbar mientras se abona y
-gris cuando no hay nada.
+en las barras agregadas. La barra de Inicio no es verde por ser un total: es verde
+solo cuando de verdad está cobrado completo, ámbar mientras se abona y gris cuando
+no hay nada. Esa barra es la única que no pasa por el componente: está escrita a
+mano en `Inicio.tsx` para poder medir 12px y ocupar el ancho de la hoja, pero
+respeta el mismo canal, el mismo `scaleX` de 420ms y el mismo origen del color.
 
 ### Nota y Aviso
 
 Dos niveles distintos, y la diferencia importa porque la app avisa mucho:
 
-- **`Nota`** (el patrón por defecto): sin caja y sin color de fondo — icono de
-  aviso de 15px en tinta tercera + texto en `menuda` tinta segunda. Para lo que
-  informa y no alarma: excedente pagado de más, precio puesto a mano, "lo
-  recaudado incluye pagos de más". Una caja de color aquí compite con la cifra, que
-  es lo que tiene que mandar en la pantalla.
-- **`Aviso`** (`src/components/Piezas.tsx`): caja de color, radio 8px, `menuda`.
-  Tono `neutro` en verde azulado apagado y tono `ojo` en ámbar. Se reserva para lo
-  que sí interrumpe: persona archivada, posible nombre repetido mientras se
-  escribe, evento sin tipos de cupo, avisos de Ajustes al cambiar precios en masa.
+- **`Nota`** (el patrón por defecto): **es un patrón, no un componente** — se
+  escribe en la propia pantalla, sin caja y sin color de fondo: `IconoAviso` de
+  15px en tinta tercera + texto en `menuda` tinta segunda, en un `<p>` con
+  `flex items-start gap-1.5`. Para lo que informa y no alarma. Su instancia viva es
+  la nota al pie de Inicio ("Incluye RD$ … de pagos de más, por eso lo recaudado y
+  lo que falta no suman justo la meta"), escrita directamente en `Inicio.tsx`. Ahí
+  una caja de color competiría con la cifra que tiene que mandar en la pantalla.
+- **`Aviso`** (`src/components/Piezas.tsx`): caja de color, radio 8px, `menuda`,
+  icono de 16px. Tono `neutro` en verde azulado apagado y tono `ojo` en ámbar. Se
+  reserva para lo que sí interrumpe o corrige la lectura de la cuenta: persona
+  archivada (`ojo`), posible nombre repetido mientras se escribe, evento sin tipos
+  de cupo, los avisos de Ajustes al cambiar precios en masa, y en la ficha de
+  persona el excedente pagado de más y el precio puesto a mano (`neutro`).
 
 Si dudas cuál usar: si la usuaria puede seguir trabajando sin leerlo, es `Nota`.
+El mismo hecho puede pedir los dos niveles según dónde aparezca — el excedente es
+`Nota` al pie del total de Inicio y `Aviso` dentro de la cuenta de una persona,
+porque ahí sí explica un número que no cuadra.
 
 ### Estado vacío
 
@@ -946,8 +992,10 @@ de tener que ir a la ficha a anular.
 - **Do** construir toda lista como renglones (`.renglon`) dentro de una sola
   `.hoja`, separados por el hairline de `{colors.linea}` y por aire.
 - **Do** definir cualquier superficie nueva con una raya de 1px, no con una sombra.
-- **Do** dejar sin hoja lo que es un titular: si al quitarle el borde a un bloque
-  no se pierde nada, no llevaba borde.
+- **Do** poner toda cifra sobre una hoja, incluida la que manda la pantalla; sobre
+  el papel de la mesa solo van el `h1` con su bajada y el enlace de volver.
+- **Do** subdividir una hoja grande por dentro —hairlines, `{colors.hoja-2}`,
+  `lg:divide-x`— antes que partirla en varias superficies.
 - **Do** usar el componente `Monto` para cualquier cantidad de dinero, y `.cifra`
   para cualquier número comparable.
 - **Do** derivar el color de toda barra de progreso —incluidas las agregadas— de
@@ -995,8 +1043,13 @@ de tener que ir a la ficha a anular.
   de pantalla, ni la raya roja de margen junto a una lista, ni versalitas
   espaciadas. Se quitaron a propósito y el encargo del usuario es explícito:
   moderno, no "hecho para viejitos".
-- **Don't** meter un número solo en una tarjeta para "darle importancia": el tamaño
-  y el aire hacen ese trabajo, el borde lo deshace.
+- **Don't** sacar una cifra de su hoja para "darle aire". Ya se probó en Inicio y
+  se revirtió por pedido del usuario: el número quedaba flotando sobre la mesa y la
+  pantalla se descosía. La hoja no le quita importancia a la cifra; es lo que la
+  sostiene y lo que une el titular con el resumen y las listas.
+- **Don't** convertir el resumen de Inicio en una retícula de tarjetitas de
+  panel de control: las cuatro cuentas son un renglón de totales dentro de la misma
+  hoja, sobre `{colors.hoja-2}` y entre dos hairlines.
 - **Don't** volver a una rejilla de píldoras o de botones para elegir entre datos
   que crecen (iglesias, tipos de cupo, pastores): no escala y se come la pantalla.
 - **Don't** poner el conteo de resultados en la cara de un botón de filtro, ni
