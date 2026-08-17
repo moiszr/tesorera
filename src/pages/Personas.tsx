@@ -288,7 +288,7 @@ export default function Personas() {
                   aria-label={`Ver la ficha de ${p.nombre}`}
                 />
 
-                <div className="pointer-events-none relative z-10 flex min-h-[46px] items-center px-5 py-1.5">
+                <div className="pointer-events-none relative z-10 flex min-h-[52px] items-center px-5 py-1">
                   {/* Una sola escala en toda la fila: el nombre pesa más por su
                       grosor, no por su tamaño. Mezclar tamaños entre columnas
                       hace que la tabla se lea desnivelada. */}
@@ -331,7 +331,7 @@ export default function Personas() {
                       <Link
                         to={`/registrar-pago?persona=${p.id}`}
                         aria-label={`Registrar un abono de ${p.nombre}`}
-                        className="inline-flex min-h-[36px] items-center gap-1.5 rounded-pieza border border-linea bg-hoja px-2.5 text-menuda font-medium text-tinta2 opacity-0 transition-[opacity,color,border-color] duration-150 hover:border-accionBorde hover:text-accionTexto focus-visible:opacity-100 group-hover:opacity-100"
+                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-pieza border border-linea bg-hoja px-3 text-menuda font-medium text-tinta2 opacity-0 transition-[opacity,color,border-color] duration-150 hover:border-accionBorde hover:text-accionTexto focus-visible:opacity-100 group-hover:opacity-100"
                       >
                         <IconoPago tam={15} />
                         Cobrar
