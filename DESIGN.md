@@ -30,64 +30,69 @@ colors:
   sinpagos-marca: "#d4d4d8"
   aviso-fondo: "#eeedff"
   aviso-tinta: "#3f34a8"
-  iglesia-indigo: "#4a5578"
-  iglesia-pizarra: "#41525c"
-  iglesia-arcilla: "#8a5a3c"
-  iglesia-ciruela: "#6d4560"
-  iglesia-tabaco: "#6b4a2e"
-  iglesia-humo: "#59555f"
+  iglesia-purpura: "#7c3aed"
+  iglesia-rosa: "#db2777"
+  iglesia-cyan: "#0891b2"
+  iglesia-pizarra: "#475569"
+  iglesia-ciruela: "#a21caf"
+  iglesia-grafito: "#57534e"
 typography:
   micro:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "0.8125rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "0.75rem"
     fontWeight: 600
-    lineHeight: "1.15rem"
-    letterSpacing: "0.06em"
+    lineHeight: "1rem"
+    letterSpacing: "0.01em"
+    fontFeature: "cv11 1, ss01 1"
   menuda:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "0.9375rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: "1.35rem"
-    letterSpacing: "normal"
+    letterSpacing: "-0.006em"
+    fontFeature: "cv11 1, ss01 1"
   base:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "1.0625rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "0.9375rem"
     fontWeight: 400
-    lineHeight: 1.55
-    letterSpacing: "normal"
+    lineHeight: "1.55"
+    letterSpacing: "-0.009em"
+    fontFeature: "cv11 1, ss01 1"
   guia:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "1.1875rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "1.0625rem"
     fontWeight: 500
-    lineHeight: 1.45
-    letterSpacing: "normal"
+    lineHeight: "1.45"
+    letterSpacing: "-0.012em"
+    fontFeature: "cv11 1, ss01 1"
   titulo:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "1.3125rem"
+    fontWeight: 600
+    lineHeight: "1.28"
+    letterSpacing: "-0.021em"
+    fontFeature: "cv11 1, ss01 1"
+  cifra:
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
     fontSize: "1.375rem"
     fontWeight: 600
-    lineHeight: 1.3
-    letterSpacing: "-0.014em"
-  cifra:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 600
-    lineHeight: 1.15
-    letterSpacing: "-0.02em"
-    fontFeature: "tnum 1, lnum 1"
+    lineHeight: "1.15"
+    letterSpacing: "-0.022em"
+    fontFeature: "tnum 1, lnum 1, cv11 1, ss01 1"
   cifraGrande:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "1.875rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "1.75rem"
     fontWeight: 600
-    lineHeight: 1.1
-    letterSpacing: "-0.025em"
-    fontFeature: "tnum 1, lnum 1"
+    lineHeight: "1.1"
+    letterSpacing: "-0.026em"
+    fontFeature: "tnum 1, lnum 1, cv11 1, ss01 1"
   cifraEnorme:
-    fontFamily: "Fira Sans, system-ui, sans-serif"
-    fontSize: "2.25rem"
+    fontFamily: "Inter Variable, Inter, system-ui, sans-serif"
+    fontSize: "2.125rem"
     fontWeight: 600
-    lineHeight: 1.05
-    letterSpacing: "-0.028em"
-    fontFeature: "tnum 1, lnum 1"
+    lineHeight: "1.05"
+    letterSpacing: "-0.03em"
+    fontFeature: "tnum 1, lnum 1, cv11 1, ss01 1"
 rounded:
   foco: "4px"
   pieza: "6px"
@@ -292,7 +297,7 @@ saturación en el mismo movimiento: un verde y un ámbar lavados se leían a doc
 viejo.
 
 La densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre
-raíz de 17px, renglones de 44–66px, barras de herramientas de 44px, todo dentro de
+raíz de 16px, renglones de 44–66px, barras de herramientas de 44px, todo dentro de
 1366×768 sin scroll horizontal. La escala es **fija, no fluida**: hay un solo
 dispositivo de destino y la estabilidad de las columnas vale más que la
 adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px, no
@@ -316,7 +321,7 @@ siempre acompañados de su texto.
   `.hoja` definida por una raya de 1px, no por una sombra.
 - Renglones de una o dos líneas separados por una raya fina. **Sin trama alterna,
   sin raya de margen, sin ornamento de época**: se retiró y no vuelve.
-- Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y
+- Una sola familia tipográfica (Inter Variable) con cifras tabulares obligatorias, y
   rótulos en minúscula (nunca versalitas espaciadas).
 - Un solo acento (morado) para acciones, entrada activa, progreso agregado y la
   métrica que manda; verde/ámbar/gris solo para estado de pago.
@@ -325,7 +330,7 @@ siempre acompañados de su texto.
 - Los controles densos —filtros y selectores— son botones compactos que abren menús
   en la capa superior del navegador, nunca rejillas de píldoras que crecen con los
   datos.
-- Escala fija en rem sobre raíz de 17px; sin modo oscuro, sin tipografía fluida.
+- Escala fija en rem sobre raíz de 16px; sin modo oscuro, sin tipografía fluida.
 - Movimiento breve y de una sola curva; la barra de progreso al guardar es el único
   momento con autoría.
 
@@ -494,17 +499,30 @@ sobre la hoja y se pierde sobre el lienzo es un gris mal elegido.
 
 ## Typography
 
-**Familia única:** Fira Sans (con `system-ui`, `sans-serif` de respaldo), en pesos
-400, 500, 600 y 700. No hay segunda familia: los "números" no son un mono, son la
-misma Fira con cifras tabulares activadas.
+**Familia única:** Inter Variable (con `Inter`, `system-ui`, `sans-serif` de
+respaldo). No hay segunda familia: los "números" no son un mono, son la misma Inter
+con cifras tabulares activadas.
 
-**Character:** Fira Sans es una grotesca humanista de origen editorial: tiene cifras
-de altura pareja, buena diferenciación entre 1/l/I y una minúscula ancha que aguanta
-18px sin verse infantil. Elegida por legibilidad a la distancia de lectura con
-lentes, no por personalidad.
+**Character:** Inter es la tipografía de Linear y el estándar de producto por
+razones concretas, no por moda: x-height alta que la hace legible en tamaños
+chicos, diferenciación clara entre 1/l/I, y cifras tabulares impecables, que aquí
+es innegociable porque toda columna de dinero tiene que cuadrar.
 
-**Raíz de 17px.** `html { font-size: 17px }`, así que todo rem del sistema se lee
-1rem = 17px. La escala es **fija a propósito** (nada de `clamp`): hay un solo destino,
+Va con **`cv11` y `ss01` encendidos en todo el sistema**: son la 'a' de un solo
+piso y la 'l' con cola. Sin ellos Inter se lee como Helvetica genérica; con ellos
+tiene el aire geométrico que se le reconoce en Linear. `tnum` NO va global —en
+prosa las tabulares dejan huecos feos— sino solo en `.cifra`, y ahí el tracking
+vuelve a `0`, porque el negativo del texto aprieta los números.
+
+**Raíz de 16px, y no es un paso de la escala: es su fundamento.** Todos los pasos
+van en `rem` y cuelgan de ese valor, así que vive en `html` de `estilos.css` y en
+ningún token — por eso el detector lo marca como tamaño suelto y por eso no lo es.
+
+Bajó de 17px a 16px al cambiar de Fira Sans a Inter. **No es un recorte de la regla
+de accesibilidad del proyecto, que sigue en pie:** Inter tiene la x-height más alta,
+así que a 16px se lee del mismo tamaño aparente que Fira a 17. Equivalencia medida,
+no supuesta. Si algún día se vuelve a otra familia, este número se recalcula contra
+su x-height; no se hereda. La escala es **fija a propósito** (nada de `clamp`): hay un solo destino,
 una laptop de 13–14" a ~1366×768, y las columnas de cifras deben medir siempre lo
 mismo.
 
@@ -1019,7 +1037,7 @@ con el nombre que se buscó, y "Quitar filtros".
 ### Toasts
 
 Sonner abajo a la derecha con 20px de separación, vestido con los tokens del sistema: fondo
-`{colors.hoja}`, borde `{colors.linea-fuerte}`, Fira Sans a 0.9375rem. El título lleva el
+`{colors.hoja}`, borde `{colors.linea-fuerte}`, Inter a 0.9375rem. El título lleva el
 monto y el nombre; la descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado
 completo"). El toast del pago guardado dura 8s y trae "Deshacer": la corrección más rápida
 posible antes de tener que ir a la ficha a anular.
