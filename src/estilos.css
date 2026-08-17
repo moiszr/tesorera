@@ -39,13 +39,17 @@
   --lomo-texto: #52525b;
   --lomo-activo: #ffffff;
 
-  /* Acento: azul vivo, lo único de color de la interfaz.
-     Contraste 5.2:1 sobre blanco y sobre él, así que sirve igual de fondo de
-     botón que de texto. */
-  --accion: #2563eb;
-  --accion-alto: #1d4ed8;
-  --accion-suave: #eff6ff;
-  --accion-borde: #bfdbfe;
+  /* Acento: azul eléctrico. Lo único de color de la interfaz.
+     Van DOS tonos del mismo azul, y no es capricho: el brillante mide 4.55:1
+     sobre blanco puro, pero cae a 4.25 sobre el lienzo gris y a 3.98 sobre su
+     propio fondo suave, que es justo donde va la cifra principal. Así que el
+     brillante se reserva para SUPERFICIES (fondo de botón, barra de progreso,
+     puntos) y el oscuro para TEXTO sobre fondos claros. */
+  --accion: #0070f3;          /* superficie · blanco encima 4.55:1 */
+  --accion-texto: #005ed1;    /* texto      · 5.2–6.0:1 sobre los tres fondos */
+  --accion-alto: #005ed1;     /* hover del botón */
+  --accion-suave: #e6f1fe;
+  --accion-borde: #a8d0fb;
 
   /* Estados de pago — mismos colores en toda la app, siempre con texto.
      Vivos, no apagados: un verde y un ámbar lavados se leen a documento viejo. */
@@ -62,8 +66,8 @@
   --sinpagos-marca: #d4d4d8;
 
   /* Aviso tranquilo (excedente, notas del sistema) */
-  --aviso-fondo: #eff6ff;
-  --aviso-tinta: #1e40af;
+  --aviso-fondo: #e6f1fe;
+  --aviso-tinta: #01458f;
 
   /* Impresión: en papel el fondo es el papel de verdad. */
   --papel-impreso: #ffffff;

@@ -192,7 +192,7 @@ export function DialogoPersona({
           </div>
         </details>
 
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
 
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>

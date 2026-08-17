@@ -20,6 +20,7 @@ const config: Config = {
         lomoTexto: 'var(--lomo-texto)',
         accion: 'var(--accion)',
         accionAlto: 'var(--accion-alto)',
+        accionTexto: 'var(--accion-texto)',
         accionSuave: 'var(--accion-suave)',
         accionBorde: 'var(--accion-borde)',
         pagadoFondo: 'var(--pagado-fondo)',

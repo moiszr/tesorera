@@ -110,7 +110,7 @@ export function FiltroMenu({
           'inline-flex min-h-[44px] max-w-[280px] items-center gap-2 rounded-pieza px-3 text-menuda',
           'border transition-colors duration-150 active:scale-[0.98]',
           activo
-            ? 'border-accion bg-[rgba(37,99,235,0.09)] font-medium text-accion'
+            ? 'border-accion bg-[rgba(0,112,243,0.09)] font-medium text-accionTexto'
             : 'border-linea text-tinta2 hover:border-lineaFuerte hover:bg-hoja2 hover:text-tinta',
         ].join(' ')}
       >
@@ -147,7 +147,7 @@ export function FiltroMenu({
                 alElegir(undefined)
               }
             }}
-            className="-mr-1 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-[rgba(37,99,235,0.16)]"
+            className="-mr-1 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-[rgba(0,112,243,0.16)]"
           >
             <IconoCerrar tam={14} />
           </span>
@@ -243,7 +243,7 @@ function BotonOpcion({
       className={[
         'flex min-h-[44px] w-full items-center gap-2.5 px-3 text-left text-menuda',
         'transition-colors duration-150',
-        elegida ? 'bg-[rgba(37,99,235,0.09)] font-medium text-accion' : 'hover:bg-hoja2',
+        elegida ? 'bg-[rgba(0,112,243,0.09)] font-medium text-accionTexto' : 'hover:bg-hoja2',
       ].join(' ')}
     >
       {children}

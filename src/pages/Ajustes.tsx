@@ -208,7 +208,7 @@ function DialogoEvento({
           <Campo etiqueta="Empieza" type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} />
           <Campo etiqueta="Termina" type="date" value={fin} onChange={(e) => setFin(e.target.value)} />
         </div>
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>
             Cancelar
@@ -570,7 +570,7 @@ function DialogoCategoria({
             cupo. Si cambias el precio, te preguntaré si se lo aplico a quienes no han pagado completo.
           </Aviso>
         )}
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>
             Cancelar
@@ -756,7 +756,7 @@ function DialogoIglesia({
                 className={[
                   'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda',
                   'border transition-colors duration-150 active:scale-[0.98]',
-                  color === c.valor ? 'border-accion bg-[rgba(37,99,235,0.08)] font-medium' : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
+                  color === c.valor ? 'border-accion bg-[rgba(0,112,243,0.08)] font-medium' : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
                 ].join(' ')}
               >
                 <span
@@ -780,7 +780,7 @@ function DialogoIglesia({
             Archivar esta iglesia (deja de aparecer al agregar personas; nadie pierde su etiqueta)
           </label>
         )}
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>
             Cancelar

@@ -113,7 +113,7 @@ export default function FichaPersona() {
     <div className="entra-hoja">
       <Link
         to="/personas"
-        className="mb-3 inline-flex min-h-[44px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accion"
+        className="mb-3 inline-flex min-h-[44px] items-center gap-1 text-menuda text-tinta2 transition-colors hover:text-accionTexto"
       >
         <IconoVolver tam={16} />
         Todas las personas
@@ -127,7 +127,7 @@ export default function FichaPersona() {
             {persona.pastor && <span className="text-menuda">Pastor {persona.pastor}</span>}
             {inscripcion && <span className="text-menuda">{inscripcion.categoria}</span>}
             {persona.telefono && (
-              <a href={`tel:${persona.telefono}`} className="cifra text-menuda underline-offset-4 hover:text-accion hover:underline">
+              <a href={`tel:${persona.telefono}`} className="cifra text-menuda underline-offset-4 hover:text-accionTexto hover:underline">
                 {persona.telefono}
               </a>
             )}
@@ -307,7 +307,7 @@ export default function FichaPersona() {
                           onClick={() => setAAnular(p)}
                           aria-label={`Anular el pago de ${formatoRD(p.monto)}`}
                           title="Anular este pago"
-                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(37,99,235,0.09)] hover:text-accion"
+                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(0,112,243,0.09)] hover:text-accionTexto"
                         >
                           <IconoAnular tam={18} />
                         </button>
@@ -444,7 +444,7 @@ function DialogoEditarPersona({
         )}
         <Campo etiqueta="Teléfono" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
         <Campo etiqueta="Notas" value={notas} onChange={(e) => setNotas(e.target.value)} />
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>
             Cancelar
@@ -562,7 +562,7 @@ function DialogoCupo({
           }
         />
 
-        {problema && <p className="text-menuda text-accion">{problema}</p>}
+        {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
 
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
           <Boton type="button" variante="texto" onClick={alCerrar}>

@@ -110,7 +110,7 @@ export function Selector({
           problema
             ? 'border-accion'
             : abierto
-              ? 'border-accion ring-2 ring-[rgba(37,99,235,0.18)]'
+              ? 'border-accion ring-2 ring-[rgba(0,112,243,0.18)]'
               : 'border-lineaFuerte hover:border-tinta3',
         ].join(' ')}
       >
@@ -182,7 +182,7 @@ export function Selector({
                   className={[
                     'flex min-h-[44px] w-full items-center gap-2.5 px-3 py-1.5 text-left',
                     'transition-colors duration-150',
-                    o.id === valor ? 'bg-[rgba(37,99,235,0.09)] text-accion' : 'hover:bg-hoja2',
+                    o.id === valor ? 'bg-[rgba(0,112,243,0.09)] text-accionTexto' : 'hover:bg-hoja2',
                   ].join(' ')}
                 >
                   {o.color && (
@@ -206,13 +206,13 @@ export function Selector({
                   {o.detalle && o.detalleNumerico && (
                     <span
                       className={`cifra shrink-0 font-medium text-menuda ${
-                        o.id === valor ? 'text-accion' : 'text-tinta2'
+                        o.id === valor ? 'text-accionTexto' : 'text-tinta2'
                       }`}
                     >
                       {o.detalle}
                     </span>
                   )}
-                  {o.id === valor && <IconoCheque tam={16} className="shrink-0 text-accion" />}
+                  {o.id === valor && <IconoCheque tam={16} className="shrink-0 text-accionTexto" />}
                 </button>
               </li>
             ))
@@ -221,7 +221,7 @@ export function Selector({
       </div>
 
       {problema ? (
-        <p className="mt-1.5 text-menuda text-accion">{problema}</p>
+        <p className="mt-1.5 text-menuda text-accionTexto">{problema}</p>
       ) : ayuda ? (
         <p className="mt-1.5 text-menuda text-tinta2">{ayuda}</p>
       ) : null}

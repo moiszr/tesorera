@@ -144,7 +144,7 @@ export default function Personas() {
             onChange={(e) => setBuscar(e.target.value)}
             placeholder="Buscar por nombre…"
             aria-label="Buscar persona por nombre"
-            className="h-[44px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.18)]"
+            className="h-[44px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(0,112,243,0.18)]"
           />
         </div>
 

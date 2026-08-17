@@ -157,7 +157,7 @@ export default function Inicio() {
             <h2 className="text-menuda font-semibold">Últimos pagos</h2>
             <Link
               to="/personas"
-              className="inline-flex items-center gap-1 text-menuda text-tinta2 underline-offset-4 transition-colors hover:text-accion hover:underline"
+              className="inline-flex items-center gap-1 text-menuda text-tinta2 underline-offset-4 transition-colors hover:text-accionTexto hover:underline"
             >
               Ver todas
               <IconoAdelante tam={14} />
@@ -269,7 +269,7 @@ function Metrica({
       <p className="rotulo">{rotulo}</p>
       <p
         className={`cifra mt-1.5 font-semibold leading-none ${
-          fuerte ? 'text-cifraGrande text-accion' : 'text-cifra'
+          fuerte ? 'text-cifraGrande text-accionTexto' : 'text-cifra'
         }`}
       >
         {valor}
