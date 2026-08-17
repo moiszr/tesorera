@@ -641,10 +641,23 @@ de filtro mide lo mismo con tres opciones que con cincuenta.**
 
 **Las columnas de la lista de personas.** Un renglón es **una sola línea**: Nombre
 (flexible, mínimo 150px, con `truncate`) · Iglesia (220px) · Ha pagado (112px, derecha)
-· Su cupo (112px, derecha) · Cómo va (128px). Los dos montos van en columnas separadas,
-cada una alineada consigo misma: pegados en un solo bloque, lo pagado bailaba según lo
-largo que fuera el precio. Cuando alguien no está inscrito, las dos columnas de dinero
-se funden en una que dice "Sin inscribir".
+· Su cupo (112px, derecha) · Cómo va (128px) · el botón "Cobrar" (112px, derecha). Los
+dos montos van en columnas separadas, cada una alineada consigo misma: pegados en un
+solo bloque, lo pagado bailaba según lo largo que fuera el precio. Cuando alguien no
+está inscrito, las dos columnas de dinero se funden en una que dice "Sin inscribir".
+
+**La columna de cobrar existe mientras quede algo por cobrar.** El botón se pinta solo
+si la persona está inscrita **y** su estado no es "pagado": un renglón que dice "Pagado"
+y al lado ofrece "Cobrar" se contradice, y de paso la columna deja de ser una pared de
+botones que grita más que los números para pasar a señalar a quién falta cobrarle. **La
+caja de 112px se queda siempre**, con botón o sin él —también en el encabezado, donde es
+un espaciador `aria-hidden`—: es lo que mantiene las cinco columnas anteriores a plomo de
+fila en fila. Lo que no se queda es su captura de clics: vacía y captadora serían 112px
+muertos por encima del enlace que cubre el renglón entero. A quien ya pagó se le sigue
+cobrando desde su ficha —el renglón entero lleva ahí—, que es donde se ven el total
+pagado y el excedente antes de tocar nada. Y si el precio de su cupo sube por encima de
+lo que pagó, el estado vuelve a "abonando" en la siguiente carga y el botón reaparece
+solo.
 
 **Prioridad de columnas al angostar.** Las columnas se caen por prioridad, no todas a
 la vez: Iglesia aparece desde `xl`, "Su cupo" desde `md`, y el encabezado de columnas

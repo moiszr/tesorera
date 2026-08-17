@@ -19,6 +19,19 @@ import { IconoBuscar, IconoMas } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
 
+/**
+ * Quién enseña botón de cobrar en su renglón: el que está inscrito y todavía
+ * debe algo. Vive aquí, en una sola definición, porque la regla se usa dos
+ * veces en la fila (el botón y su zona de clic) y separarlas dejaría huecos
+ * muertos sobre el enlace del renglón.
+ *
+ * Se mira el estado y no el balance: un cupo de precio 0 también tiene balance
+ * 0, pero ahí el chip dice "Sin pagos" y cobrarle sí tiene sentido.
+ */
+function puedeCobrar(p: PersonaEnLista): boolean {
+  return p.inscripcion_id !== null && p.estado !== 'pagado'
+}
+
 const ORDENES: { valor: Orden; texto: string }[] = [
   { valor: 'nombre', texto: 'Por nombre' },
   { valor: 'menos_pagado', texto: 'Los que más deben' },
@@ -323,7 +336,20 @@ export default function Personas() {
                     <ChipEstado estado={p.estado} />
                   </span>
 
-                  {/* Cobrar desde la fila, en todas y siempre visible.
+                  {/* Cobrar desde la fila, pero solo donde queda algo por
+                      cobrar. Un renglón que dice "Pagado" y al lado ofrece
+                      "Cobrar" se contradice a sí mismo. Y hay premio: mostrando
+                      el botón solo donde falta, la columna deja de ser una pared
+                      de botones que grita más que los propios números y pasa a
+                      decir de un vistazo a quién hay que cobrarle.
+                      A quien ya pagó se le sigue pudiendo cobrar —un abono de
+                      más, una corrección—: el renglón entero es un enlace a su
+                      ficha, y allí "Registrar abono" está siempre, con el total
+                      pagado y el excedente delante antes de tocar nada.
+                      La caja de 112px se queda aunque el botón no esté: es lo
+                      que mantiene las columnas a plomo. Lo que no se queda es su
+                      captura de clics, o serían 112px muertos encima del enlace
+                      de la fila.
                       Contorno blanco en vez de relleno: 64 botones con fondo de
                       color forman una columna que le grita más fuerte que los
                       propios números. Sin icono —el billete a 16px se leía como
@@ -332,8 +358,12 @@ export default function Personas() {
                       hay UN botón mirándote y no sesenta y cuatro.
                       El ::before le devuelve los 46px de zona de clic que la
                       caja de 34px no tiene, sin deformarla ni salirse de la fila. */}
-                  <span className="pointer-events-auto flex w-[112px] shrink-0 justify-end pl-3">
-                    {p.inscripcion_id && (
+                  <span
+                    className={`flex w-[112px] shrink-0 justify-end pl-3 ${
+                      puedeCobrar(p) ? 'pointer-events-auto' : ''
+                    }`}
+                  >
+                    {puedeCobrar(p) && (
                       <Link
                         to={`/registrar-pago?persona=${p.id}`}
                         aria-label={`Registrar un abono de ${p.nombre}`}

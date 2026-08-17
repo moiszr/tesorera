@@ -28,6 +28,23 @@ describe('calcularEstado', () => {
     expect(calcularEstado(0, 0)).toBe('sinpagos')
     expect(calcularEstado(1000, 0)).toBe('abonando')
   })
+
+  // El botón "Cobrar" de la lista de personas se pinta cuando el estado NO es
+  // "pagado". Como el estado se recalcula en cada consulta a partir del precio
+  // vivo de la inscripción, subirle el precio a alguien que ya había saldado
+  // tiene que devolverlo a "abonando" — y con él, su botón.
+  it('si el precio sube por encima de lo pagado, vuelve a abonando', () => {
+    expect(calcularEstado(450000, 450000)).toBe('pagado')
+    expect(calcularEstado(450000, 500000)).toBe('abonando')
+  })
+
+  // La otra cara de lo mismo: con precio 0 el balance también es 0, pero el
+  // estado es "sin pagos" y ahí sí hay que ofrecer cobrar. Por eso el botón
+  // mira el estado y no el balance.
+  it('balance cero no siempre significa pagado', () => {
+    expect(calcularBalance(0, 0)).toBe(0)
+    expect(calcularEstado(0, 0)).not.toBe('pagado')
+  })
 })
 
 describe('balance y excedente', () => {

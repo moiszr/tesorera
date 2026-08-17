@@ -162,6 +162,28 @@ describe('precio del tipo de cupo', () => {
     expect(aplicarPrecioDeCategoria(catNino).cambiadas).toBe(0)
     expect(inscripcionesAfectadas(catNino).cuantas).toBe(0)
   })
+
+  // La lista de personas solo enseña el botón "Cobrar" a quien NO está en
+  // "pagado". El estado no se guarda: se recalcula en cada consulta contra el
+  // precio vivo de la inscripción. Así que si a alguien que ya saldó se le sube
+  // el precio de su cupo, tiene que volver a "abonando" él solo — y con él, su
+  // botón. Sin esto, alguien quedaría marcado como pagado debiendo dinero y sin
+  // forma de cobrarle desde la lista.
+  it('subirle el precio a quien ya pagó lo devuelve a abonando en la lista', () => {
+    const { personaId, inscripcionId } = crearPersona('Ya pagó', catFamiliar, 450000)
+    pagar(inscripcionId, 450000)
+
+    const antes = listarPersonas({}).find((p) => p.id === personaId)!
+    expect(antes.estado).toBe('pagado')
+    expect(antes.balance).toBe(0)
+
+    // Es lo que hace "Cambiar tipo de cupo o precio" en la ficha.
+    db.prepare('UPDATE inscripciones SET precio = 500000 WHERE id = ?').run(inscripcionId)
+
+    const despues = listarPersonas({}).find((p) => p.id === personaId)!
+    expect(despues.estado).toBe('abonando')
+    expect(despues.balance).toBe(50000)
+  })
 })
 
 describe('búsqueda y totales', () => {
