@@ -1,6 +1,6 @@
 ---
 name: Tesorera
-description: El libro de caja abierto — lomo de tela, hoja de papel definida por una raya fina, y columnas de cifras para llevar los abonos de la convención.
+description: Una libreta de tesorería moderna — papel cálido, lomo de tela oxblood, cifras tabulares y rayas finas; densidad de herramienta, no de panel de control.
 colors:
   papel: "#f3efe6"
   hoja: "#fffdf8"
@@ -88,6 +88,13 @@ typography:
     lineHeight: 1
     letterSpacing: "-0.03em"
     fontFeature: "tnum 1, lnum 1"
+  cifraTitular:
+    fontFamily: "Fira Sans, system-ui, sans-serif"
+    fontSize: "4.25rem"
+    fontWeight: 600
+    lineHeight: 0.95
+    letterSpacing: "-0.035em"
+    fontFeature: "tnum 1, lnum 1"
 rounded:
   foco: "4px"
   pieza: "8px"
@@ -152,6 +159,13 @@ components:
     rounded: "{rounded.pieza}"
     padding: "12px 16px 12px 4.2rem"
     typography: "{typography.cifraGrande}"
+  buscador-barra:
+    backgroundColor: "{colors.hoja}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.pieza}"
+    padding: "0 16px 0 44px"
+    height: "44px"
+    typography: "{typography.guia}"
   chip-pagado:
     backgroundColor: "{colors.pagado-fondo}"
     textColor: "{colors.pagado-tinta}"
@@ -170,18 +184,43 @@ components:
     rounded: "{rounded.redondo}"
     padding: "4px 12px"
     typography: "{typography.menuda}"
-  chip-filtro:
+  filtro-boton:
     backgroundColor: "transparent"
     textColor: "{colors.tinta-2}"
-    rounded: "{rounded.redondo}"
-    padding: "0 14px"
+    rounded: "{rounded.pieza}"
+    padding: "0 12px"
+    height: "44px"
+    width: "280px"
+    typography: "{typography.menuda}"
+  filtro-boton-activo:
+    backgroundColor: "rgba(138, 51, 64, 0.08)"
+    textColor: "{colors.accion}"
+    rounded: "{rounded.pieza}"
+    padding: "0 12px"
     height: "44px"
     typography: "{typography.menuda}"
-  chip-filtro-activo:
-    backgroundColor: "rgba(138, 51, 64, 0.09)"
+  selector-campo:
+    backgroundColor: "{colors.hoja}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.pieza}"
+    padding: "0 12px"
+    height: "46px"
+  menu:
+    backgroundColor: "{colors.hoja}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.hoja}"
+    padding: "4px 0"
+    width: "280px"
+  menu-opcion:
+    backgroundColor: "transparent"
+    textColor: "{colors.tinta}"
+    padding: "0 12px"
+    height: "44px"
+    typography: "{typography.menuda}"
+  menu-opcion-elegida:
+    backgroundColor: "rgba(138, 51, 64, 0.08)"
     textColor: "{colors.accion}"
-    rounded: "{rounded.redondo}"
-    padding: "0 14px"
+    padding: "0 12px"
     height: "44px"
     typography: "{typography.menuda}"
   lomo:
@@ -217,33 +256,37 @@ components:
 
 ## Overview
 
-**Creative North Star: "El libro de caja"**
+**Creative North Star: "La libreta de tesorería moderna"**
 
-La app no es un panel de control: es el libro de contabilidad encuadernado que la
-tesorera ya sabe leer, abierto sobre la mesa. A la izquierda, el lomo de tela
-oxblood con las cuatro pestañas del libro; a la derecha, la hoja de papel cálido
-donde se escribe. Esa metáfora define la estructura de cada pantalla: donde un
-dashboard genérico pondría una retícula de tarjetas, aquí hay una sola hoja con
-renglones separados por rayas finas y columnas de cifras alineadas.
+El objeto sigue siendo un libro de caja: lomo de tela oxblood a la izquierda con
+las cuatro pestañas, hoja de papel cálido a la derecha donde se escribe. Pero el
+libro dejó de imitarse a sí mismo. La raya roja de margen y la trama alterna de
+renglones —los dos adornos que hacían "libro viejo"— se quitaron a propósito, y
+lo que carga la identidad hoy es material, no ornamento: el papel cálido, la tela
+oxblood, las cifras tabulares y el hairline. La frase que fija la dirección es del
+usuario: **moderno, no "hecho para viejitos"**. Nadie vuelve a poner una raya roja
+vertical junto a una tabla ni a rayar los renglones para que "parezca contabilidad".
 
-La hoja se define por **una raya fina, no por una sombra**. Es la corrección
-mayor de esta revisión: la sombra marcada hacía flotar todo y la pantalla se
-sentía recargada de superficies. Hoy la `.hoja` lleva `border: 1px solid` de la
-raya y apenas un filo de sombra; los renglones perdieron la trama alterna (raya +
-trama + columnas a la vez es una hoja de cálculo de los noventa); y la raya roja
-de margen dejó de dibujarse en pantalla. El libro se lee ahora por rayas y aire.
+Lo que sí quedó del libro es la estructura, y esa es la parte útil: una hoja por
+bloque, renglones de una sola línea separados por una raya de 1px, columnas de
+cifras alineadas consigo mismas. Donde un panel de control genérico pondría una
+retícula de tarjetitas, aquí hay una hoja con renglones. Y donde una tarjeta
+serviría solo para dibujar un borde alrededor de un número, no hay tarjeta: la
+cifra recaudada de Inicio vive **directamente sobre el papel de la mesa**, sin
+caja, porque es el objeto de la pantalla y meterla en una ficha la degradaba a
+campo de formulario.
 
-La densidad es de herramienta de trabajo: texto base de 18px sobre una raíz de
-17px, renglones de 46–66px según lo que carguen, botones de 44px, y todo lo
-importante cabe en 1366×768 sin scroll horizontal. La escala es **fija, no
-fluida**: hay un solo dispositivo de destino y la estabilidad de las columnas
-vale más que la adaptabilidad. Los dos escalones chicos de la escala crecieron a
-propósito (14px y 16px, no 11px y 13px) porque quien lee esto lee con lentes: un
-rótulo bonito que ella no distingue es un rótulo inservible.
+La densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre
+raíz de 17px, renglones de 46–52px, barras de herramientas de 44px, todo dentro de
+1366×768 sin scroll horizontal. La escala es **fija, no fluida**: hay un solo
+dispositivo de destino y la estabilidad de las columnas vale más que la
+adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px,
+no 11px y 13px) porque quien lee esto lee con lentes; eso es accesibilidad, no
+falta de refinamiento.
 
 El contenido son los números. Toda la dramaturgia tipográfica está reservada al
-dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras
-las cifras saltan a 30, 42 y 59px. El color se administra con avaricia: un solo
+dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las
+cifras saltan a 30, 42, 59 y 72px. El color se administra con avaricia: un solo
 acento (la familia oxblood) reservado para acciones, y tres colores de estado que
 existen únicamente para decir cómo va un pago, siempre acompañados de su texto.
 
@@ -251,11 +294,16 @@ existen únicamente para decir cómo va un pago, siempre acompañados de su text
 
 - Lomo de tela a la izquierda (236px) + hoja de papel a la derecha; una sola hoja
   por bloque, nunca una hoja dentro de otra.
-- La hoja es un rectángulo delimitado por hairline, no una tarjeta que flota.
-- Renglones separados por una raya fina y por aire; sin trama alterna.
+- La hoja se define por un hairline, no por una sombra; y cuando el contenido no
+  necesita hoja (el titular de Inicio), no lleva hoja.
+- Renglones de una sola línea separados por una raya fina. Sin trama alterna, sin
+  raya de margen: el adorno de época se retiró y no vuelve.
 - Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y
   rótulos en minúscula (nunca versalitas espaciadas).
 - Un solo acento (oxblood) para acciones; verde/ámbar/gris solo para estado de pago.
+- Los controles densos —filtros y selectores— son botones compactos que abren
+  menús en la capa superior del navegador, nunca rejillas de píldoras que crecen
+  con los datos.
 - Escala fija en rem sobre raíz de 17px; sin modo oscuro, sin tipografía fluida.
 - Movimiento breve y de una sola curva; la barra de progreso al guardar es el
   único momento con autoría.
@@ -269,23 +317,22 @@ del semáforo pero rebajados a tinta de libro.
 ### Primary
 
 - **Vino de acción** (`{colors.accion}`): el único acento de la app. Botón sólido
-  principal, borde y texto de lo seleccionado, borde y anillo de foco de los
-  campos, enlaces dentro del texto, `caret-color` y `accent-color` del documento.
-  Su versión oscura (`{colors.accion-alto}`) es exclusivamente el hover del botón
-  sólido. Aparece además al 5–16% de opacidad como fondo de opción resaltada, de
-  píldora seleccionada y de hover de renglón en Inicio.
+  principal, borde y texto de lo seleccionado (opción elegida de un menú, filtro
+  puesto, forma de pago elegida), borde y anillo de foco de los campos, enlaces
+  dentro del texto, `caret-color` y `accent-color` del documento. Su versión
+  oscura (`{colors.accion-alto}`) es exclusivamente el hover del botón sólido.
+  Aparece además al 6–16% de opacidad como fondo de opción resaltada, de filtro
+  activo y de resultado resaltado en el buscador de cobro.
 - **Tela del lomo** (`{colors.lomo}`): la encuadernación. Solo la barra lateral de
   navegación, la cubierta de la marca y el `theme-color` de la ventana.
   `{colors.lomo-alto}` es la pestaña activa; `{colors.lomo-texto}` la tinta sobre
   la tela; `{colors.lomo-pestana}` la marca de 3×24px que señala la pestaña
   marcada del libro.
 - **Rúbrica** (`{colors.rubrica}`): la raya roja de margen del libro mayor.
-  **Ya no se dibuja sobre ninguna lista.** El artefacto `.margen-rubrica` fue
-  eliminado: una raya roja vertical corriendo por cada tabla competía con las
-  columnas de cifras y era decoración de época, no estructura. Sobrevive en dos
-  lugares y solo en dos: el dibujo del estado vacío (al 30% de opacidad) y la
-  franja de margen de la marca. La variable sigue declarada porque esos dos usos
-  la necesitan; no es un color disponible para superficies nuevas.
+  **No se dibuja sobre ninguna superficie de datos.** Sobrevive exactamente en dos
+  sitios: el dibujo del estado vacío (al 30% de opacidad) y la franja de margen de
+  la marca. La variable sigue declarada porque esos dos usos la necesitan; no es
+  un color disponible para pantallas nuevas.
 
 ### Secondary
 
@@ -297,20 +344,23 @@ significa nada fuera del estado de un pago.
   relleno de las barras de progreso; el par fondo/tinta viste el chip y la banda
   de "Pago guardado".
 - **Abonando** (`{colors.abonando-fondo}` / `{colors.abonando-tinta}` /
-  `{colors.abonando-marca}`): ámbar de papel. Es también el tono del aviso que
-  pide atención (`Aviso tono="ojo"`).
+  `{colors.abonando-marca}`): ámbar de papel. Es también el tono del `Aviso` que
+  pide atención (`tono="ojo"`): persona archivada, nombre repetido, evento sin
+  tipos de cupo.
 - **Sin pagos** (`{colors.sinpagos-fondo}` / `{colors.sinpagos-tinta}` /
   `{colors.sinpagos-marca}`): gris cálido neutro. Viste también la etiqueta
-  "ANULADO" del historial.
+  "Anulado" del historial.
 
-Las tres tríadas pasan AA sobre su propio fondo (5.96:1 a 6.82:1) y sobre las
-tres superficies de la app.
+Las tres tríadas pasan AA sobre su propio fondo y sobre las tres superficies de la
+app.
 
 ### Tertiary
 
 - **Aviso tranquilo** (`{colors.aviso-fondo}` / `{colors.aviso-tinta}`): verde
-  azulado apagado. Es el tono de las notas del sistema que informan sin alarmar:
-  excedente pagado de más, precio puesto a mano. Nunca es un error.
+  azulado apagado. Es el tono del componente `Aviso` neutro, que solo se usa donde
+  hay que interrumpir de verdad (los avisos de Ajustes al cambiar precios). Nunca
+  es un error. Para notas que solo informan, el sistema ya **no** usa caja de
+  color: usa el patrón `Nota` (ver Components).
 - **Colores de iglesia** (`{colors.iglesia-indigo}`, `{colors.iglesia-pizarra}`,
   `{colors.iglesia-arcilla}`, `{colors.iglesia-ciruela}`,
   `{colors.iglesia-tabaco}`, `{colors.iglesia-humo}`): seis opciones cerradas,
@@ -321,26 +371,28 @@ tres superficies de la app.
 
 ### Neutral
 
-- **Papel de la mesa** (`{colors.papel}`): el fondo del documento, la mesa donde
-  reposa el libro. Nunca lleva contenido directamente.
-- **Hoja** (`{colors.hoja}`): la superficie escrita. Toda la información vive
-  sobre esta. También el fondo de campos y diálogos.
+- **Papel de la mesa** (`{colors.papel}`): el fondo del documento. Ya no es solo
+  el hueco entre hojas: el titular de Inicio y sus rótulos se escriben
+  directamente sobre él, así que tiene que sostener texto con contraste AA.
+- **Hoja** (`{colors.hoja}`): la superficie escrita de las listas y los
+  formularios. También el fondo de campos, diálogos y menús.
 - **Hoja segunda** (`{colors.hoja-2}`): la superficie recesiva dentro de una hoja.
-  Ya no es la alternancia de filas: hoy viste el renglón de resumen de Inicio, el
-  pie del diálogo, el estado de cuenta del comprobante, la franja de archivados de
-  Ajustes, el fondo del campo de monto y del buscador de personas, y el hover de
-  renglón en la lista de personas.
+  No es alternancia de filas: viste el hover de renglón, el pie del diálogo, el
+  estado de cuenta del comprobante, la franja de archivados de Ajustes, el fondo
+  del campo de monto y del buscador del cobro, y el número de paso.
 - **Tinta** (`{colors.tinta}`): texto principal, 14.2–16.1:1 sobre los tres
   fondos. **Tinta segunda** (`{colors.tinta-2}`): rótulos, bajadas, texto de apoyo
   y el "RD$" que precede a una cifra, 6.9–7.8:1. **Tinta tercera**
-  (`{colors.tinta-3}`): placeholders, marcas de agua y texto de un pago anulado,
-  4.5–5.1:1. Los tres escalones se recalibraron en esta revisión precisamente
-  para que ninguno bajara de 4.5:1 sobre `{colors.hoja}`, `{colors.hoja-2}` **ni**
-  `{colors.papel}`.
+  (`{colors.tinta-3}`): placeholders, iconos de apoyo, marcas de agua y texto de
+  un pago anulado, 4.5–5.1:1. Los tres escalones están calibrados para no bajar de
+  4.5:1 sobre `{colors.hoja}`, `{colors.hoja-2}` **ni** `{colors.papel}`.
 - **Raya** (`{colors.linea}`): el hairline que delimita la hoja, separa los
-  renglones y hace de canal vacío en las barras de progreso. **Raya fuerte**
-  (`{colors.linea-fuerte}`): el borde de campos y botones de contorno, y el
-  pulgar de la barra de scroll.
+  renglones, dibuja el borde de los menús y hace de canal vacío en las barras de
+  progreso. Es también el borde de los controles de la **barra de herramientas**
+  (buscador de Personas y botones de filtro). **Raya fuerte**
+  (`{colors.linea-fuerte}`): el borde de todo control **dentro de un formulario**
+  (campo, selector, botón de contorno, botones de forma de pago), el borde del
+  toast y el pulgar de la barra de scroll.
 - **Papel impreso** (`{colors.papel-impreso}`) y **raya impresa**
   (`{colors.linea-impresa}`): en papel el fondo es blanco de verdad, no nuestro
   tono cálido, y el borde del recibo tiene que verse en una impresora en gris.
@@ -369,6 +421,13 @@ de estado le enseña a leer el verde de dos maneras distintas, y entonces el ver
 deja de querer decir nada. Si hace falta una séptima iglesia, se busca en azul,
 tierra, ciruela o gris — nunca en el semáforo.
 
+**La regla de las dos rayas.** El hairline claro (`{colors.linea}`) es estructura:
+delimita superficies, separa renglones y viste la barra de herramientas, que es
+cromo y debe quedarse callada. El hairline fuerte (`{colors.linea-fuerte}`) es
+**contorno de algo que se rellena**: campos, selectores, botones de contorno. Un
+control de formulario con el borde claro se lee como texto; un filtro con el borde
+fuerte compite con la lista.
+
 **La regla del acompañado en pantalla y en papel.** Todo color que carga
 significado tiene que pasar AA sobre las tres superficies de la app
 (`{colors.hoja}`, `{colors.hoja-2}`, `{colors.papel}`), no solo sobre la más
@@ -393,26 +452,29 @@ siempre lo mismo.
 
 ### Hierarchy
 
-- **cifraEnorme** (600, 3.5rem ≈ 59px, interlineado 1): el número mandón de la
-  pantalla. Solo dos lugares: lo recaudado en Inicio y el saldo en la ficha de una
-  persona. Una sola por pantalla.
+- **cifraTitular** (600, 4.25rem ≈ 72px, interlineado 0.95): el titular de Inicio
+  —lo recaudado— y **nada más**. Es el único escalón que se escribe sobre el papel
+  de la mesa en vez de sobre una hoja, y existe precisamente para eso: cuando la
+  cifra manda la pantalla, no necesita una caja que la señale.
+- **cifraEnorme** (600, 3.5rem ≈ 59px, interlineado 1): el saldo en la ficha de una
+  persona ("Le falta" mientras deba, "Pagó en total" cuando ya cerró). Una sola
+  por pantalla.
 - **cifraGrande** (600, 2.5rem ≈ 42px): el campo donde se escribe el monto del
   abono. Es el único *input* de este tamaño en la app.
-- **cifra** (600, 1.75rem ≈ 30px): cifras de segundo nivel — "Le falta", "Abonó",
-  los cuatro conteos del evento, el total del comprobante.
+- **cifra** (600, 1.75rem ≈ 30px): cifras de segundo nivel — "Le falta" del cobro,
+  "Abonó" del recibo, las cifras de apoyo de Inicio y del reporte.
 - **titulo** (600, 1.4375rem ≈ 24px, tracking −0.011em): el `h1` de cada pantalla.
   Uno por pantalla; también es el rótulo "Tesorera" del lomo.
-- **guia** (500, 1.1875rem ≈ 20px): montos en fila, nombre de la persona elegida,
-  título de diálogo, campos de búsqueda. El escalón "un poco más importante".
+- **guia** (500, 1.1875rem ≈ 20px): nombre de la persona elegida, título de
+  diálogo, campos de búsqueda, datos de la franja de cuenta, botón grande.
 - **base** (400, 1.0625rem ≈ 18px, interlineado 1.55): el texto de lectura y el
   cuerpo de las filas. Es el mínimo de lectura de la app.
 - **menuda** (400, 0.9375rem ≈ 16px): rótulos, metadatos de fila, ayudas bajo los
-  campos, texto de chips y de píldoras. Creció desde 14px en esta revisión; sigue
-  sin cargar información que no exista en otro lado.
+  campos, texto de chips, de opciones de menú y de botones de filtro. Es el
+  escalón de trabajo de todo lo denso.
 - **micro** (600, 0.8125rem ≈ 14px, tracking 0.06em): el escalón más chico que
-  existe, y ahora casi no se usa: el conteo dentro de un chip de filtro, la
-  etiqueta "ANULADO" del historial y el número de paso del flujo de cobro. **Ya
-  no es la clase `.rotulo`.**
+  existe y hoy queda **un solo uso en toda la app**: el número de paso del
+  instructivo del cobro. No es la clase `.rotulo` y no debe volver a serlo.
 
 ### Named Rules
 
@@ -430,20 +492,22 @@ solo para datos accesorios que se repiten en otro lado.
 
 **La regla de las cifras tabulares.** Todo número que la usuaria pueda comparar
 con otro lleva la clase `.cifra` (`tabular-nums lining-nums`). Montos, conteos,
-porcentajes, números de paso. Si una columna de números no cuadra al scrollear, es
-que alguien olvidó `.cifra`.
+porcentajes, teléfonos, números de paso. Si una columna de números no cuadra al
+scrollear, es que alguien olvidó `.cifra`.
 
-**La regla del "RD$" pequeño.** El símbolo de moneda nunca compite con el número.
-El componente `Monto` es el dueño único de esa proporción y la ajusta por escalón:
-`0.5em` en `cifra`, `0.46em` en `cifraGrande`, `0.42em` en `cifraEnorme`, y tamaño
-pleno en los escalones de texto — siempre en tinta segunda, peso 500, alineado a
-la línea base. Ninguna pantalla rehace esos valores a mano. La única excepción
-legítima es el prefijo del **campo** de monto, que es una etiqueta dentro de un
-input y no un valor.
+**La regla del "RD$" pequeño.** El símbolo de moneda nunca compite con el número, y
+se encoge conforme la cifra crece. El componente `Monto` es el dueño de esa
+proporción y la ajusta por escalón: `0.5em` en `cifra`, `0.46em` en `cifraGrande`,
+`0.42em` en `cifraEnorme`, y tamaño pleno en los escalones de texto — siempre en
+tinta segunda, peso 500, alineado a la línea base. El titular de Inicio continúa la
+escalera con `0.34em`, y es hoy el **único** sitio donde la proporción se escribe
+fuera de `Monto`, porque `Monto` todavía no tiene el escalón `cifraTitular`. Eso es
+una deuda a saldar dentro de `Monto`, no permiso para volver a escribir el símbolo
+a mano en otra pantalla.
 
 **La regla del drama reservado.** Los escalones de texto son vecinos (16 → 18 →
-20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59px). Si un
-título de sección quiere ser enorme, la respuesta es no: el número es el
+20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59 → 72px). Si
+un título de sección quiere ser enorme, la respuesta es no: el número es el
 contenido.
 
 ## Layout
@@ -451,53 +515,68 @@ contenido.
 **El libro abierto.** Toda la app vive en un `flex` de dos partes: el lomo, una
 `nav` de 236px de ancho y alto de pantalla completa (`sticky`, `h-screen`), y el
 cuerpo, que ocupa el resto con 28px de padding horizontal (36px a partir de `xl`)
-y 24px vertical. El contenido del cuerpo se centra con un ancho máximo de 1120px:
-en la laptop de destino eso llena la pantalla, y en un monitor grande el libro no
-se estira.
+y 24px vertical. El contenido del cuerpo se centra con un ancho máximo de 1120px.
 
-**La hoja como unidad.** Cada bloque de contenido es una `.hoja`: fondo
-`{colors.hoja}`, radio de 10px, **borde de 1px `{colors.linea}`** y un filo de
-sombra casi imperceptible. Las hojas se separan entre sí con 20px (`gap-5` /
-`space-y-5`). El padding interior es de 20px (24px en la hoja de Inicio, 28px en
-comprobante y reporte); las hojas con lista llevan `overflow-hidden` y trasladan
-el padding a cada renglón para que las rayas lleguen de borde a borde.
+**La hoja como unidad — y como decisión.** Cada bloque de contenido *que agrupa
+datos* es una `.hoja`: fondo `{colors.hoja}`, radio de 10px, borde de 1px
+`{colors.linea}` y un filo de sombra casi imperceptible. Las hojas se separan
+entre sí con 20px (`gap-5` / `space-y-5`). El padding interior es de 20px (24px en
+la franja de cuenta de la ficha, 28px en comprobante y reporte); las hojas con
+lista llevan `overflow-hidden` y trasladan el padding a cada renglón para que las
+rayas lleguen de borde a borde. Lo nuevo de esta revisión es lo contrario: **un
+titular no lleva hoja**. El encabezado de Inicio (cifra, barra, frase de reparto,
+botones) se escribe sobre el papel de la mesa, sin borde.
 
 **El renglón, no la tarjeta.** Las listas son `<ul>` cuyos `<li>` llevan
 `.renglon`: una raya inferior de `{colors.linea}` y nada más — sin raya en el
 último, **sin trama alterna**. La altura mínima la fija lo que el renglón carga:
-46px en la lista de personas (una línea), 52px en los últimos pagos, 58px en el
-resumen por iglesia y en las iglesias de Ajustes, 62px en el buscador del flujo de
-cobro, 64px en el historial de pagos, 66px en los tipos de cupo.
+46px en la lista de personas (una línea), 50px en las dos listas de Inicio, 52px
+en el historial de pagos, 62px en el buscador del cobro y en las iglesias de
+Ajustes, 66px en los tipos de cupo.
 
-**Las columnas de la lista de personas.** Un renglón es **una sola línea**, y sus
-columnas están fijadas: Nombre (flexible, con `truncate`) · Iglesia (248px) · Ha
-pagado (112px, alineada a la derecha) · Su cupo (112px, alineada a la derecha) ·
-Cómo va (128px). Los dos montos van en **columnas separadas, cada una alineada
-consigo misma**: pegados en un solo bloque, lo pagado bailaba de izquierda a
-derecha según lo largo que fuera el precio. Cuando alguien no está inscrito, las
-dos columnas de dinero se funden en una sola de 224px que dice "Sin inscribir".
+**La barra de herramientas de una línea.** En Personas, filtrar ocupa **una fila de
+44px**: buscador flexible (mínimo 220px) + un `FiltroMenu` por criterio (Cómo va ·
+Cupo · Pastor · Iglesia) + el control de Orden al final + "Limpiar" cuando hay algo
+puesto. Sustituyó a un panel de cinco filas de píldoras con columna de etiquetas
+que medía ~450px de alto y que empeoraba con cada iglesia nueva. La regla que
+queda: **un control de filtro mide lo mismo con tres opciones que con cincuenta.**
 
-**Buscar delante, filtrar detrás.** El campo de búsqueda está siempre a la vista
-porque es lo que ella hace veinte veces al día; los filtros viven detrás de un
-botón "Filtros" que despliega su propia hoja con las filas de píldoras (Cómo va ·
-Tipo de cupo · Iglesia · Orden). Con el panel cerrado, los filtros puestos se
-quedan a la vista como píldoras removibles: un filtro escondido que ella no ve es
-una lista que "perdió" gente.
+**Las columnas de la lista de personas.** Un renglón es **una sola línea**: Nombre
+(flexible, mínimo 150px, con `truncate`) · Iglesia (220px) · Ha pagado (112px,
+derecha) · Su cupo (112px, derecha) · Cómo va (128px). Los dos montos van en
+columnas separadas, cada una alineada consigo misma: pegados en un solo bloque, lo
+pagado bailaba según lo largo que fuera el precio. Cuando alguien no está inscrito,
+las dos columnas de dinero se funden en una que dice "Sin inscribir".
 
-**Rejillas confirmadas.** Solo existen tres formas:
-1. Pantalla de una columna (Ajustes, Comprobante, Reporte).
+**Prioridad de columnas al angostar.** Las columnas se caen por prioridad, no
+todas a la vez: Iglesia aparece desde `xl`, "Su cupo" desde `md`, y el encabezado
+de columnas desde `sm`. Nombre, "Ha pagado" y "Cómo va" no se caen nunca — son la
+respuesta a "¿cuánto pagó fulano?".
+
+**Rejillas confirmadas.** Solo existen cuatro formas:
+1. Pantalla de una columna (Ajustes, Comprobante a 560px, Reporte).
 2. Contenido + rail auxiliar de 340px (`lg:grid-cols-[minmax(0,1fr)_340px]` en
-   Registrar pago; el rail a la izquierda en la ficha de persona).
-3. **Inicio es una sola hoja**, no cuatro apiladas: cabecera con lo recaudado y la
-   barra, un renglón de resumen con los cuatro conteos entre dos rayas sobre
-   `{colors.hoja-2}`, y debajo el doblez del libro — `grid lg:grid-cols-2
-   lg:divide-x lg:divide-linea`, "Últimos pagos" a la izquierda y "Por iglesia" a
-   la derecha.
+   Registrar pago, **solo cuando hay algo que poner en el rail**: el recibo del
+   último pago o el instructivo de tres pasos la primera vez).
+3. Registrar pago sin rail: **centrado a 680px** (`mx-auto max-w-[680px]`), título
+   incluido. Una columna sola pegada a la izquierda con medio ancho vacío al lado
+   se lee como un error de maquetación.
+4. Inicio: encabezado a todo el ancho sin hoja + dos hojas con lista
+   (`lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]`, "Últimos pagos" algo más
+   ancha que "Por iglesia"), con **`items-start`** para que cada hoja mida lo que
+   necesite en vez de estirarse a la altura de la vecina.
+
+**La ficha de persona es una sola hoja.** La cuenta es una franja de cabecera
+horizontal (el saldo en `cifraEnorme` con su chip a la izquierda; Precio del cupo,
+Ha pagado y Abonos como datos en línea a la derecha; barra de progreso debajo), y
+el historial de pagos ocupa el ancho completo en columnas: Monto (132px, derecha) ·
+Fecha (flexible) · Forma de pago (132px, desde `md`) · Acciones (104px, derecha).
+Antes eran una tarjeta estrecha y una columna medio vacía: con muchos pagos, la
+columna se hacía un cordón interminable mientras al lado sobraba media pantalla.
 
 **Comportamiento responsivo: estructural, no tipográfico.** Los únicos cambios por
-ancho son colapsar las rejillas a una columna y ocultar columnas secundarias de la
-lista de personas (Iglesia y "Cómo va" desaparecen bajo `sm`). El tamaño de letra
-nunca cambia.
+ancho son colapsar rejillas a una columna y esconder columnas secundarias por
+prioridad. El tamaño de letra nunca cambia.
 
 **Impresión.** El comprobante y el reporte se imprimen desde la misma hoja: `@page`
 de 14mm, raíz a 12pt, fondo `{colors.papel-impreso}`, `.no-imprimir` oculta el
@@ -511,11 +590,22 @@ el documento.
 bloque necesita subdividirse, se subdivide con hairlines, con `{colors.hoja-2}` o
 con espacio — nunca con una superficie nueva.
 
+**La regla de la hoja que se gana.** Una hoja existe para *agrupar* varias cosas
+que se leen juntas. Un solo número, por importante que sea, no se mete en una
+caja: la caja lo convierte en un campo de formulario. Si al quitarle el borde a un
+bloque no se pierde nada, no llevaba borde.
+
 **La regla de la raya y el aire.** Una fila se separa de la siguiente con una raya
-de 1px y con espacio, no con relleno de fondo. Raya + trama alterna + columnas a
-la vez es una hoja de cálculo, no un libro. (La única alternancia que queda en la
-app es la tabla del **reporte impreso**, donde la trama ayuda a seguir la fila con
-el dedo en papel; no es licencia para traerla de vuelta a la pantalla.)
+de 1px y con espacio, no con relleno de fondo. Raya + trama alterna + columnas a la
+vez es una hoja de cálculo, no un libro. (La única alternancia que queda en la app
+es la tabla del **reporte impreso**, donde la trama ayuda a seguir la fila con el
+dedo en papel; no es licencia para traerla de vuelta a la pantalla.)
+
+**La regla del control de tamaño fijo.** Ningún control puede crecer con los datos.
+Filtros y selectores son botones de una línea que abren un menú; el menú es lo que
+crece, y crece hacia la capa superior del navegador, no hacia abajo empujando la
+pantalla. Prueba concreta: si al agregar la iglesia número veinte una pantalla
+cambia de alto, ese control está mal hecho.
 
 **La regla de las cuatro pestañas.** El lomo lleva exactamente cuatro entradas
 (Inicio, Personas, Registrar pago, Ajustes). Una pantalla nueva se cuelga de una
@@ -524,59 +614,69 @@ de las cuatro; no se agrega una quinta.
 ## Elevation & Depth
 
 El sistema es **plano y se define por trazo**. La profundidad la da el papel, no
-la luz, y desde esta revisión la jerarquía es: la mesa (`{colors.papel}`, sin
-nada), la hoja (borde de 1px más un filo de sombra de 1px que apenas la despega) y
-el diálogo (la única sombra realmente profunda de la app). Todo lo demás
-—renglones, chips, campos, botones— es plano y se separa con hairlines o con
-relleno. Los botones no se levantan al hover: cambian de color y se hunden un 2%
-al presionar (`active:scale-[0.98]`).
+la luz. La jerarquía es de tres niveles: la mesa (`{colors.papel}`, sin nada), la
+hoja (borde de 1px más un filo de sombra que apenas la despega) y **la capa
+superior del navegador** —diálogos y menús de popover—, que es lo único que de
+verdad flota por encima del libro. Todo lo demás (renglones, chips, campos,
+botones) es plano y se separa con hairlines o con relleno. Los botones no se
+levantan al hover: cambian de color y se hunden un 2% al presionar
+(`active:scale-[0.98]`).
 
 ### Shadow Vocabulary
 
 - **hoja** (`border: 1px solid var(--linea)` + `box-shadow: 0 1px 2px rgba(58,42,28,0.04)`):
   el reposo de toda superficie de contenido. El borde es lo que la define; la
   sombra solo evita que se vea pegada como una calcomanía.
-- **dialogo** (`box-shadow: 0 12px 24px -8px rgba(40,28,18,0.18), 0 32px 64px -24px rgba(40,28,18,0.32)`):
-  solo para `<dialog>`, acompañada de un `::backdrop` de `rgba(40,28,18,0.42)`.
-  Es la única sombra profunda que el sistema autoriza, y existe porque el diálogo
-  sí está por encima del libro.
-- **toast** (`box-shadow: 0 2px 4px rgba(58,42,28,0.06), 0 14px 32px -14px rgba(58,42,28,0.28)`):
-  el aviso de Sonner, que flota sobre todo y necesita despegarse de verdad.
-- **botón sólido** (`box-shadow: 0 1px 2px rgba(58,42,28,0.12)`): un filo de 1px
-  bajo el botón principal, para que se lea como una pieza y no como una mancha.
+- **dialogo** (`0 12px 24px -8px rgba(40,28,18,0.18), 0 32px 64px -24px rgba(40,28,18,0.32)`):
+  la sombra de la capa superior. La usan el `<dialog>` (con `::backdrop` de
+  `rgba(40,28,18,0.42)`) **y los menús de popover** de `FiltroMenu` y `Selector`
+  (con `::backdrop` transparente). Es la misma sombra a propósito: las dos cosas
+  están al mismo nivel real sobre el libro; lo que las distingue es el velo, no la
+  profundidad.
+- **toast** (`0 2px 4px rgba(58,42,28,0.06), 0 14px 32px -14px rgba(58,42,28,0.28)`):
+  el aviso de Sonner, que flota sobre todo, incluso sobre el diálogo.
+- **botón sólido** (`0 1px 2px rgba(58,42,28,0.12)`): un filo de 1px bajo el botón
+  principal, para que se lea como una pieza y no como una mancha.
 
 ### Named Rules
 
 **La regla del trazo antes que la luz.** Una superficie se delimita con una raya;
 la sombra solo se usa cuando algo está de verdad por encima del libro (diálogo,
-toast). Si un bloque nuevo pide sombra para verse separado, lo que le falta es
-una raya o aire.
+menú, toast). Si un bloque nuevo pide sombra para verse separado, lo que le falta
+es una raya o aire.
+
+**La regla del velo, no de la sombra.** Lo que separa un menú de un diálogo no es
+cuánto flota sino si oscurece el libro: el diálogo interrumpe y lleva velo; el
+menú es un control y su `::backdrop` es transparente. Un menú con velo convierte
+elegir una iglesia en un acto solemne.
 
 **La regla de la sombra de tinta.** Las sombras nunca son negras: su color es
-`rgba(58,42,28,…)` (o `rgba(40,28,18,…)` en el diálogo), la sombra que proyecta
-papel sobre papel. Siempre llevan desplazamiento vertical real y difusión suave;
-nunca un halo plano centrado ni un desplazamiento duro.
+`rgba(58,42,28,…)` (o `rgba(40,28,18,…)` en la capa superior), la sombra que
+proyecta papel sobre papel. Siempre llevan desplazamiento vertical real y difusión
+suave; nunca un halo plano centrado ni un desplazamiento duro.
 
 ## Shapes
 
-Tres radios y nada más: **10px** para la hoja y el diálogo (el corte de una hoja
-de libreta), **8px** para las piezas que se tocan —botones, campos, píldoras
-cuadradas, botones de icono— y **999px** para lo que es un contador o una marca:
-chips de estado, chips de filtro, barras de progreso, puntos de color, el número
-de paso. El foco del teclado redondea a 4px.
+Tres radios y nada más: **10px** para la hoja, el diálogo y el menú de popover (el
+corte de una hoja de libreta), **8px** para las piezas que se tocan —botones,
+campos, selectores, botones de filtro, botones de icono— y **999px** para lo que es
+un contador o una marca: chips de estado, barras de progreso, puntos de color, el
+número de paso. El foco del teclado redondea a 4px.
 
-Los bordes son de 1px y solo existen en dos pesos: `{colors.linea}` para delimitar
-una hoja y separar renglones e información dentro de ella, `{colors.linea-fuerte}`
-para delimitar algo interactivo (campo, botón de contorno). Un borde de
-`{colors.accion}` significa siempre "esto está enfocado o seleccionado", nunca
-decoración.
+Los bordes son de 1px y solo existen en dos pesos, con el reparto que fija *La
+regla de las dos rayas*: `{colors.linea}` para estructura y cromo,
+`{colors.linea-fuerte}` para el contorno de un control de formulario. Un borde de
+`{colors.accion}` significa siempre "esto está enfocado, abierto o seleccionado",
+nunca decoración.
 
 Las barras de progreso son la silueta recurrente del sistema: cápsula de 8px de
-alto por defecto, 10px en la ficha de persona y en el recibo del cobro, 12px en la
-barra grande de Inicio. Canal `{colors.linea}`, relleno con la *marca* del estado,
-y crecimiento por `transform: scaleX()` desde el origen izquierdo. Las listas ya
-no llevan barras: dos columnas de cifras dicen lo mismo y no dejan nada colgando
-debajo del renglón.
+alto por defecto y en la ficha, 10px en el recibo del cobro (el único sitio donde
+la barra es protagonista), y 8px en la barra grande de Inicio — que adelgazó a
+propósito cuando la cifra creció a `cifraTitular`: dos elementos gritando compiten,
+y el que tiene que ganar es el número. Canal `{colors.linea}`, relleno con la
+*marca* del estado, y crecimiento por `transform: scaleX()` desde el origen
+izquierdo. Las listas no llevan barras: dos columnas de cifras dicen lo mismo y no
+dejan nada colgando debajo del renglón.
 
 Los iconos son un juego dibujado a mano de 21 piezas en `src/components/Iconos.tsx`:
 caja de 24, trazo 1.6, remates y uniones redondeados, `fill: none`,
@@ -592,17 +692,18 @@ Carácter: piezas de papel grueso. Cambian de color, no de altura.
 - **Forma:** radio de 8px (`{rounded.pieza}`), altura mínima 44px, 52px en la
   variante `grande` (que además sube a `guia`). Peso 500, icono opcional a la
   izquierda con 8px de separación.
-- **principal:** fondo `{colors.accion}`, texto blanco (7.99:1), filo de 1px. Es
-  el único botón sólido y hay **uno por pantalla**: "Registrar pago", "Guardar
-  pago", "Agregar persona", el confirmar de un diálogo.
+- **principal:** fondo `{colors.accion}`, texto blanco, filo de 1px. Es el único
+  botón sólido y hay **uno por pantalla**: "Registrar pago", "Guardar pago",
+  "Agregar persona", el confirmar de un diálogo.
 - **contorno:** fondo `{colors.hoja}` con borde `{colors.linea-fuerte}`; al hover
   el borde sube a `{colors.tinta-3}` y el fondo a `{colors.hoja-2}`. La acción
-  secundaria de igual peso.
+  secundaria de igual peso ("Agregar persona" junto a "Registrar pago" en Inicio,
+  "Cambiar cupo o precio", los montos rápidos del cobro).
 - **suave:** fondo `rgba(138,51,64,0.07)` (0.12 al hover), texto de acción, sin
-  borde. Para un atajo sugerido ("Saldar: RD$ 1,200") y para el botón "Filtros"
-  cuando hay filtros puestos.
-- **texto:** sin fondo ni borde, texto `{colors.tinta-2}`. Para salidas y
-  cancelaciones ("Cambiar", "No, dejarlo así").
+  borde. Para un atajo sugerido ("Saldar: RD$ 1,200").
+- **texto:** sin fondo ni borde, texto `{colors.tinta-2}`, hover con un lavado
+  neutro `rgba(36,31,27,0.05)`. Para salidas, cancelaciones y las acciones de
+  cabecera de la ficha ("Editar", "Archivar", "Cambiar", "Limpiar").
 - **Estados:** hover cambia fondo o borde en 150ms con la curva `salida`; `active`
   escala a 0.98; deshabilitado baja a 45% de opacidad y desactiva el puntero; en
   carga, el icono se sustituye por un anillo giratorio de 17px y el botón se
@@ -610,40 +711,36 @@ Carácter: piezas de papel grueso. Cambian de color, no de altura.
 
 ### Chips
 
-Tres familias distintas que no deben mezclarse.
+Solo queda **una** familia de chip, y eso es una decisión, no una omisión: los
+chips de filtro y los "filtros puestos" se eliminaron con el panel de filtros.
 
-- **ChipEstado** (informativo): cápsula con el par fondo/tinta del estado, punto de
-  7px con la *marca*, y **siempre** el texto del estado. Hoy respira más:
-  `text-menuda`, `gap-2`, `px-3 py-1`. No es pulsable, no cambia de tamaño, y su
-  orden de aparición es siempre Pagado → Abonando → Sin pagos.
-- **Chip de filtro** (interactivo, dentro del panel de Filtros): cápsula de
-  **44px** de alto, `px-3.5`, `text-menuda`. En reposo, borde `{colors.linea}` y
-  texto `{colors.tinta-2}`; activo, borde `{colors.accion}`, fondo
-  `rgba(138,51,64,0.09)` y texto de acción, con `aria-pressed`. Lleva el conteo de
-  resultados en `micro` a la derecha y un punto de color cuando representa una
-  iglesia.
-- **Filtro puesto** (removible, cuando el panel está cerrado): cápsula de acento
-  con el texto del filtro y un botón redondo con el icono de cerrar, que dice
-  `aria-label="Quitar el filtro …"`. Comunica lo mismo que el chip activo, pero su
-  gesto es quitar, no alternar.
+- **ChipEstado** (informativo, el único chip del sistema): cápsula con el par
+  fondo/tinta del estado, punto de 7px con la *marca*, `text-menuda` peso 500,
+  `px-3 py-1`, `gap-2`. **Siempre** lleva el texto del estado. No es pulsable, no
+  cambia de tamaño, y su orden de aparición es siempre Pagado → Abonando → Sin
+  pagos.
+- La etiqueta "Anulado" del historial es la única cápsula que no es un ChipEstado:
+  usa el par `sinpagos` a `text-menuda` peso 500 y vive en la columna de forma de
+  pago, porque describe el pago, no el estado de la persona.
 
 ### Cards / Containers
 
 No hay tarjetas: hay **hojas**. Radio de 10px, fondo `{colors.hoja}`, borde de 1px
-`{colors.linea}` y un filo de sombra. El padding interior es de 20px (24px en
-Inicio, 28px en los documentos imprimibles); las hojas con lista usan
+`{colors.linea}` y un filo de sombra. El padding interior es de 20px (24px en la
+franja de cuenta, 28px en los documentos imprimibles); las hojas con lista usan
 `overflow-hidden` y llevan el padding a cada renglón. La cabecera de una hoja con
-lista es una franja con hairline inferior, título en peso 600 y, a la derecha, un
-enlace en `menuda` con el icono de avance.
+lista es una franja de 44–50px con título en peso 600 y, a la derecha, un enlace en
+`menuda` con el icono de avance; debajo puede ir una fila de rótulos de columna
+separada por hairline.
 
 ### Inputs / Fields
 
 Carácter: la línea donde se escribe, no una caja hundida.
 
 - **Estilo:** altura mínima 46px, radio 8px, fondo `{colors.hoja}` (o
-  `{colors.hoja-2}` cuando el campo es un buscador o el campo de monto dentro de
-  una hoja), borde de 1px `{colors.linea-fuerte}`, placeholder en
-  `{colors.tinta-3}`. Etiqueta encima en `menuda`, peso 500, `{colors.tinta-2}`.
+  `{colors.hoja-2}` cuando es un buscador dentro de una hoja o el campo de monto),
+  borde de 1px `{colors.linea-fuerte}`, placeholder en `{colors.tinta-3}`.
+  Etiqueta encima en `menuda`, peso 500, `{colors.tinta-2}`.
 - **Hover:** el borde sube a `{colors.tinta-3}`.
 - **Foco:** borde `{colors.accion}` más un anillo de 2px `rgba(138,51,64,0.18)`.
   El `:focus-visible` global es un contorno de 2px del color de acción con 2px de
@@ -655,6 +752,13 @@ Carácter: la línea donde se escribe, no una caja hundida.
   error cuando lo hay.
 - **Campo de monto:** el único input en `cifraGrande`, sobre `{colors.hoja-2}`,
   con el "RD$" fijo a la izquierda en `guia` peso 500 y el texto sangrado 4.2rem.
+- **Buscador de la barra de herramientas:** 44px de alto, `guia`, icono de 20px a
+  la izquierda con sangría de 44px, borde `{colors.linea}` (no el fuerte: es cromo)
+  y el mismo foco de acción. Es lo único que está siempre a la vista en Personas,
+  porque buscar es lo que ella hace veinte veces al día.
+- **Campo de fecha:** nunca muestra el formato del navegador. En reposo es un botón
+  de 46px que dice la fecha escrita en español ("Hoy, 16 de agosto de 2026") con un
+  "Cambiar" a la derecha; el `input[type=date]` real solo aparece al tocarlo.
 - **Sin flechitas:** los spinners nativos de `input[type=number]` están anulados;
   los montos se escriben.
 
@@ -675,14 +779,76 @@ respalda sola al abrir".
 ### Dialogs
 
 `<dialog>` nativo: se encarga solo del foco, del `Escape` y de la capa superior.
-Ancho por defecto 460px (520px en formularios), radio 10px, fondo `{colors.hoja}`,
-sombra `dialogo`, backdrop `rgba(40,28,18,0.42)`. Cabecera con título en `guia`
-peso 600 y un botón de cerrar; pie opcional con fondo `{colors.hoja-2}`, hairline
-superior y los botones alineados a la derecha.
+Ancho por defecto 460px (480–520px en formularios), alto máximo 86vh, radio 10px,
+fondo `{colors.hoja}`, sombra `dialogo`, backdrop `rgba(40,28,18,0.42)`. Cabecera
+con título en `guia` peso 600 y un botón de cerrar de 44px; **el cuerpo hace scroll
+y el pie se queda quieto**, para que el botón de guardar no se vaya de la pantalla
+cuando el formulario crece. Pie opcional con fondo `{colors.hoja-2}` y hairline
+superior.
 
 `Confirmacion` es la única forma de pedir permiso: el botón de salida dice "No,
 dejarlo así" y el de confirmar dice exactamente lo que va a pasar ("Sí, anular
 este pago"), nunca "Aceptar".
+
+**`DialogoPersona`** es el formulario compartido de agregar persona, y vive fuera
+de las pantallas porque se abre desde dos sitios: la lista de Personas y el
+buscador del cobro cuando llega alguien que todavía no está inscrito. Arrastra el
+nombre ya escrito en el buscador, avisa de un posible repetido *mientras* se
+escribe (no después de guardar, cuando el duplicado ya existe), y esconde teléfono
+y notas en un `<details>` de 44px. Es la prueba de que un formulario compartido no
+necesita dos maquetaciones.
+
+### FiltroMenu (componente insignia)
+
+El control de filtro de la barra de herramientas. Un botón compacto de 44px (radio
+8px, `menuda`, máximo 280px, `truncate`) que abre un menú con la API nativa
+`popover`: capa superior, `Escape` y cierre al tocar afuera sin escribir una línea
+de JavaScript para ello. El panel se posiciona a mano bajo el botón y se pega al
+borde derecho de la ventana si no cabe.
+
+Las decisiones que hay que respetar al tocarlo:
+
+- **El filtro activo se dice dentro del botón**, en la forma "Iglesia: Getsemaní",
+  con la etiqueta a opacidad reducida y el valor en peso 500. Un filtro que no se
+  ve puesto es una lista que "perdió" gente.
+- **La × vive dentro del botón**, como control redondo de 28px con
+  `aria-label="Quitar el filtro …"`. Quitar un filtro es un gesto distinto de
+  abrirlo, y por eso es un blanco distinto. Cuando no hay filtro puesto, ese sitio
+  lo ocupa la flecha de desplegar.
+- **Los conteos viven dentro del menú**, a la derecha de cada opción, en `menuda`
+  tinta tercera y tabulares. En el botón serían ruido; en el menú son lo que ayuda
+  a elegir.
+- **El buscador aparece solo por encima de 8 opciones** (`umbralBusqueda`), como
+  franja de 44px sobre la lista, y enfoca solo al abrir. `Enter` elige el primer
+  resultado.
+- **`permiteTodas={false}` para el orden.** El orden siempre tiene un valor, así
+  que no lleva "Todas", no se puede quitar y **no se pinta como filtro activo**:
+  un control permanentemente encendido enseña a ignorar el color de activo.
+
+### Selector (componente insignia)
+
+Elegir una opción dentro de un formulario. Es **siempre** un campo de una línea de
+46px que abre el mismo menú de popover; se reescribió por completo desde la versión
+adaptativa (rejilla de botones por debajo de un umbral, campo por encima). El
+motivo está en su docblock y es medible: tres iglesias más cuatro tipos de cupo se
+comían 500px de diálogo, y empeoraba con cada iglesia nueva. Hoy el formulario mide
+lo mismo con tres opciones que con cincuenta y se lee de arriba abajo como
+cualquier formulario. Abre hacia arriba si abajo no cabe, y lleva la etiqueta,
+ayuda y error del sistema de campos.
+
+**La regla del detalle que confirma y el detalle que elige.** Un dato secundario
+de una opción se coloca según para qué sirve, no según el sitio que sobre:
+
+- Un **detalle numérico** (el precio del cupo) se repite en **los dos** sitios: en
+  el campo cerrado y a la derecha en el menú. En el campo confirma lo que se va a
+  pagar; en el menú se compara en columna, alineado y tabular.
+- Un **detalle de texto** (el pastor de la iglesia) vive **solo en el menú**, en una
+  segunda línea bajo el nombre. Ayuda a *elegir* entre dos iglesias parecidas —que
+  es justo cuando uno se equivoca—, pero no hace falta para confirmar, y en la
+  misma línea truncaba el nombre de la iglesia, que es lo que ella lee.
+
+La opción elegida se marca por partida triple: fondo de acción al 8%, peso 500 y el
+icono de cheque — color, peso y forma, nunca color solo.
 
 ### La barra de progreso (componente insignia)
 
@@ -698,16 +864,32 @@ animación de la app que dura más de 250ms, y es deliberada.
 El color del relleno **siempre sale de `calcularEstado(pagado, precio)`**, incluso
 en las barras agregadas. La barra grande de Inicio no es verde por ser un total:
 es verde solo cuando de verdad está cobrado completo, ámbar mientras se abona y
-gris cuando no hay nada. Pintar de verde un progreso a medias es mentirle a quien
-mira la pantalla de lejos.
+gris cuando no hay nada.
+
+### Nota y Aviso
+
+Dos niveles distintos, y la diferencia importa porque la app avisa mucho:
+
+- **`Nota`** (el patrón por defecto): sin caja y sin color de fondo — icono de
+  aviso de 15px en tinta tercera + texto en `menuda` tinta segunda. Para lo que
+  informa y no alarma: excedente pagado de más, precio puesto a mano, "lo
+  recaudado incluye pagos de más". Una caja de color aquí compite con la cifra, que
+  es lo que tiene que mandar en la pantalla.
+- **`Aviso`** (`src/components/Piezas.tsx`): caja de color, radio 8px, `menuda`.
+  Tono `neutro` en verde azulado apagado y tono `ojo` en ámbar. Se reserva para lo
+  que sí interrumpe: persona archivada, posible nombre repetido mientras se
+  escribe, evento sin tipos de cupo, avisos de Ajustes al cambiar precios en masa.
+
+Si dudas cuál usar: si la usuaria puede seguir trabajando sin leerlo, es `Nota`.
 
 ### Estado vacío
 
 Nunca dice "no hay nada": dice qué hacer. Un dibujo de 72×52 de hoja reglada en
-blanco (con su raya de margen en rúbrica al 30%), título en `guia` peso 600, una
+blanco (con su raya de margen en rúbrica al 30% — el único resto de ornamento que
+queda, y a escala de dibujo, no de interfaz), título en `guia` peso 600, una
 explicación de máximo 38 caracteres de ancho en `{colors.tinta-2}`, y un botón que
-ejecuta el siguiente paso ("Registrar el primer pago", "Agregar la primera
-persona").
+ejecuta el siguiente paso. Los vacíos con filtros puestos ofrecen dos salidas
+concretas: "Agregar a '…'" con el nombre que se buscó, y "Quitar filtros".
 
 ### La marca
 
@@ -727,19 +909,22 @@ tareas, no el icono de Chrome.
 
 ### Motion
 
-- **Duración ordinaria:** 150ms para cambios de color y estado; 180ms para el
-  diálogo; 260ms para la entrada de un renglón; 300ms para la entrada de una hoja;
-  **420ms solo para la barra de progreso**.
+- **Duración ordinaria:** 140ms para el menú de popover; 150ms para cambios de
+  color y estado; 180ms para el diálogo; 260ms para la entrada de un renglón;
+  300ms para la entrada de una hoja; **420ms solo para la barra de progreso**.
 - **Curvas:** tres, y solo tres, declaradas como variables — `--salida`
   (`cubic-bezier(0.23,1,0.32,1)`, la de casi todo), `--entrasale`
   (`cubic-bezier(0.77,0,0.175,1)`) y `--gaveta` (`cubic-bezier(0.32,0.72,0,1)`).
   Nada de `ease`, `linear` ni curvas de fábrica en animaciones nuevas.
 - **Entradas:** las listas usan `.entra-renglon` (opacidad + 5px de subida, con
-  retardo escalonado de 26ms por índice vía `--i`, tope de 12 elementos); las
+  retardo escalonado de 26ms por índice vía `--i`, tope de 10–12 elementos); las
   pantallas usan `.entra-hoja` (opacidad + 7px). Nada nace desde cero: siempre
   desde un estado casi visible.
 - **Diálogo:** escala de 0.97 a 1 con 6px de subida, con `@starting-style` y
   `allow-discrete` sobre `overlay`/`display`; el backdrop hace fundido aparte.
+- **Menú (`.menu-filtro`):** opacidad + 4px de bajada en 140ms, con
+  `@starting-style` y `allow-discrete`. Más corto que el diálogo a propósito: un
+  menú es un control, no una interrupción.
 - **Movimiento reducido:** con `prefers-reduced-motion`, las entradas conservan la
   opacidad y pierden el desplazamiento, y todo lo demás cae a 0.01ms.
 - **Prohibido:** rebote, elástico, parallax, y animar `width`, `height` o
@@ -750,7 +935,9 @@ tareas, no el icono de Chrome.
 Sonner abajo a la derecha con 20px de separación, vestido con los tokens del
 sistema: fondo `{colors.hoja}`, borde `{colors.linea-fuerte}`, radio 10px, sombra
 de toast, Fira Sans a 0.9375rem. El título lleva el monto y el nombre; la
-descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
+descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo"). El toast
+del pago guardado dura 8s y trae "Deshacer": la corrección más rápida posible antes
+de tener que ir a la ficha a anular.
 
 ## Do's and Don'ts
 
@@ -759,6 +946,8 @@ descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
 - **Do** construir toda lista como renglones (`.renglon`) dentro de una sola
   `.hoja`, separados por el hairline de `{colors.linea}` y por aire.
 - **Do** definir cualquier superficie nueva con una raya de 1px, no con una sombra.
+- **Do** dejar sin hoja lo que es un titular: si al quitarle el borde a un bloque
+  no se pierde nada, no llevaba borde.
 - **Do** usar el componente `Monto` para cualquier cantidad de dinero, y `.cifra`
   para cualquier número comparable.
 - **Do** derivar el color de toda barra de progreso —incluidas las agregadas— de
@@ -766,11 +955,24 @@ descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
 - **Do** dejar exactamente un botón sólido `principal` por pantalla, y que su texto
   diga la acción concreta ("Guardar pago", no "Aceptar").
 - **Do** acompañar todo color de estado con su texto y su `aria-valuetext`.
-- **Do** mantener 44px de alto mínimo en todo lo que se toca y el `:focus-visible`
-  de 2px del color de acción visible siempre.
+- **Do** resolver cualquier lista larga de opciones con `Selector` o `FiltroMenu`,
+  para que el control mida lo mismo con tres opciones que con cincuenta.
+- **Do** colocar un detalle numérico en el campo *y* en el menú (confirma y se
+  compara), y un detalle de texto solo en el menú, en segunda línea (ayuda a
+  elegir).
+- **Do** dejar que `<dialog>` y `popover` hagan el foco, el `Escape` y el cierre al
+  tocar afuera; el sistema no reimplementa modales.
+- **Do** caer columnas por prioridad al angostar (Iglesia desde `xl`, "Su cupo"
+  desde `md`), nunca todas a la vez.
+- **Do** mantener 44px de alto mínimo en todo lo que se toca —hoy sin una sola
+  violación— y el `:focus-visible` de 2px del color de acción visible siempre.
 - **Do** verificar cualquier color de texto nuevo contra AA sobre `{colors.hoja}`,
   `{colors.hoja-2}` **y** `{colors.papel}`, no solo sobre el fondo más claro.
 - **Do** escribir cada estado vacío como una instrucción con su botón.
+- **Do** guardar en `src/lib/preferencias.ts` (localStorage) lo que solo es
+  comodidad —la última iglesia y el último tipo de cupo elegidos, que ahorran dos
+  toques por persona al inscribir a media iglesia de un tirón— y solo eso: si se
+  pierde, no pasa nada.
 - **Do** dibujar cualquier icono nuevo en la caja de 24 con trazo 1.6 y remates
   redondos, dentro de `src/components/Iconos.tsx`.
 - **Do** marcar con `.no-imprimir` todo lo que no debe salir en papel, y usar
@@ -780,11 +982,26 @@ descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
 
 ### Don't:
 
+- **Don't** poner una clase de `display` de Tailwind (`flex`, `grid`, `block`) en
+  un `<dialog>`. Esa regla de autor le gana al `dialog:not([open]) { display: none }`
+  del navegador y **todo diálogo cerrado se queda ocupando su altura en la
+  página**, invisible pero clicable (llegó a inflar la página a 3998px para 3239px
+  de contenido). El `display: flex` se declara **solo** en `dialog.dialogo[open]`
+  dentro de `src/estilos.css`; en el JSX van `flex-col` y las demás utilidades,
+  nunca `flex`.
 - **Don't** anidar una `.hoja` dentro de otra, ni convertir un renglón en tarjeta
   con sombra o borde propio.
-- **Don't** devolver la trama alterna a los renglones de pantalla, ni traer de
-  vuelta la raya roja de margen (`.margen-rubrica`) a una lista: se quitaron a
-  propósito.
+- **Don't** devolver el ornamento de libro viejo: ni trama alterna en los renglones
+  de pantalla, ni la raya roja de margen junto a una lista, ni versalitas
+  espaciadas. Se quitaron a propósito y el encargo del usuario es explícito:
+  moderno, no "hecho para viejitos".
+- **Don't** meter un número solo en una tarjeta para "darle importancia": el tamaño
+  y el aire hacen ese trabajo, el borde lo deshace.
+- **Don't** volver a una rejilla de píldoras o de botones para elegir entre datos
+  que crecen (iglesias, tipos de cupo, pastores): no escala y se come la pantalla.
+- **Don't** poner el conteo de resultados en la cara de un botón de filtro, ni
+  pintar como filtro activo un control que siempre tiene valor (el orden).
+- **Don't** ponerle velo (`::backdrop` opaco) a un menú: el velo es del diálogo.
 - **Don't** usar rojo para un estado de pago ni para una persona que debe. El único
   rojo de la app es el vino de acción, y pertenece a los botones.
 - **Don't** dar a una iglesia (ni a ninguna identidad) un color verde o ámbar: esos
@@ -792,8 +1009,6 @@ descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
 - **Don't** introducir un segundo color de acento, un degradado, ni un color fuera
   de las variables de `src/estilos.css` (con la única excepción declarada de la
   paleta de iglesias en `Piezas.tsx`).
-- **Don't** poner un rótulo en mayúsculas espaciadas: `.rotulo` es en minúscula
-  por decisión de legibilidad.
 - **Don't** bajar un texto por debajo de `micro`, ni usar `micro` para algo que no
   se pueda leer en otro lado de la misma pantalla.
 - **Don't** cambiar el tamaño de letra por ancho de pantalla ni introducir `clamp`:
@@ -802,6 +1017,8 @@ descripción dice qué queda ("Le faltan RD$ 800", "Quedó pagado completo").
   como reemplazo del juego dibujado a mano.
 - **Don't** escribir una cifra sin cifras tabulares, ni un monto sin el "RD$"
   del componente `Monto`, ni redefinir a mano la proporción del símbolo.
+- **Don't** guardar en localStorage nada que sea un dato del negocio: los pagos,
+  las personas y las inscripciones viven en SQLite y solo ahí.
 - **Don't** animar `width` en una barra de progreso, ni pasar de 250ms en nada que
   no sea esa barra al guardar un pago.
 - **Don't** usar rebote, elástico o parallax, ni ignorar `prefers-reduced-motion`.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-16T18:00:00.000Z",
+  "generatedAt": "2026-08-16T21:30:00.000Z",
   "title": "Design System: Tesorera",
   "extensions": {
     "colorMeta": {
@@ -42,13 +42,13 @@
       },
       "linea": {
         "role": "neutral",
-        "displayName": "Raya fina",
+        "displayName": "Raya fina (estructura y cromo)",
         "canonical": "#e6dfd2",
         "tonalRamp": ["#272319", "#423c2c", "#5f5641", "#7f7458", "#a29777", "#c4baa0", "#e6dfd2", "#f6f2ea"]
       },
       "linea-fuerte": {
         "role": "neutral",
-        "displayName": "Raya de pieza",
+        "displayName": "Raya de pieza (contorno de control)",
         "canonical": "#d3c8b6",
         "tonalRamp": ["#241f16", "#3e3627", "#594e39", "#77694d", "#978664", "#b6a68a", "#d3c8b6", "#eee8dd"]
       },
@@ -102,7 +102,7 @@
       },
       "rubrica": {
         "role": "primary",
-        "displayName": "Rúbrica de margen",
+        "displayName": "Rúbrica de margen (solo marca y dibujo del vacío)",
         "canonical": "#a8443c",
         "tonalRamp": ["#2c0e0b", "#471815", "#63231f", "#83302a", "#a8443c", "#c26f68", "#dba09b", "#f2d6d3"]
       },
@@ -170,11 +170,11 @@
     "typographyMeta": {
       "micro": {
         "displayName": "Micro",
-        "purpose": "El escalón más chico (≈14px) y casi el menos usado: el conteo dentro de un chip de filtro, la etiqueta ANULADO del historial y el número de paso del flujo de cobro. Ya NO es la clase .rotulo."
+        "purpose": "El escalón más chico (≈14px) y hoy con UN solo uso en toda la app: el número de paso del instructivo del cobro. No es la clase .rotulo y no debe volver a serlo."
       },
       "menuda": {
         "displayName": "Menuda",
-        "purpose": "Rótulos (.rotulo), metadatos de fila, ayudas bajo los campos, texto de chips y píldoras. Creció de 14 a 16px: la usuaria lee con lentes."
+        "purpose": "El escalón de trabajo de todo lo denso: rótulos (.rotulo), metadatos de fila, ayudas bajo los campos, chips, opciones de menú y botones de filtro. Son 16px, no 13: la usuaria lee con lentes."
       },
       "base": {
         "displayName": "Base",
@@ -182,7 +182,7 @@
       },
       "guia": {
         "displayName": "Guía",
-        "purpose": "Montos en fila, nombre de la persona elegida, título de diálogo, campos de búsqueda."
+        "purpose": "Nombre de la persona elegida, título de diálogo, campos de búsqueda, datos de la franja de cuenta, botón grande."
       },
       "titulo": {
         "displayName": "Título",
@@ -190,7 +190,7 @@
       },
       "cifra": {
         "displayName": "Cifra",
-        "purpose": "Cifras de segundo nivel: 'Le falta', 'Abonó', los cuatro conteos del evento, el total del comprobante."
+        "purpose": "Cifras de segundo nivel: 'Le falta' del cobro, 'Abonó' del recibo, las cifras de apoyo de Inicio y del reporte."
       },
       "cifraGrande": {
         "displayName": "Cifra grande",
@@ -198,7 +198,11 @@
       },
       "cifraEnorme": {
         "displayName": "Cifra enorme",
-        "purpose": "El número mandón de la pantalla: lo recaudado en Inicio y el saldo en la ficha. Una sola por pantalla."
+        "purpose": "El saldo en la ficha de una persona. Una sola por pantalla."
+      },
+      "cifraTitular": {
+        "displayName": "Cifra titular",
+        "purpose": "Lo recaudado en Inicio y nada más. Es el único escalón que se escribe sobre el papel de la mesa en vez de sobre una hoja: cuando la cifra manda la pantalla, no necesita una caja que la señale."
       }
     },
     "shadows": [
@@ -210,12 +214,12 @@
       {
         "name": "dialogo",
         "value": "0 12px 24px -8px rgba(40, 28, 18, 0.18), 0 32px 64px -24px rgba(40, 28, 18, 0.32)",
-        "purpose": "La única sombra profunda del sistema. Solo para <dialog>, con backdrop rgba(40,28,18,0.42)."
+        "purpose": "La sombra de la capa superior del navegador. La usan el <dialog> (backdrop rgba(40,28,18,0.42)) y los menús de popover de FiltroMenu y Selector (backdrop transparente). Misma sombra a propósito: lo que las distingue es el velo, no la profundidad."
       },
       {
         "name": "toast",
         "value": "0 2px 4px rgba(58, 42, 28, 0.06), 0 14px 32px -14px rgba(58, 42, 28, 0.28)",
-        "purpose": "El aviso de Sonner, que sí flota por encima del libro."
+        "purpose": "El aviso de Sonner, que flota por encima de todo, incluso del diálogo."
       },
       {
         "name": "filo-boton",
@@ -227,7 +231,7 @@
       {
         "name": "salida",
         "value": "cubic-bezier(0.23, 1, 0.32, 1)",
-        "purpose": "La curva de casi todo: cambios de color, entradas de renglón y hoja, y el crecimiento de la barra de progreso."
+        "purpose": "La curva de casi todo: cambios de color, entradas de renglón y hoja, apertura de menú y diálogo, y el crecimiento de la barra de progreso."
       },
       {
         "name": "entrasale",
@@ -240,9 +244,14 @@
         "purpose": "Curva de panel que se desliza; reservada para superficies que corren como una gaveta."
       },
       {
+        "name": "duracion-menu",
+        "value": "140ms",
+        "purpose": "Apertura y cierre del menú de popover (.menu-filtro): opacidad + 4px de bajada, con @starting-style y allow-discrete. Más corto que el diálogo a propósito: un menú es un control, no una interrupción."
+      },
+      {
         "name": "duracion-estado",
         "value": "150ms",
-        "purpose": "Cambios de color, borde y fondo en botones, campos, chips y navegación."
+        "purpose": "Cambios de color, borde y fondo en botones, campos, chips, filtros y navegación."
       },
       {
         "name": "duracion-dialogo",
@@ -252,7 +261,7 @@
       {
         "name": "duracion-renglon",
         "value": "260ms",
-        "purpose": "Entrada de un renglón de lista (opacidad + 5px), escalonada 26ms por índice vía --i, con tope de 12."
+        "purpose": "Entrada de un renglón de lista (opacidad + 5px), escalonada 26ms por índice vía --i, con tope de 10 a 12."
       },
       {
         "name": "duracion-hoja",
@@ -266,16 +275,21 @@
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" },
+      { "name": "sm", "value": "640px (aparece el encabezado de columnas)" },
+      { "name": "md", "value": "768px (aparece la columna 'Su cupo' y 'Forma de pago')" },
+      { "name": "lg", "value": "1024px (se abren las rejillas de dos columnas)" },
+      { "name": "xl", "value": "1280px (aparece la columna 'Iglesia'; el cuerpo pasa a 36px de padding)" },
       { "name": "objetivo", "value": "1366x768 (laptop de 13-14 pulgadas, único destino real)" },
       { "name": "ancho-maximo-contenido", "value": "1120px" },
       { "name": "ancho-lomo", "value": "236px" },
       { "name": "ancho-rail-auxiliar", "value": "340px" },
-      { "name": "columna-iglesia", "value": "248px (lista de personas)" },
+      { "name": "ancho-cobro-centrado", "value": "680px (Registrar pago cuando no hay rail)" },
+      { "name": "ancho-comprobante", "value": "560px" },
+      { "name": "alto-barra-herramientas", "value": "44px (una sola fila: buscador + filtros + orden)" },
+      { "name": "columna-iglesia", "value": "220px (lista de personas, desde xl)" },
       { "name": "columna-monto", "value": "112px (Ha pagado / Su cupo, alineadas a la derecha)" },
-      { "name": "columna-estado", "value": "128px (Cómo va)" }
+      { "name": "columna-estado", "value": "128px (Cómo va)" },
+      { "name": "columna-historial", "value": "132px monto / 132px forma de pago / 104px acciones (ficha de persona)" }
     ]
   },
   "components": [
@@ -307,25 +321,33 @@
       "name": "Chip de estado",
       "kind": "chip",
       "refersTo": "chip-pagado",
-      "description": "Estado de pago informativo. El color nunca va solo: siempre lleva su texto y su punto de marca.",
+      "description": "El único chip del sistema. El color nunca va solo: siempre lleva su texto y su punto de marca.",
       "html": "<span class=\"ds-chip ds-chip-pagado\"><span class=\"ds-chip-punto\" aria-hidden=\"true\"></span>Pagado</span> <span class=\"ds-chip ds-chip-abonando\"><span class=\"ds-chip-punto\" aria-hidden=\"true\"></span>Abonando</span> <span class=\"ds-chip ds-chip-sinpagos\"><span class=\"ds-chip-punto\" aria-hidden=\"true\"></span>Sin pagos</span>",
       "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; white-space: nowrap; } .ds-chip-punto { width: 7px; height: 7px; border-radius: 999px; } .ds-chip-pagado { background: var(--pagado-fondo, #e6efe4); color: var(--pagado-tinta, #2c5a31); } .ds-chip-pagado .ds-chip-punto { background: var(--pagado-marca, #4d8a53); } .ds-chip-abonando { background: var(--abonando-fondo, #fbf0d8); color: var(--abonando-tinta, #77510e); } .ds-chip-abonando .ds-chip-punto { background: var(--abonando-marca, #bf8920); } .ds-chip-sinpagos { background: var(--sinpagos-fondo, #eeeae2); color: var(--sinpagos-tinta, #5d574d); } .ds-chip-sinpagos .ds-chip-punto { background: var(--sinpagos-marca, #a1988a); }"
     },
     {
-      "name": "Chip de filtro",
-      "kind": "chip",
-      "refersTo": "chip-filtro",
-      "description": "Filtro pulsable con conteo, dentro del panel de Filtros. 44px de alto, como todo lo que se toca.",
-      "html": "<button type=\"button\" class=\"ds-filtro\" aria-pressed=\"false\">Abonando<span class=\"ds-filtro-cuenta\">14</span></button> <button type=\"button\" class=\"ds-filtro ds-filtro-activo\" aria-pressed=\"true\">Pagado<span class=\"ds-filtro-cuenta\">31</span></button>",
-      "css": ".ds-filtro { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; cursor: pointer; background: transparent; color: var(--tinta-2, #575047); border: 1px solid var(--linea, #e6dfd2); transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms cubic-bezier(0.23,1,0.32,1), color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1); } .ds-filtro:hover { border-color: var(--linea-fuerte, #d3c8b6); background: var(--hoja-2, #faf7f0); color: var(--tinta, #241f1b); } .ds-filtro:active { transform: scale(0.98); } .ds-filtro:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: 2px; border-radius: 999px; } .ds-filtro-cuenta { font-variant-numeric: tabular-nums lining-nums; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.06em; color: var(--tinta-3, #756b62); } .ds-filtro-activo { border-color: var(--accion, #8a3340); background: rgba(138,51,64,0.09); color: var(--accion, #8a3340); } .ds-filtro-activo .ds-filtro-cuenta { color: var(--accion, #8a3340); }"
+      "name": "Barra de herramientas con FiltroMenu",
+      "kind": "custom",
+      "refersTo": "filtro-boton",
+      "description": "Una sola fila de 44px: buscador + un botón compacto por filtro + el orden al final. Sustituyó a un panel de cinco filas de píldoras de ~450px. Cada botón dice dentro lo que está filtrando y trae su × para quitarlo; los conteos viven dentro del menú, no en el botón. El control mide lo mismo con tres opciones que con cincuenta.",
+      "html": "<div class=\"ds-barra\"><div class=\"ds-buscador\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m15.4 15.4 4.1 4.1\"/></svg><input type=\"search\" placeholder=\"Buscar por nombre…\" aria-label=\"Buscar persona por nombre\"></div><button type=\"button\" class=\"ds-filtro\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span class=\"ds-truncar\">Cómo va</span><svg class=\"ds-flecha\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m7 10 5 5 5-5\"/></svg></button><button type=\"button\" class=\"ds-filtro ds-filtro-activo\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span class=\"ds-punto\" aria-hidden=\"true\"></span><span class=\"ds-truncar\"><span class=\"ds-etiqueta\">Iglesia: </span>Getsemaní</span><span role=\"button\" tabindex=\"0\" class=\"ds-quitar\" aria-label=\"Quitar el filtro Iglesia\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M7 7l10 10M17 7 7 17\"/></svg></span></button></div>",
+      "css": ".ds-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: 'Fira Sans', system-ui, sans-serif; } .ds-buscador { position: relative; flex: 1; min-width: 220px; } .ds-buscador svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--tinta-3, #756b62); } .ds-buscador input { width: 100%; height: 44px; padding: 0 16px 0 44px; border-radius: 8px; background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); color: var(--tinta, #241f1b); font-family: inherit; font-size: 1.1875rem; transition: border-color 150ms cubic-bezier(0.23,1,0.32,1), box-shadow 150ms cubic-bezier(0.23,1,0.32,1); } .ds-buscador input::placeholder { color: var(--tinta-3, #756b62); } .ds-buscador input:focus { outline: none; border-color: var(--accion, #8a3340); box-shadow: 0 0 0 2px rgba(138,51,64,0.18); } .ds-filtro { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; max-width: 280px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px solid var(--linea, #e6dfd2); color: var(--tinta-2, #575047); font-family: inherit; font-size: 0.9375rem; cursor: pointer; transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms cubic-bezier(0.23,1,0.32,1), color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1); } .ds-filtro:hover { border-color: var(--linea-fuerte, #d3c8b6); background: var(--hoja-2, #faf7f0); color: var(--tinta, #241f1b); } .ds-filtro:active { transform: scale(0.98); } .ds-filtro:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: 2px; border-radius: 4px; } .ds-truncar { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-flecha { flex: none; margin-right: -2px; opacity: 0.6; } .ds-filtro-activo { border-color: var(--accion, #8a3340); background: rgba(138,51,64,0.08); color: var(--accion, #8a3340); font-weight: 500; } .ds-etiqueta { font-weight: 400; opacity: 0.7; } .ds-punto { width: 8px; height: 8px; flex: none; border-radius: 999px; background: #41525c; } .ds-quitar { display: flex; align-items: center; justify-content: center; flex: none; width: 28px; height: 28px; margin-right: -4px; border-radius: 999px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-quitar:hover { background: rgba(138,51,64,0.16); }"
+    },
+    {
+      "name": "Selector con su menú",
+      "kind": "input",
+      "refersTo": "selector-campo",
+      "description": "Campo de una línea que abre un menú de popover. SIEMPRE campo, nunca rejilla de botones: con botones, tres iglesias y cuatro cupos se comían 500px de diálogo. Un detalle numérico (el precio) se repite en el campo y a la derecha en el menú, porque confirma y se compara; un detalle de texto (el pastor) va solo en el menú, en segunda línea, porque ayuda a elegir y en la misma línea truncaba el nombre.",
+      "html": "<div class=\"ds-sel\"><span class=\"ds-sel-etiqueta\">Tipo de cupo</span><button type=\"button\" class=\"ds-sel-campo\" aria-expanded=\"true\" aria-haspopup=\"listbox\"><span class=\"ds-sel-valor\">Adulto — habitación familiar</span><span class=\"ds-sel-detalle\">RD$ 4,500</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m7 10 5 5 5-5\"/></svg></button><ul class=\"ds-menu\" role=\"listbox\"><li><button type=\"button\" role=\"option\" aria-selected=\"true\" class=\"ds-op ds-op-elegida\"><span class=\"ds-op-txt\"><span class=\"ds-op-nombre\">Adulto — habitación familiar</span></span><span class=\"ds-op-num\">RD$ 4,500</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12.5 4.5 4.5L19 7.5\"/></svg></button></li><li><button type=\"button\" role=\"option\" aria-selected=\"false\" class=\"ds-op\"><span class=\"ds-op-txt\"><span class=\"ds-op-nombre\">Adulto — habitación compartida</span></span><span class=\"ds-op-num\">RD$ 3,200</span></button></li><li><button type=\"button\" role=\"option\" aria-selected=\"false\" class=\"ds-op\"><span class=\"ds-punto-ig\" aria-hidden=\"true\"></span><span class=\"ds-op-txt\"><span class=\"ds-op-nombre\">Iglesia Getsemaní</span><span class=\"ds-op-sub\">Pastor Ramírez</span></span></button></li></ul></div>",
+      "css": ".ds-sel { font-family: 'Fira Sans', system-ui, sans-serif; width: 100%; max-width: 420px; color: var(--tinta, #241f1b); } .ds-sel-etiqueta { display: block; margin-bottom: 6px; font-size: 0.9375rem; font-weight: 500; color: var(--tinta-2, #575047); } .ds-sel-campo { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 46px; padding: 0 12px; text-align: left; border-radius: 8px; background: var(--hoja, #fffdf8); border: 1px solid var(--accion, #8a3340); box-shadow: 0 0 0 2px rgba(138,51,64,0.18); color: inherit; font-family: inherit; font-size: 1.0625rem; cursor: pointer; transition: border-color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-sel-campo:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: 2px; } .ds-sel-valor { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-sel-detalle { flex: none; font-variant-numeric: tabular-nums lining-nums; font-weight: 500; color: var(--tinta-2, #575047); } .ds-menu { list-style: none; margin: 6px 0 0; padding: 4px 0; max-height: 280px; overflow-y: auto; background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); border-radius: 10px; box-shadow: 0 12px 24px -8px rgba(40,28,18,0.18), 0 32px 64px -24px rgba(40,28,18,0.32); } .ds-op { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 44px; padding: 6px 12px; text-align: left; background: transparent; border: none; color: inherit; font-family: inherit; font-size: 0.9375rem; cursor: pointer; transition: background-color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-op:hover { background: var(--hoja-2, #faf7f0); } .ds-op:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: -2px; } .ds-op-elegida { background: rgba(138,51,64,0.08); color: var(--accion, #8a3340); } .ds-op-elegida .ds-op-nombre { font-weight: 500; } .ds-op-txt { flex: 1; min-width: 0; } .ds-op-nombre { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-op-sub { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-op-num { flex: none; font-variant-numeric: tabular-nums lining-nums; font-weight: 500; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-op-elegida .ds-op-num { color: var(--accion, #8a3340); } .ds-punto-ig { width: 10px; height: 10px; flex: none; border-radius: 999px; background: #41525c; }"
     },
     {
       "name": "Hoja con renglones",
       "kind": "card",
       "refersTo": "hoja",
-      "description": "La unidad de lista del sistema: una hoja delimitada por hairline, encabezado de columna en minúscula y renglones de una sola línea separados por una raya. Sin trama alterna, sin raya de margen, jamás tarjetas.",
+      "description": "La unidad de lista del sistema: una hoja delimitada por hairline, encabezado de columna en minúscula y renglones de UNA SOLA línea de 46px separados por una raya. Sin trama alterna, sin raya de margen, jamás tarjetas. Las columnas caen por prioridad: Iglesia desde xl, Su cupo desde md.",
       "html": "<div class=\"ds-hoja ds-hoja-lista\"><div class=\"ds-cabecera\"><span class=\"ds-rotulo ds-col-nombre\">Nombre</span><span class=\"ds-rotulo ds-col-iglesia\">Iglesia</span><span class=\"ds-rotulo ds-col-monto\">Ha pagado</span><span class=\"ds-rotulo ds-col-monto\">Su cupo</span><span class=\"ds-rotulo ds-col-estado\">Cómo va</span></div><ul><li class=\"ds-renglon\"><a class=\"ds-fila\" href=\"#\"><span class=\"ds-col-nombre ds-nombre\">María Altagracia Pérez</span><span class=\"ds-col-iglesia ds-iglesia\"><span class=\"ds-punto-iglesia\"></span><span class=\"ds-truncar\">Iglesia Central de Villa Duarte</span></span><span class=\"ds-col-monto\"><span class=\"ds-monto ds-monto-fuerte\"><span class=\"ds-rd\">RD$</span>3,200</span></span><span class=\"ds-col-monto\"><span class=\"ds-monto ds-monto-tenue\"><span class=\"ds-rd\">RD$</span>4,500</span></span><span class=\"ds-col-estado\"><span class=\"ds-chip ds-chip-abonando\"><span class=\"ds-chip-punto\"></span>Abonando</span></span></a></li><li class=\"ds-renglon\"><a class=\"ds-fila\" href=\"#\"><span class=\"ds-col-nombre ds-nombre\">Juan Ramón de la Cruz</span><span class=\"ds-col-iglesia ds-iglesia\"><span class=\"ds-punto-iglesia ds-punto-pizarra\"></span><span class=\"ds-truncar\">Iglesia Getsemaní, Los Alcarrizos</span></span><span class=\"ds-col-monto\"><span class=\"ds-monto ds-monto-fuerte\"><span class=\"ds-rd\">RD$</span>4,500</span></span><span class=\"ds-col-monto\"><span class=\"ds-monto ds-monto-tenue\"><span class=\"ds-rd\">RD$</span>4,500</span></span><span class=\"ds-col-estado\"><span class=\"ds-chip ds-chip-pagado\"><span class=\"ds-chip-punto\"></span>Pagado</span></span></a></li></ul></div>",
-      "css": ".ds-hoja { background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); border-radius: 10px; box-shadow: 0 1px 2px rgba(58,42,28,0.04); font-family: 'Fira Sans', system-ui, sans-serif; color: var(--tinta, #241f1b); } .ds-hoja-lista { overflow: hidden; } .ds-hoja-lista ul { margin: 0; padding: 0; list-style: none; } .ds-cabecera { display: flex; padding: 10px 20px; border-bottom: 1px solid var(--linea, #e6dfd2); } .ds-rotulo { font-size: 0.9375rem; line-height: 1.35rem; font-weight: 500; color: var(--tinta-2, #575047); } .ds-col-nombre { flex: 1; min-width: 0; padding-right: 16px; } .ds-col-iglesia { width: 248px; flex: none; padding-right: 16px; min-width: 0; } .ds-col-monto { width: 112px; flex: none; text-align: right; } .ds-col-estado { width: 128px; flex: none; padding-left: 20px; } .ds-renglon { border-bottom: 1px solid var(--linea, #e6dfd2); } .ds-renglon:last-child { border-bottom: 0; } .ds-fila { display: flex; align-items: center; min-height: 46px; padding: 6px 20px; text-decoration: none; color: inherit; transition: background-color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-fila:hover { background: var(--hoja-2, #faf7f0); } .ds-fila:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: -2px; } .ds-nombre { font-weight: 500; font-size: 1.0625rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-iglesia { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-truncar { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-punto-iglesia { width: 8px; height: 8px; flex: none; border-radius: 999px; background: #8a5a3c; } .ds-punto-pizarra { background: #41525c; } .ds-monto { font-variant-numeric: tabular-nums lining-nums; font-size: 1.0625rem; white-space: nowrap; } .ds-monto-fuerte { font-weight: 500; } .ds-monto-tenue { color: var(--tinta-2, #575047); } .ds-rd { margin-right: 4px; font-weight: 400; color: var(--tinta-2, #575047); } .ds-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-size: 0.9375rem; font-weight: 500; white-space: nowrap; } .ds-chip-punto { width: 7px; height: 7px; border-radius: 999px; } .ds-chip-pagado { background: var(--pagado-fondo, #e6efe4); color: var(--pagado-tinta, #2c5a31); } .ds-chip-pagado .ds-chip-punto { background: var(--pagado-marca, #4d8a53); } .ds-chip-abonando { background: var(--abonando-fondo, #fbf0d8); color: var(--abonando-tinta, #77510e); } .ds-chip-abonando .ds-chip-punto { background: var(--abonando-marca, #bf8920); }"
+      "css": ".ds-hoja { background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); border-radius: 10px; box-shadow: 0 1px 2px rgba(58,42,28,0.04); font-family: 'Fira Sans', system-ui, sans-serif; color: var(--tinta, #241f1b); } .ds-hoja-lista { overflow: hidden; } .ds-hoja-lista ul { margin: 0; padding: 0; list-style: none; } .ds-cabecera { display: flex; padding: 10px 20px; border-bottom: 1px solid var(--linea, #e6dfd2); } .ds-rotulo { font-size: 0.9375rem; line-height: 1.35rem; font-weight: 500; color: var(--tinta-2, #575047); } .ds-col-nombre { flex: 1; min-width: 150px; padding-right: 16px; } .ds-col-iglesia { width: 220px; flex: none; padding-right: 16px; min-width: 0; overflow: hidden; } .ds-col-monto { width: 112px; flex: none; text-align: right; } .ds-col-estado { width: 128px; flex: none; padding-left: 20px; } .ds-renglon { border-bottom: 1px solid var(--linea, #e6dfd2); } .ds-renglon:last-child { border-bottom: 0; } .ds-fila { display: flex; align-items: center; min-height: 46px; padding: 6px 20px; text-decoration: none; color: inherit; transition: background-color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-fila:hover { background: var(--hoja-2, #faf7f0); } .ds-fila:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: -2px; } .ds-nombre { font-weight: 500; font-size: 1.0625rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-iglesia { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-truncar { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-punto-iglesia { width: 8px; height: 8px; flex: none; border-radius: 999px; background: #8a5a3c; } .ds-punto-pizarra { background: #41525c; } .ds-monto { font-variant-numeric: tabular-nums lining-nums; font-size: 1.0625rem; white-space: nowrap; } .ds-monto-fuerte { font-weight: 500; } .ds-monto-tenue { color: var(--tinta-2, #575047); } .ds-rd { margin-right: 4px; font-weight: 400; color: var(--tinta-2, #575047); } .ds-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-size: 0.9375rem; font-weight: 500; white-space: nowrap; } .ds-chip-punto { width: 7px; height: 7px; border-radius: 999px; } .ds-chip-pagado { background: var(--pagado-fondo, #e6efe4); color: var(--pagado-tinta, #2c5a31); } .ds-chip-pagado .ds-chip-punto { background: var(--pagado-marca, #4d8a53); } .ds-chip-abonando { background: var(--abonando-fondo, #fbf0d8); color: var(--abonando-tinta, #77510e); } .ds-chip-abonando .ds-chip-punto { background: var(--abonando-marca, #bf8920); }"
     },
     {
       "name": "Lomo del libro (navegación)",
@@ -336,39 +358,40 @@
       "css": ".ds-lomo { width: 236px; min-height: 460px; display: flex; flex-direction: column; background: var(--lomo, #47222a); color: var(--lomo-texto, #f6e9e3); font-family: 'Fira Sans', system-ui, sans-serif; } .ds-lomo ul { margin: 0; padding: 0 12px; list-style: none; display: flex; flex-direction: column; gap: 2px; } .ds-lomo-cabecera { padding: 24px 20px 4px; } .ds-lomo-titulo { margin: 0; font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.015em; color: #fff; } .ds-lomo-evento { margin: 4px 0 0; font-size: 0.9375rem; line-height: 1.35; color: rgba(246,233,227,0.72); } .ds-lomo-evento span { color: rgba(246,233,227,0.58); } .ds-lomo-raya { height: 1px; margin: 16px 20px; background: rgba(246,233,227,0.16); } .ds-lomo-entrada { position: relative; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border-radius: 8px; font-size: 1rem; text-decoration: none; color: rgba(246,233,227,0.82); transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), color 150ms cubic-bezier(0.23,1,0.32,1); } .ds-lomo-entrada:hover { background: rgba(255,255,255,0.07); color: #fff; } .ds-lomo-entrada:focus-visible { outline: 2px solid #e8b4a0; outline-offset: 2px; } .ds-lomo-activa { background: var(--lomo-alto, #5c2f38); color: #fff; font-weight: 600; } .ds-lomo-pestana { position: absolute; left: 0; top: 50%; width: 3px; height: 24px; transform: translateY(-50%); border-radius: 0 999px 999px 0; background: #e8b4a0; transition: opacity 150ms cubic-bezier(0.23,1,0.32,1); } .ds-lomo-pie { margin: auto 20px 20px; padding-top: 16px; font-size: 0.9375rem; color: rgba(246,233,227,0.66); }"
     },
     {
-      "name": "Cabecera de Inicio con la barra del cobro",
+      "name": "Titular de Inicio (sin hoja)",
       "kind": "custom",
       "refersTo": "hoja",
-      "description": "El componente insignia dentro de la única hoja de Inicio: lo recaudado en cifra enorme, la barra que crece por scaleX en 420ms, y el renglón de resumen con los cuatro conteos. El color de la barra sale de calcularEstado, nunca es verde por defecto.",
-      "html": "<div class=\"ds-hoja ds-inicio\"><div class=\"ds-inicio-cabecera\"><div class=\"ds-inicio-fila\"><div><p class=\"ds-rotulo\">Recaudado</p><p class=\"ds-cifra-enorme\"><span class=\"ds-rd-enorme\">RD$</span>184,500</p></div><div class=\"ds-derecha\"><p class=\"ds-rotulo\">Falta por cobrar</p><p class=\"ds-cifra\"><span class=\"ds-rd-cifra\">RD$</span>86,500</p></div></div><div class=\"ds-canal\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"68\" aria-valuetext=\"68 por ciento de RD$ 271,000\"><div class=\"ds-relleno\"></div></div><div class=\"ds-pie-barra\"><span><span class=\"ds-porciento\">68%</span> de lo que suman todos los cupos</span><span class=\"ds-num\">Meta: RD$ 271,000</span></div></div><div class=\"ds-resumen\"><span class=\"ds-cuenta\"><span class=\"ds-cuenta-n\">62</span><span class=\"ds-cuenta-r\">inscritos</span></span><span class=\"ds-cuenta\"><span class=\"ds-cuenta-n ds-verde\">31</span><span class=\"ds-cuenta-r\">pagaron completo</span></span><span class=\"ds-cuenta\"><span class=\"ds-cuenta-n ds-ambar\">18</span><span class=\"ds-cuenta-r\">abonando</span></span><span class=\"ds-cuenta\"><span class=\"ds-cuenta-n ds-gris\">13</span><span class=\"ds-cuenta-r\">sin pagos</span></span></div></div>",
-      "css": ".ds-hoja { background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); border-radius: 10px; box-shadow: 0 1px 2px rgba(58,42,28,0.04); font-family: 'Fira Sans', system-ui, sans-serif; color: var(--tinta, #241f1b); } .ds-inicio { overflow: hidden; } .ds-inicio-cabecera { padding: 24px 24px 20px; } .ds-inicio-fila { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; } .ds-derecha { text-align: right; } .ds-rotulo { margin: 0 0 4px; font-size: 0.9375rem; line-height: 1.35rem; font-weight: 500; color: var(--tinta-2, #575047); } .ds-cifra-enorme { margin: 0; font-size: 3.5rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums lining-nums; } .ds-rd-enorme { margin-right: 8px; font-size: 0.42em; font-weight: 500; vertical-align: baseline; color: var(--tinta-2, #575047); } .ds-cifra { margin: 0; font-size: 1.75rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.018em; font-variant-numeric: tabular-nums lining-nums; } .ds-rd-cifra { margin-right: 6px; font-size: 0.5em; font-weight: 500; vertical-align: baseline; color: var(--tinta-2, #575047); } .ds-canal { margin-top: 20px; height: 12px; width: 100%; border-radius: 999px; background: var(--linea, #e6dfd2); overflow: hidden; } .ds-relleno { height: 100%; border-radius: 999px; background: var(--abonando-marca, #bf8920); transform-origin: left; transform: scaleX(0.68); transition: transform 420ms cubic-bezier(0.23,1,0.32,1); } .ds-pie-barra { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-porciento, .ds-num { font-variant-numeric: tabular-nums lining-nums; } .ds-porciento { font-weight: 500; color: var(--tinta, #241f1b); } .ds-resumen { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 12px 24px; border-top: 1px solid var(--linea, #e6dfd2); border-bottom: 1px solid var(--linea, #e6dfd2); background: var(--hoja-2, #faf7f0); } .ds-cuenta { display: flex; align-items: baseline; gap: 6px; } .ds-cuenta-n { font-variant-numeric: tabular-nums lining-nums; font-size: 1.75rem; font-weight: 600; line-height: 1; letter-spacing: -0.018em; } .ds-cuenta-r { font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-verde { color: var(--pagado-tinta, #2c5a31); } .ds-ambar { color: var(--abonando-tinta, #77510e); } .ds-gris { color: var(--sinpagos-tinta, #5d574d); } @media (prefers-reduced-motion: reduce) { .ds-relleno { transition-duration: 0.01ms; } }"
+      "description": "El componente insignia de Inicio y la prueba de la regla de la hoja que se gana: lo recaudado en cifraTitular (72px) directamente sobre el papel de la mesa, sin borde. Las cuatro cuentas son UNA FRASE que se lee en voz alta, no cuatro cuadritos de panel. El excedente es una nota al pie discreta, no una caja de color. El color de la barra sale de calcularEstado, nunca es verde por defecto.",
+      "html": "<div class=\"ds-inicio\"><div class=\"ds-inicio-tit\"><h1>Convención Octubre 2026</h1><p>16 de octubre de 2026 <span>· Faltan 61 días</span></p></div><div class=\"ds-inicio-fila\"><div><p class=\"ds-rotulo\">Recaudado</p><p class=\"ds-titular\"><span class=\"ds-rd-titular\">RD$</span>184,500</p></div><div class=\"ds-inicio-apoyo\"><div><p class=\"ds-rotulo\">Falta por cobrar</p><p class=\"ds-cifra\">RD$ 86,500</p></div><div><p class=\"ds-rotulo\">Meta</p><p class=\"ds-cifra ds-tenue\">RD$ 271,000</p></div></div></div><div class=\"ds-canal\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"68\" aria-valuetext=\"68 por ciento de RD$ 271,000\"><div class=\"ds-relleno\"></div></div><p class=\"ds-frase\"><span class=\"ds-pct\">68%</span> cobrado · <span class=\"ds-n\">62</span> inscritos <span class=\"ds-sep\">·</span> <span class=\"ds-n ds-verde\">31</span> completos <span class=\"ds-sep\">·</span> <span class=\"ds-n ds-ambar\">18</span> abonando <span class=\"ds-sep\">·</span> <span class=\"ds-n\">13</span> sin pagos</p><p class=\"ds-nota\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Incluye <span class=\"ds-n-chico\">RD$ 300</span> de pagos de más, por eso lo recaudado y lo que falta no suman justo la meta.</span></p></div>",
+      "css": ".ds-inicio { font-family: 'Fira Sans', system-ui, sans-serif; background: var(--papel, #f3efe6); color: var(--tinta, #241f1b); padding: 24px; } .ds-inicio-tit h1 { margin: 0; font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.011em; display: inline; } .ds-inicio-tit p { display: inline; margin: 0 0 0 12px; font-size: 1.0625rem; color: var(--tinta-2, #575047); } .ds-inicio-tit p span { color: var(--tinta-3, #756b62); } .ds-rotulo { margin: 0 0 4px; font-size: 0.9375rem; line-height: 1.35rem; font-weight: 500; color: var(--tinta-2, #575047); } .ds-inicio-fila { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 40px; margin-top: 28px; } .ds-inicio-apoyo { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 36px; } .ds-titular { margin: 0; font-size: 4.25rem; font-weight: 600; line-height: 0.95; letter-spacing: -0.035em; font-variant-numeric: tabular-nums lining-nums; } .ds-rd-titular { margin-right: 10px; font-size: 0.34em; font-weight: 500; vertical-align: baseline; color: var(--tinta-2, #575047); } .ds-cifra { margin: 0; font-size: 1.75rem; font-weight: 600; line-height: 1; letter-spacing: -0.018em; font-variant-numeric: tabular-nums lining-nums; } .ds-tenue { color: var(--tinta-2, #575047); } .ds-canal { margin-top: 24px; height: 8px; width: 100%; border-radius: 999px; background: var(--linea, #e6dfd2); overflow: hidden; } .ds-relleno { height: 100%; border-radius: 999px; background: var(--abonando-marca, #bf8920); transform-origin: left; transform: scaleX(0.68); transition: transform 420ms cubic-bezier(0.23,1,0.32,1); } .ds-frase { margin: 12px 0 0; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-pct, .ds-n, .ds-n-chico { font-variant-numeric: tabular-nums lining-nums; font-weight: 600; color: var(--tinta, #241f1b); } .ds-n-chico { font-weight: 500; } .ds-sep { color: var(--tinta-3, #756b62); } .ds-verde { color: var(--pagado-tinta, #2c5a31); } .ds-ambar { color: var(--abonando-tinta, #77510e); } .ds-nota { display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 0; font-size: 0.9375rem; color: var(--tinta-2, #575047); } .ds-nota svg { flex: none; margin-top: 2px; color: var(--tinta-3, #756b62); } @media (prefers-reduced-motion: reduce) { .ds-relleno { transition-duration: 0.01ms; } }"
     },
     {
       "name": "Estado vacío",
       "kind": "custom",
       "refersTo": "hoja",
-      "description": "Nunca dice 'no hay nada': dice qué hacer ahora, con el botón que lo hace. El dibujo es el único lugar de la pantalla donde sobrevive la rúbrica.",
+      "description": "Nunca dice 'no hay nada': dice qué hacer ahora, con el botón que lo hace. El dibujo es el único lugar de la app donde sobrevive la rúbrica, y a escala de dibujo, no de interfaz.",
       "html": "<div class=\"ds-hoja ds-vacio\"><svg width=\"72\" height=\"52\" viewBox=\"0 0 72 52\" aria-hidden=\"true\" class=\"ds-vacio-dibujo\"><rect x=\"0.5\" y=\"0.5\" width=\"71\" height=\"51\" rx=\"4\" fill=\"var(--hoja-2, #faf7f0)\" stroke=\"currentColor\"/><path d=\"M14 0v52\" stroke=\"var(--rubrica, #a8443c)\" stroke-opacity=\"0.3\"/><path d=\"M22 14h38M22 24h30M22 34h22\" stroke=\"currentColor\" stroke-linecap=\"round\"/></svg><h3>Todavía no hay personas</h3><p>Agrega a la primera persona con su iglesia y su tipo de cupo. La app le lleva la cuenta desde el primer abono.</p><button type=\"button\" class=\"ds-boton-vacio\">Agregar la primera persona</button></div>",
-      "css": ".ds-vacio { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 56px 24px; font-family: 'Fira Sans', system-ui, sans-serif; } .ds-vacio-dibujo { color: var(--linea, #e6dfd2); } .ds-vacio h3 { margin: 20px 0 0; font-size: 1.1875rem; font-weight: 600; color: var(--tinta, #241f1b); } .ds-vacio p { margin: 6px 0 0; max-width: 38ch; font-size: 1.0625rem; line-height: 1.55; color: var(--tinta-2, #575047); } .ds-boton-vacio { margin-top: 20px; min-height: 52px; padding: 0 24px; border: none; border-radius: 8px; background: var(--accion, #8a3340); color: #fff; font-family: inherit; font-size: 1.1875rem; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(58,42,28,0.12); transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1); } .ds-boton-vacio:hover { background: var(--accion-alto, #71272f); } .ds-boton-vacio:active { transform: scale(0.98); } .ds-boton-vacio:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: 2px; border-radius: 4px; }"
+      "css": ".ds-vacio { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 56px 24px; font-family: 'Fira Sans', system-ui, sans-serif; background: var(--hoja, #fffdf8); border: 1px solid var(--linea, #e6dfd2); border-radius: 10px; box-shadow: 0 1px 2px rgba(58,42,28,0.04); } .ds-vacio-dibujo { color: var(--linea, #e6dfd2); } .ds-vacio h3 { margin: 20px 0 0; font-size: 1.1875rem; font-weight: 600; color: var(--tinta, #241f1b); } .ds-vacio p { margin: 6px 0 0; max-width: 38ch; font-size: 1.0625rem; line-height: 1.55; color: var(--tinta-2, #575047); } .ds-boton-vacio { margin-top: 20px; min-height: 52px; padding: 0 24px; border: none; border-radius: 8px; background: var(--accion, #8a3340); color: #fff; font-family: inherit; font-size: 1.1875rem; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(58,42,28,0.12); transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1); } .ds-boton-vacio:hover { background: var(--accion-alto, #71272f); } .ds-boton-vacio:active { transform: scale(0.98); } .ds-boton-vacio:focus-visible { outline: 2px solid var(--accion, #8a3340); outline-offset: 2px; border-radius: 4px; }"
     },
     {
-      "name": "Aviso tranquilo",
+      "name": "Nota y Aviso",
       "kind": "custom",
       "refersTo": "aviso",
-      "description": "Nota del sistema que informa sin alarmar (excedente, precio a mano). Nunca es un error ni usa rojo.",
-      "html": "<p class=\"ds-aviso\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Pagó <strong>RD$ 300</strong> de más.</span></p>",
-      "css": ".ds-aviso { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--aviso-fondo, #e6eeee); color: var(--aviso-tinta, #2c5253); font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.35; } .ds-aviso svg { flex: none; margin-top: 2px; } .ds-aviso strong { font-variant-numeric: tabular-nums lining-nums; font-weight: 500; }"
+      "description": "Dos niveles. Nota (sin caja) es el patrón por defecto: informa sin competir con la cifra. Aviso (caja de color, tono neutro o tono ojo) se reserva para lo que sí interrumpe. Si la usuaria puede seguir trabajando sin leerlo, es Nota.",
+      "html": "<p class=\"ds-nota-suelta\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Pagó <strong>RD$ 300</strong> de más.</span></p><p class=\"ds-aviso\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Esta persona está archivada: no aparece en la lista ni en la búsqueda de pagos. Su historial sigue completo.</span></p>",
+      "css": ".ds-nota-suelta { display: flex; align-items: flex-start; gap: 6px; margin: 0 0 12px; font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.35rem; color: var(--tinta-2, #575047); } .ds-nota-suelta svg { flex: none; margin-top: 2px; color: var(--tinta-3, #756b62); } .ds-nota-suelta strong { font-variant-numeric: tabular-nums lining-nums; font-weight: 500; color: var(--tinta, #241f1b); } .ds-aviso { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--abonando-fondo, #fbf0d8); color: var(--abonando-tinta, #77510e); font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.35rem; } .ds-aviso svg { flex: none; margin-top: 2px; }"
     }
   ],
   "narrative": {
-    "northStar": "El libro de caja",
-    "overview": "La app no es un panel de control: es el libro de contabilidad encuadernado que la tesorera ya sabe leer, abierto sobre la mesa. A la izquierda, el lomo de tela oxblood con las cuatro pestañas del libro; a la derecha, la hoja de papel cálido donde se escribe. Esa metáfora define la estructura de cada pantalla: donde un dashboard genérico pondría una retícula de tarjetas, aquí hay una sola hoja con renglones separados por rayas finas y columnas de cifras alineadas.\n\nLa hoja se define por una raya fina, no por una sombra. Es la corrección mayor de esta revisión: la sombra marcada hacía flotar todo y la pantalla se sentía recargada de superficies. Hoy la .hoja lleva border: 1px solid de la raya y apenas un filo de sombra; los renglones perdieron la trama alterna (raya + trama + columnas a la vez es una hoja de cálculo de los noventa); y la raya roja de margen dejó de dibujarse en pantalla. El libro se lee ahora por rayas y aire.\n\nLa densidad es de herramienta de trabajo: texto base de 18px sobre una raíz de 17px, renglones de 46–66px según lo que carguen, botones de 44px, y todo lo importante cabe en 1366×768 sin scroll horizontal. La escala es fija, no fluida: hay un solo dispositivo de destino y la estabilidad de las columnas vale más que la adaptabilidad. Los dos escalones chicos de la escala crecieron a propósito (14px y 16px, no 11px y 13px) porque quien lee esto lee con lentes.\n\nEl contenido son los números. Toda la dramaturgia tipográfica está reservada al dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las cifras saltan a 30, 42 y 59px. El color se administra con avaricia: un solo acento (la familia oxblood) reservado para acciones, y tres colores de estado que existen únicamente para decir cómo va un pago, siempre acompañados de su texto.",
+    "northStar": "La libreta de tesorería moderna",
+    "overview": "El objeto sigue siendo un libro de caja: lomo de tela oxblood a la izquierda con las cuatro pestañas, hoja de papel cálido a la derecha donde se escribe. Pero el libro dejó de imitarse a sí mismo. La raya roja de margen y la trama alterna de renglones —los dos adornos que hacían 'libro viejo'— se quitaron a propósito, y lo que carga la identidad hoy es material, no ornamento: el papel cálido, la tela oxblood, las cifras tabulares y el hairline. La frase que fija la dirección es del usuario: moderno, no 'hecho para viejitos'. Nadie vuelve a poner una raya roja vertical junto a una tabla ni a rayar los renglones para que 'parezca contabilidad'.\n\nLo que sí quedó del libro es la estructura, y esa es la parte útil: una hoja por bloque, renglones de una sola línea separados por una raya de 1px, columnas de cifras alineadas consigo mismas. Donde un panel de control genérico pondría una retícula de tarjetitas, aquí hay una hoja con renglones. Y donde una tarjeta serviría solo para dibujar un borde alrededor de un número, no hay tarjeta: la cifra recaudada de Inicio vive directamente sobre el papel de la mesa, sin caja, porque es el objeto de la pantalla y meterla en una ficha la degradaba a campo de formulario.\n\nLa densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre raíz de 17px, renglones de 46–52px, barras de herramientas de 44px, todo dentro de 1366×768 sin scroll horizontal. La escala es fija, no fluida: hay un solo dispositivo de destino y la estabilidad de las columnas vale más que la adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px, no 11px y 13px) porque quien lee esto lee con lentes; eso es accesibilidad, no falta de refinamiento.\n\nEl contenido son los números. Toda la dramaturgia tipográfica está reservada al dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las cifras saltan a 30, 42, 59 y 72px. El color se administra con avaricia: un solo acento (la familia oxblood) reservado para acciones, y tres colores de estado que existen únicamente para decir cómo va un pago, siempre acompañados de su texto.",
     "keyCharacteristics": [
       "Lomo de tela a la izquierda (236px) + hoja de papel a la derecha; una sola hoja por bloque, nunca una hoja dentro de otra.",
-      "La hoja es un rectángulo delimitado por hairline, no una tarjeta que flota.",
-      "Renglones separados por una raya fina y por aire; sin trama alterna.",
+      "La hoja se define por un hairline, no por una sombra; y cuando el contenido no necesita hoja (el titular de Inicio), no lleva hoja.",
+      "Renglones de una sola línea separados por una raya fina. Sin trama alterna, sin raya de margen: el adorno de época se retiró y no vuelve.",
       "Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y rótulos en minúscula (nunca versalitas espaciadas).",
       "Un solo acento (oxblood) para acciones; verde/ámbar/gris solo para estado de pago.",
+      "Los controles densos —filtros y selectores— son botones compactos que abren menús en la capa superior del navegador, nunca rejillas de píldoras que crecen con los datos.",
       "Escala fija en rem sobre raíz de 17px; sin modo oscuro, sin tipografía fluida.",
       "Movimiento breve y de una sola curva; la barra de progreso al guardar es el único momento con autoría."
     ],
@@ -394,6 +417,11 @@
         "section": "colors"
       },
       {
+        "name": "La regla de las dos rayas",
+        "body": "El hairline claro (la raya fina) es estructura: delimita superficies, separa renglones y viste la barra de herramientas, que es cromo y debe quedarse callada. El hairline fuerte es contorno de algo que se rellena: campos, selectores, botones de contorno. Un control de formulario con el borde claro se lee como texto; un filtro con el borde fuerte compite con la lista.",
+        "section": "colors"
+      },
+      {
         "name": "La regla del acompañado en pantalla y en papel",
         "body": "Todo color que carga significado tiene que pasar AA sobre las tres superficies de la app (la hoja, la hoja segunda y el papel), no solo sobre la más clara. Un gris que se lee sobre la hoja y se pierde sobre la mesa es un gris mal elegido.",
         "section": "colors"
@@ -410,17 +438,17 @@
       },
       {
         "name": "La regla de las cifras tabulares",
-        "body": "Todo número que la usuaria pueda comparar con otro lleva la clase .cifra (tabular-nums lining-nums). Montos, conteos, porcentajes, números de paso. Si una columna de números no cuadra al scrollear, es que alguien olvidó .cifra.",
+        "body": "Todo número que la usuaria pueda comparar con otro lleva la clase .cifra (tabular-nums lining-nums). Montos, conteos, porcentajes, teléfonos, números de paso. Si una columna de números no cuadra al scrollear, es que alguien olvidó .cifra.",
         "section": "typography"
       },
       {
         "name": "La regla del 'RD$' pequeño",
-        "body": "El símbolo de moneda nunca compite con el número. El componente Monto es el dueño único de esa proporción y la ajusta por escalón: 0.5em en cifra, 0.46em en cifraGrande, 0.42em en cifraEnorme, y tamaño pleno en los escalones de texto — siempre en tinta segunda, peso 500, alineado a la línea base. Ninguna pantalla rehace esos valores a mano. La única excepción legítima es el prefijo del campo de monto, que es una etiqueta dentro de un input y no un valor.",
+        "body": "El símbolo de moneda nunca compite con el número, y se encoge conforme la cifra crece. El componente Monto es el dueño de esa proporción y la ajusta por escalón: 0.5em en cifra, 0.46em en cifraGrande, 0.42em en cifraEnorme, y tamaño pleno en los escalones de texto — siempre en tinta segunda, peso 500, alineado a la línea base. El titular de Inicio continúa la escalera con 0.34em, y es hoy el único sitio donde la proporción se escribe fuera de Monto, porque Monto todavía no tiene el escalón cifraTitular. Eso es una deuda a saldar dentro de Monto, no permiso para volver a escribir el símbolo a mano en otra pantalla.",
         "section": "typography"
       },
       {
         "name": "La regla del drama reservado",
-        "body": "Los escalones de texto son vecinos (16 → 18 → 20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59px). Si un título de sección quiere ser enorme, la respuesta es no: el número es el contenido.",
+        "body": "Los escalones de texto son vecinos (16 → 18 → 20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59 → 72px). Si un título de sección quiere ser enorme, la respuesta es no: el número es el contenido.",
         "section": "typography"
       },
       {
@@ -429,8 +457,18 @@
         "section": "layout"
       },
       {
+        "name": "La regla de la hoja que se gana",
+        "body": "Una hoja existe para agrupar varias cosas que se leen juntas. Un solo número, por importante que sea, no se mete en una caja: la caja lo convierte en un campo de formulario. Si al quitarle el borde a un bloque no se pierde nada, no llevaba borde.",
+        "section": "layout"
+      },
+      {
         "name": "La regla de la raya y el aire",
         "body": "Una fila se separa de la siguiente con una raya de 1px y con espacio, no con relleno de fondo. Raya + trama alterna + columnas a la vez es una hoja de cálculo, no un libro. La única alternancia que queda en la app es la tabla del reporte impreso, donde la trama ayuda a seguir la fila con el dedo en papel; no es licencia para traerla de vuelta a la pantalla.",
+        "section": "layout"
+      },
+      {
+        "name": "La regla del control de tamaño fijo",
+        "body": "Ningún control puede crecer con los datos. Filtros y selectores son botones de una línea que abren un menú; el menú es lo que crece, y crece hacia la capa superior del navegador, no hacia abajo empujando la pantalla. Prueba concreta: si al agregar la iglesia número veinte una pantalla cambia de alto, ese control está mal hecho.",
         "section": "layout"
       },
       {
@@ -440,40 +478,61 @@
       },
       {
         "name": "La regla del trazo antes que la luz",
-        "body": "Una superficie se delimita con una raya; la sombra solo se usa cuando algo está de verdad por encima del libro (diálogo, toast). Si un bloque nuevo pide sombra para verse separado, lo que le falta es una raya o aire.",
+        "body": "Una superficie se delimita con una raya; la sombra solo se usa cuando algo está de verdad por encima del libro (diálogo, menú, toast). Si un bloque nuevo pide sombra para verse separado, lo que le falta es una raya o aire.",
+        "section": "elevation"
+      },
+      {
+        "name": "La regla del velo, no de la sombra",
+        "body": "Lo que separa un menú de un diálogo no es cuánto flota sino si oscurece el libro: el diálogo interrumpe y lleva velo; el menú es un control y su ::backdrop es transparente. Un menú con velo convierte elegir una iglesia en un acto solemne.",
         "section": "elevation"
       },
       {
         "name": "La regla de la sombra de tinta",
-        "body": "Las sombras nunca son negras: su color es rgba(58,42,28,…) (o rgba(40,28,18,…) en el diálogo), la sombra que proyecta papel sobre papel. Siempre llevan desplazamiento vertical real y difusión suave; nunca un halo plano centrado ni un desplazamiento duro.",
+        "body": "Las sombras nunca son negras: su color es rgba(58,42,28,…) (o rgba(40,28,18,…) en la capa superior), la sombra que proyecta papel sobre papel. Siempre llevan desplazamiento vertical real y difusión suave; nunca un halo plano centrado ni un desplazamiento duro.",
         "section": "elevation"
+      },
+      {
+        "name": "La regla del detalle que confirma y el detalle que elige",
+        "body": "Un dato secundario de una opción se coloca según para qué sirve, no según el sitio que sobre. Un detalle numérico (el precio del cupo) se repite en los dos sitios: en el campo cerrado confirma lo que se va a pagar, y en el menú se compara en columna, alineado y tabular. Un detalle de texto (el pastor de la iglesia) vive solo en el menú, en una segunda línea bajo el nombre: ayuda a elegir entre dos iglesias parecidas, pero no hace falta para confirmar, y en la misma línea truncaba el nombre de la iglesia, que es lo que ella lee.",
+        "section": "components"
       }
     ],
     "dos": [
       "Do construir toda lista como renglones (.renglon) dentro de una sola .hoja, separados por el hairline de la raya fina y por aire.",
       "Do definir cualquier superficie nueva con una raya de 1px, no con una sombra.",
+      "Do dejar sin hoja lo que es un titular: si al quitarle el borde a un bloque no se pierde nada, no llevaba borde.",
       "Do usar el componente Monto para cualquier cantidad de dinero, y .cifra para cualquier número comparable.",
       "Do derivar el color de toda barra de progreso —incluidas las agregadas— de calcularEstado(pagado, precio).",
       "Do dejar exactamente un botón sólido principal por pantalla, y que su texto diga la acción concreta ('Guardar pago', no 'Aceptar').",
       "Do acompañar todo color de estado con su texto y su aria-valuetext.",
-      "Do mantener 44px de alto mínimo en todo lo que se toca y el :focus-visible de 2px del color de acción visible siempre.",
+      "Do resolver cualquier lista larga de opciones con Selector o FiltroMenu, para que el control mida lo mismo con tres opciones que con cincuenta.",
+      "Do colocar un detalle numérico en el campo y en el menú (confirma y se compara), y un detalle de texto solo en el menú, en segunda línea (ayuda a elegir).",
+      "Do dejar que <dialog> y popover hagan el foco, el Escape y el cierre al tocar afuera; el sistema no reimplementa modales.",
+      "Do caer columnas por prioridad al angostar (Iglesia desde xl, 'Su cupo' desde md), nunca todas a la vez.",
+      "Do mantener 44px de alto mínimo en todo lo que se toca —hoy sin una sola violación— y el :focus-visible de 2px del color de acción visible siempre.",
       "Do verificar cualquier color de texto nuevo contra AA sobre la hoja, la hoja segunda y el papel, no solo sobre el fondo más claro.",
       "Do escribir cada estado vacío como una instrucción con su botón.",
+      "Do guardar en src/lib/preferencias.ts (localStorage) lo que solo es comodidad —la última iglesia y el último tipo de cupo elegidos, que ahorran dos toques por persona al inscribir a media iglesia de un tirón— y solo eso: si se pierde, no pasa nada.",
       "Do dibujar cualquier icono nuevo en la caja de 24 con trazo 1.6 y remates redondos, dentro de src/components/Iconos.tsx.",
       "Do marcar con .no-imprimir todo lo que no debe salir en papel, y usar el papel impreso / la raya impresa para lo que sí sale.",
       "Do animar posición y tamaño con transform y opacity, con una de las tres curvas del sistema."
     ],
     "donts": [
+      "Don't poner una clase de display de Tailwind (flex, grid, block) en un <dialog>. Esa regla de autor le gana al dialog:not([open]) { display: none } del navegador y todo diálogo cerrado se queda ocupando su altura en la página, invisible pero clicable (llegó a inflar la página a 3998px para 3239px de contenido). El display: flex se declara solo en dialog.dialogo[open] dentro de src/estilos.css; en el JSX van flex-col y las demás utilidades, nunca flex.",
       "Don't anidar una .hoja dentro de otra, ni convertir un renglón en tarjeta con sombra o borde propio.",
-      "Don't devolver la trama alterna a los renglones de pantalla, ni traer de vuelta la raya roja de margen (.margen-rubrica) a una lista: se quitaron a propósito.",
+      "Don't devolver el ornamento de libro viejo: ni trama alterna en los renglones de pantalla, ni la raya roja de margen junto a una lista, ni versalitas espaciadas. Se quitaron a propósito y el encargo del usuario es explícito: moderno, no 'hecho para viejitos'.",
+      "Don't meter un número solo en una tarjeta para 'darle importancia': el tamaño y el aire hacen ese trabajo, el borde lo deshace.",
+      "Don't volver a una rejilla de píldoras o de botones para elegir entre datos que crecen (iglesias, tipos de cupo, pastores): no escala y se come la pantalla.",
+      "Don't poner el conteo de resultados en la cara de un botón de filtro, ni pintar como filtro activo un control que siempre tiene valor (el orden).",
+      "Don't ponerle velo (::backdrop opaco) a un menú: el velo es del diálogo.",
       "Don't usar rojo para un estado de pago ni para una persona que debe. El único rojo de la app es el vino de acción, y pertenece a los botones.",
       "Don't dar a una iglesia (ni a ninguna identidad) un color verde o ámbar: esos dos tonos ya están comprometidos con 'Pagado' y 'Abonando'.",
       "Don't introducir un segundo color de acento, un degradado, ni un color fuera de las variables de src/estilos.css (con la única excepción declarada de la paleta de iglesias en Piezas.tsx).",
-      "Don't poner un rótulo en mayúsculas espaciadas: .rotulo es en minúscula por decisión de legibilidad.",
       "Don't bajar un texto por debajo de micro, ni usar micro para algo que no se pueda leer en otro lado de la misma pantalla.",
       "Don't cambiar el tamaño de letra por ancho de pantalla ni introducir clamp: la escala es fija por decisión, para un solo dispositivo.",
       "Don't usar emojis, glifos de texto (›, ×, ✓) ni una librería de iconos como reemplazo del juego dibujado a mano.",
       "Don't escribir una cifra sin cifras tabulares, ni un monto sin el 'RD$' del componente Monto, ni redefinir a mano la proporción del símbolo.",
+      "Don't guardar en localStorage nada que sea un dato del negocio: los pagos, las personas y las inscripciones viven en SQLite y solo ahí.",
       "Don't animar width en una barra de progreso, ni pasar de 250ms en nada que no sea esa barra al guardar un pago.",
       "Don't usar rebote, elástico o parallax, ni ignorar prefers-reduced-motion.",
       "Don't poner una palabra en inglés ni jerga técnica en ninguna superficie visible, incluidos los mensajes de error.",
