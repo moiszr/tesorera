@@ -121,7 +121,7 @@ export function ChipEstado({ estado, className = '' }: { estado: Estado; classNa
   const c = COLOR_ESTADO[estado]
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-menuda font-medium ${className}`}
+      className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-1 text-base font-medium ${className}`}
       style={{ background: c.fondo, color: c.tinta }}
     >
       <span className="h-[7px] w-[7px] rounded-full" style={{ background: c.marca }} aria-hidden />

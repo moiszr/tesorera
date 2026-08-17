@@ -15,7 +15,7 @@ import {
 } from '../components/Piezas'
 import { DialogoPersona } from '../components/DialogoPersona'
 import { FiltroMenu } from '../components/FiltroMenu'
-import { IconoBuscar, IconoMas } from '../components/Iconos'
+import { IconoBuscar, IconoMas, IconoPago } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
 
@@ -222,12 +222,13 @@ export default function Personas() {
       </div>
 
       <div className="hoja overflow-hidden">
-        <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
+        <div className="hidden border-b border-linea px-5 py-2.5 text-base sm:flex">
           <span className="rotulo min-w-[170px] flex-[1.15]">Nombre</span>
           <span className="rotulo hidden min-w-[180px] flex-1 pr-4 xl:block">Iglesia</span>
           <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
           <span className="rotulo hidden w-[112px] shrink-0 text-right md:block">Su cupo</span>
           <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
+          <span className="w-[92px] shrink-0" aria-hidden />
         </div>
 
         {cargando && personas.length === 0 ? (
@@ -273,20 +274,31 @@ export default function Personas() {
         ) : (
           <ul>
             {personas.map((p, i) => (
-              <li key={p.id} style={{ ['--i' as string]: Math.min(i, 12) }} className="entra-renglon renglon">
-                {/* Un renglón = una línea. Antes eran dos y cabían la mitad
-                    de las personas en pantalla. */}
+              <li
+                key={p.id}
+                style={{ ['--i' as string]: Math.min(i, 12) }}
+                className="entra-renglon renglon group relative"
+              >
+                {/* El enlace cubre la fila entera por detrás y el contenido no
+                    intercepta clics; así se puede hacer clic en cualquier punto
+                    del renglón y el botón de cobrar sigue siendo suyo. */}
                 <Link
                   to={`/personas/${p.id}`}
-                  className="flex min-h-[46px] items-center px-5 py-1.5 transition-colors duration-150 hover:bg-hoja2"
-                >
-                  <span className="min-w-[170px] flex-[1.15] truncate pr-4 font-medium">{p.nombre}</span>
+                  className="absolute inset-0 z-0 transition-colors duration-150 group-hover:bg-hoja2"
+                  aria-label={`Ver la ficha de ${p.nombre}`}
+                />
+
+                <div className="pointer-events-none relative z-10 flex min-h-[46px] items-center px-5 py-1.5">
+                  {/* Una sola escala en toda la fila: el nombre pesa más por su
+                      grosor, no por su tamaño. Mezclar tamaños entre columnas
+                      hace que la tabla se lea desnivelada. */}
+                  <span className="min-w-[170px] flex-[1.15] truncate pr-4 font-semibold">{p.nombre}</span>
 
                   {/* Solo la iglesia. El tipo de cupo no va aquí: su precio ya
                       está en la columna "Su cupo", y meter los dos truncaba
                       ambos hasta dejarlos ilegibles. */}
                   <span className="hidden min-w-[180px] flex-1 overflow-hidden pr-4 xl:block">
-                    <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
+                    <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} className="!text-base" />
                   </span>
 
                   {/* Dos columnas de cifras, cada una alineada consigo misma.
@@ -295,14 +307,14 @@ export default function Personas() {
                   {p.inscripcion_id ? (
                     <>
                       <span className="w-[112px] shrink-0 text-right">
-                        <Monto centavos={p.pagado} className="font-medium" />
+                        <Monto centavos={p.pagado} />
                       </span>
                       <span className="hidden w-[112px] shrink-0 text-right md:block">
                         <Monto centavos={p.precio} tenue />
                       </span>
                     </>
                   ) : (
-                    <span className="w-[112px] shrink-0 text-right text-menuda text-tinta2 md:w-[224px]">
+                    <span className="w-[112px] shrink-0 text-right text-tinta2 md:w-[224px]">
                       Sin inscribir
                     </span>
                   )}
@@ -310,7 +322,23 @@ export default function Personas() {
                   <span className="w-[128px] shrink-0 pl-5">
                     <ChipEstado estado={p.estado} />
                   </span>
-                </Link>
+
+                  {/* Cobrar desde la fila: es el atajo cuando ya la tienes
+                      delante. Aparece al pasar por encima para no ensuciar la
+                      lista, pero es alcanzable con teclado siempre. */}
+                  <span className="pointer-events-auto flex w-[92px] shrink-0 justify-end">
+                    {p.inscripcion_id && (
+                      <Link
+                        to={`/registrar-pago?persona=${p.id}`}
+                        aria-label={`Registrar un abono de ${p.nombre}`}
+                        className="inline-flex min-h-[36px] items-center gap-1.5 rounded-pieza border border-linea bg-hoja px-2.5 text-menuda font-medium text-tinta2 opacity-0 transition-[opacity,color,border-color] duration-150 hover:border-accionBorde hover:text-accionTexto focus-visible:opacity-100 group-hover:opacity-100"
+                      >
+                        <IconoPago tam={15} />
+                        Cobrar
+                      </Link>
+                    )}
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
