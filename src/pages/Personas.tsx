@@ -228,7 +228,7 @@ export default function Personas() {
           <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
           <span className="rotulo hidden w-[112px] shrink-0 text-right md:block">Su cupo</span>
           <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
-          <span className="w-[92px] shrink-0" aria-hidden />
+          <span className="w-[112px] shrink-0" aria-hidden />
         </div>
 
         {cargando && personas.length === 0 ? (
@@ -323,17 +323,19 @@ export default function Personas() {
                     <ChipEstado estado={p.estado} />
                   </span>
 
-                  {/* Cobrar desde la fila: es el atajo cuando ya la tienes
-                      delante. Aparece al pasar por encima para no ensuciar la
-                      lista, pero es alcanzable con teclado siempre. */}
-                  <span className="pointer-events-auto flex w-[92px] shrink-0 justify-end">
+                  {/* Cobrar desde la fila. Siempre visible, en todas: un botón
+                      que solo aparece al pasar por encima es un botón que no se
+                      sabe que existe, y con trackpad ni siquiera hay hover
+                      fiable. Fondo suave del acento para que 64 de ellos formen
+                      una columna tranquila y no un muro de botones. */}
+                  <span className="pointer-events-auto flex w-[112px] shrink-0 justify-end pl-3">
                     {p.inscripcion_id && (
                       <Link
                         to={`/registrar-pago?persona=${p.id}`}
                         aria-label={`Registrar un abono de ${p.nombre}`}
-                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-pieza border border-linea bg-hoja px-3 text-menuda font-medium text-tinta2 opacity-0 transition-[opacity,color,border-color] duration-150 hover:border-accionBorde hover:text-accionTexto focus-visible:opacity-100 group-hover:opacity-100"
+                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-pieza bg-accionSuave px-3 text-menuda font-semibold text-accionTexto transition-colors duration-150 hover:bg-accion hover:text-white active:scale-[0.97]"
                       >
-                        <IconoPago tam={15} />
+                        <IconoPago tam={16} />
                         Cobrar
                       </Link>
                     )}
