@@ -258,6 +258,36 @@
     }
   }
 
+  /* Menú de filtro. Va en la capa superior del navegador, así que ningún
+     contenedor con scroll lo puede recortar. */
+  .menu-filtro {
+    border: 1px solid var(--linea);
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 140ms var(--salida),
+      transform 140ms var(--salida),
+      overlay 140ms allow-discrete,
+      display 140ms allow-discrete;
+  }
+
+  .menu-filtro:not(:popover-open) {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  @starting-style {
+    .menu-filtro:popover-open {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Sin velo: es un menú, no un diálogo. Se cierra tocando afuera. */
+  .menu-filtro::backdrop {
+    background: transparent;
+  }
+
   /* Movimiento reducido: se mantiene lo que ayuda a entender (opacidad),
      se quita lo que desplaza. */
   @media (prefers-reduced-motion: reduce) {

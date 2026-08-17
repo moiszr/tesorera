@@ -14,7 +14,8 @@ import {
   colorIglesia,
 } from '../components/Piezas'
 import { DialogoPersona } from '../components/DialogoPersona'
-import { IconoBuscar, IconoCerrar, IconoFiltro, IconoMas } from '../components/Iconos'
+import { FiltroMenu } from '../components/FiltroMenu'
+import { IconoBuscar, IconoMas } from '../components/Iconos'
 
 type Orden = 'nombre' | 'menos_pagado' | 'recientes'
 
@@ -38,7 +39,6 @@ export default function Personas() {
   const [categoriaId, setCategoriaId] = useState<number | undefined>()
   const [estado, setEstado] = useState<Estado | undefined>()
   const [orden, setOrden] = useState<Orden>('nombre')
-  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false)
   const [nombreParaCrear, setNombreParaCrear] = useState('')
   const [pastor, setPastor] = useState<string | undefined>()
   const [pastores, setPastores] = useState<Pastor[]>([])
@@ -127,10 +127,12 @@ export default function Personas() {
         </Boton>
       </header>
 
-      {/* Buscar siempre a la vista; los filtros guardados detrás de un botón.
-          Lo que ella hace veinte veces al día es buscar un nombre, no filtrar. */}
+      {/* Barra de herramientas: una sola fila. Antes esto eran cinco filas de
+          píldoras con una columna de etiquetas al lado, que ocupaban media
+          pantalla y encima no escalaban al crecer las iglesias o los cupos.
+          Cada filtro muestra en el propio botón lo que está filtrando. */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative min-w-[240px] flex-1">
+        <div className="relative min-w-[220px] flex-1">
           <IconoBuscar
             tam={20}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta3"
@@ -142,136 +144,82 @@ export default function Personas() {
             onChange={(e) => setBuscar(e.target.value)}
             placeholder="Buscar por nombre…"
             aria-label="Buscar persona por nombre"
-            className="h-[46px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(138,51,64,0.18)]"
+            className="h-[44px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(138,51,64,0.18)]"
           />
         </div>
 
-        <Boton
-          variante={filtrosAbiertos || cuantosFiltros > 0 ? 'suave' : 'contorno'}
-          onClick={() => setFiltrosAbiertos((v) => !v)}
-          aria-expanded={filtrosAbiertos}
-          icono={<IconoFiltro tam={18} />}
-        >
-          Filtros
-          {cuantosFiltros > 0 && <span className="cifra">({cuantosFiltros})</span>}
-        </Boton>
+        <FiltroMenu
+          etiqueta="Cómo va"
+          valor={estado}
+          alElegir={(v) => setEstado(v as Estado | undefined)}
+          textoTodas="Todos"
+          opciones={(['pagado', 'abonando', 'sinpagos'] as Estado[]).map((e) => ({
+            valor: e,
+            etiqueta: NOMBRE_ESTADO[e],
+            cuenta: conteos?.estado?.[e],
+          }))}
+        />
+
+        {categoriasVisibles.length > 0 && (
+          <FiltroMenu
+            etiqueta="Cupo"
+            valor={categoriaId}
+            alElegir={(v) => setCategoriaId(v as number | undefined)}
+            ancho={320}
+            opciones={categoriasVisibles.map((c) => ({
+              valor: c.id,
+              etiqueta: c.nombre,
+              cuenta: conteos?.categoria?.[c.id] ?? 0,
+            }))}
+          />
+        )}
+
+        {pastores.length > 0 && (
+          <FiltroMenu
+            etiqueta="Pastor"
+            valor={pastor}
+            alElegir={(v) => setPastor(v as string | undefined)}
+            textoTodas="Todos"
+            ancho={320}
+            opciones={pastores.map((ps) => ({
+              valor: ps.nombre,
+              etiqueta: ps.nombre,
+              nota: ps.iglesias > 1 ? `${ps.iglesias} iglesias` : undefined,
+              cuenta: conteos?.pastor?.[normalizar(ps.nombre)] ?? 0,
+            }))}
+          />
+        )}
+
+        {iglesias.length > 0 && (
+          <FiltroMenu
+            etiqueta="Iglesia"
+            valor={iglesia}
+            alElegir={(v) => setIglesia(v as number | undefined)}
+            ancho={340}
+            opciones={iglesias.map((g) => ({
+              valor: g.id,
+              etiqueta: g.nombre,
+              color: colorIglesia(g.color),
+              cuenta: conteos?.iglesia?.[g.id] ?? 0,
+            }))}
+          />
+        )}
+
+        {/* El orden no es un filtro: va aparte, al final. */}
+        <FiltroMenu
+          etiqueta="Orden"
+          valor={orden}
+          alElegir={(v) => setOrden((v as Orden) ?? 'nombre')}
+          permiteTodas={false}
+          opciones={ORDENES.map((o) => ({ valor: o.valor, etiqueta: o.texto }))}
+        />
+
+        {hayFiltro && (
+          <Boton variante="texto" onClick={limpiar} className="text-menuda">
+            Limpiar
+          </Boton>
+        )}
       </div>
-
-      {/* Con los filtros cerrados, lo que está filtrando sigue a la vista y se
-          quita de a uno. Un filtro escondido que ella no ve es una lista que
-          "perdió" gente. */}
-      {!filtrosAbiertos && cuantosFiltros > 0 && (
-        <div className="mb-3 flex flex-wrap items-center gap-1.5">
-          {estado && (
-            <FiltroPuesto texto={NOMBRE_ESTADO[estado]} alQuitar={() => setEstado(undefined)} />
-          )}
-          {categoriaId && (
-            <FiltroPuesto
-              texto={categoriasVisibles.find((c) => c.id === categoriaId)?.nombre ?? ''}
-              alQuitar={() => setCategoriaId(undefined)}
-            />
-          )}
-          {pastor && (
-            <FiltroPuesto texto={`Pastor ${pastor}`} alQuitar={() => setPastor(undefined)} />
-          )}
-          {iglesia && (
-            <FiltroPuesto
-              texto={iglesias.find((g) => g.id === iglesia)?.nombre ?? ''}
-              color={colorIglesia(iglesias.find((g) => g.id === iglesia)?.color)}
-              alQuitar={() => setIglesia(undefined)}
-            />
-          )}
-          <button
-            type="button"
-            onClick={limpiar}
-            className="ml-1 min-h-[44px] rounded-full px-3.5 text-menuda font-medium text-tinta2 transition-colors hover:bg-[rgba(36,31,27,0.05)] hover:text-tinta"
-          >
-            Quitar todos
-          </button>
-        </div>
-      )}
-
-      {filtrosAbiertos && (
-        <div className="hoja entra-hoja mb-3 p-4">
-          <div className="space-y-2">
-            <FilaChips rotulo="Cómo va">
-              {(['pagado', 'abonando', 'sinpagos'] as Estado[]).map((e) => (
-                <Chip
-                  key={e}
-                  activo={estado === e}
-                  cuenta={conteos?.estado?.[e]}
-                  onClick={() => setEstado(estado === e ? undefined : e)}
-                >
-                  {NOMBRE_ESTADO[e]}
-                </Chip>
-              ))}
-            </FilaChips>
-
-            {categoriasVisibles.length > 0 && (
-              <FilaChips rotulo="Tipo de cupo">
-                {categoriasVisibles.map((c) => (
-                  <Chip
-                    key={c.id}
-                    activo={categoriaId === c.id}
-                    cuenta={conteos?.categoria?.[c.id] ?? 0}
-                    onClick={() => setCategoriaId(categoriaId === c.id ? undefined : c.id)}
-                  >
-                    {c.nombre}
-                  </Chip>
-                ))}
-              </FilaChips>
-            )}
-
-            {pastores.length > 0 && (
-              <FilaChips rotulo="Pastor">
-                {pastores.map((ps) => (
-                  <Chip
-                    key={ps.nombre}
-                    activo={pastor === ps.nombre}
-                    cuenta={conteos?.pastor?.[normalizar(ps.nombre)] ?? 0}
-                    onClick={() => setPastor(pastor === ps.nombre ? undefined : ps.nombre)}
-                  >
-                    {ps.nombre}
-                    {ps.iglesias > 1 && <span className="text-tinta3"> · {ps.iglesias} iglesias</span>}
-                  </Chip>
-                ))}
-              </FilaChips>
-            )}
-
-            {iglesias.length > 0 && (
-              <FilaChips rotulo="Iglesia">
-                {iglesias.map((g) => (
-                  <Chip
-                    key={g.id}
-                    activo={iglesia === g.id}
-                    cuenta={conteos?.iglesia?.[g.id] ?? 0}
-                    color={colorIglesia(g.color)}
-                    onClick={() => setIglesia(iglesia === g.id ? undefined : g.id)}
-                  >
-                    {g.nombre}
-                  </Chip>
-                ))}
-              </FilaChips>
-            )}
-
-            <FilaChips rotulo="Orden">
-              {ORDENES.map((o) => (
-                <Chip key={o.valor} activo={orden === o.valor} onClick={() => setOrden(o.valor)}>
-                  {o.texto}
-                </Chip>
-              ))}
-            </FilaChips>
-          </div>
-
-          {hayFiltro && (
-            <div className="mt-3 border-t border-linea pt-3">
-              <Boton variante="texto" onClick={limpiar} className="!min-h-[44px] !px-3 text-menuda">
-                Quitar filtros
-              </Boton>
-            </div>
-          )}
-        </div>
-      )}
 
       <div className="hoja overflow-hidden">
         <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
@@ -385,76 +333,6 @@ export default function Personas() {
         }}
       />
     </div>
-  )
-}
-
-function FilaChips({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="rotulo mr-1 w-[104px] shrink-0 leading-tight">{rotulo}</span>
-      {children}
-    </div>
-  )
-}
-
-function Chip({
-  activo,
-  cuenta,
-  color,
-  onClick,
-  children,
-}: {
-  activo: boolean
-  cuenta?: number
-  color?: string
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={activo}
-      className={[
-        'inline-flex min-h-[44px] items-center gap-2 rounded-full px-3.5 text-menuda font-medium',
-        'border transition-colors duration-150 active:scale-[0.98]',
-        activo
-          ? 'border-accion bg-[rgba(138,51,64,0.09)] text-accion'
-          : 'border-linea text-tinta2 hover:border-lineaFuerte hover:bg-hoja2 hover:text-tinta',
-      ].join(' ')}
-    >
-      {color && <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />}
-      <span className="max-w-[34ch] truncate">{children}</span>
-      {cuenta !== undefined && (
-        <span className={`cifra text-micro ${activo ? 'text-accion' : 'text-tinta3'}`}>{cuenta}</span>
-      )}
-    </button>
-  )
-}
-
-/** Un filtro que está puesto, con su × para quitarlo de una. */
-function FiltroPuesto({
-  texto,
-  color,
-  alQuitar,
-}: {
-  texto: string
-  color?: string
-  alQuitar: () => void
-}) {
-  return (
-    <span className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-accion bg-[rgba(138,51,64,0.08)] pl-3 pr-1 text-menuda font-medium text-accion">
-      {color && <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />}
-      <span className="max-w-[26ch] truncate">{texto}</span>
-      <button
-        type="button"
-        onClick={alQuitar}
-        aria-label={`Quitar el filtro ${texto}`}
-        className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgba(138,51,64,0.16)]"
-      >
-        <IconoCerrar tam={14} />
-      </button>
-    </span>
   )
 }
 
