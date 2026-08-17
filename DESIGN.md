@@ -601,9 +601,12 @@ tercera si está anulado), y a su lado, en la columna flexible, la fecha larga
 arriba —con la fecha relativa detrás en tinta tercera— y la forma de pago, la nota
 o el motivo de la anulación debajo en `menuda`. Cierran la fila la píldora
 "Anulado" (par `sinpagos`) cuando lo está, o los dos botones de icono de 44px
-(comprobante y anular) cuando el pago está vivo. La versión anterior repartía lo
-mismo en cuatro columnas fijas y una fila más alta; con un historial largo, apilar
-menos aire por pago es lo que deja ver la cuenta completa de un vistazo.
+(comprobante y anular) cuando el pago está vivo. Sustituyó a un reparto en cuatro
+columnas fijas (monto · fecha · forma de pago · acciones) que solo cuadraba a lo
+ancho de la pantalla completa; en una columna de 340px de rail al lado, la fila
+compacta es la que sigue siendo legible. Esta compactación **se conservó** de la
+revisión anterior aunque la maquetación de dos columnas se revirtiera: lo que el
+usuario rechazó fue el historial a todo el ancho, no la fila corta.
 
 **Comportamiento responsivo: estructural, no tipográfico.** Los únicos cambios por
 ancho son colapsar rejillas a una columna y esconder columnas secundarias por

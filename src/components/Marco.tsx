@@ -54,8 +54,8 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
                     'flex min-h-[44px] items-center gap-2.5 rounded-pieza px-2.5 text-menuda',
                     'transition-colors duration-150',
                     isActive
-                      ? 'bg-lomoActivo font-semibold text-accion shadow-[0_1px_2px_rgba(24,24,27,0.07)]'
-                      : 'font-medium text-tinta2 hover:bg-[rgba(24,24,27,0.045)] hover:text-tinta',
+                      ? 'bg-accionSuave font-semibold text-accion ring-1 ring-accionBorde'
+                      : 'font-medium text-tinta2 hover:bg-[rgba(24,24,27,0.05)] hover:text-tinta',
                   ].join(' ')
                 }
               >

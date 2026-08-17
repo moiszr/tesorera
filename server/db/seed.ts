@@ -9,11 +9,11 @@ import { conectar } from './conexion'
 import { normalizar } from '../../src/lib/fechas'
 
 const IGLESIAS = [
-  { nombre: 'Iglesia Central de Villa Duarte', color: 'indigo', pastor: 'Ramón Emilio Guzmán' },
+  { nombre: 'Iglesia Central de Villa Duarte', color: 'purpura', pastor: 'Ramón Emilio Guzmán' },
   // Mismo pastor que la anterior: así el filtro por pastor agrupa dos iglesias
   // y se ve para qué sirve.
-  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'pizarra', pastor: 'Ramón Emilio Guzmán' },
-  { nombre: 'Iglesia Monte Sinaí, San Isidro', color: 'arcilla', pastor: 'Wilfredo Antonio Peña' },
+  { nombre: 'Iglesia Getsemaní, Los Alcarrizos', color: 'cyan', pastor: 'Ramón Emilio Guzmán' },
+  { nombre: 'Iglesia Monte Sinaí, San Isidro', color: 'rosa', pastor: 'Wilfredo Antonio Peña' },
 ]
 
 const CATEGORIAS = [

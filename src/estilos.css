@@ -35,31 +35,35 @@
 
   /* Barra lateral: clara, como Linear o Notion. Un bloque de color saturado
      a la izquierda es lo que más envejecía la pantalla. */
-  --lomo: #f2f2f3;
+  --lomo: #f1f1f3;
   --lomo-texto: #52525b;
   --lomo-activo: #ffffff;
 
-  /* Acento: lo único de color. Es la identidad que sobrevive al rediseño. */
-  --accion: #8a3340;
-  --accion-alto: #71272f;
-  --accion-suave: #f7eef0;
+  /* Acento: azul vivo, lo único de color de la interfaz.
+     Contraste 5.2:1 sobre blanco y sobre él, así que sirve igual de fondo de
+     botón que de texto. */
+  --accion: #2563eb;
+  --accion-alto: #1d4ed8;
+  --accion-suave: #eff6ff;
+  --accion-borde: #bfdbfe;
 
-  /* Estados de pago — mismos colores en toda la app, siempre con texto */
-  --pagado-fondo: #e7f6ef;
-  --pagado-tinta: #116149;
-  --pagado-marca: #15866a;
+  /* Estados de pago — mismos colores en toda la app, siempre con texto.
+     Vivos, no apagados: un verde y un ámbar lavados se leen a documento viejo. */
+  --pagado-fondo: #dcfce7;
+  --pagado-tinta: #166534;
+  --pagado-marca: #16a34a;
 
-  --abonando-fondo: #fdf3e0;
-  --abonando-tinta: #8a5308;
-  --abonando-marca: #d08b1c;
+  --abonando-fondo: #fef3c7;
+  --abonando-tinta: #b45309;
+  --abonando-marca: #f59e0b;
 
-  --sinpagos-fondo: #f0f0f2;
+  --sinpagos-fondo: #f4f4f5;
   --sinpagos-tinta: #52525b;
-  --sinpagos-marca: #a1a1aa;
+  --sinpagos-marca: #d4d4d8;
 
   /* Aviso tranquilo (excedente, notas del sistema) */
-  --aviso-fondo: #e6f2f4;
-  --aviso-tinta: #1f5f6b;
+  --aviso-fondo: #eff6ff;
+  --aviso-tinta: #1e40af;
 
   /* Impresión: en papel el fondo es el papel de verdad. */
   --papel-impreso: #ffffff;

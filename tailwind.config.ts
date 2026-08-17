@@ -21,6 +21,7 @@ const config: Config = {
         accion: 'var(--accion)',
         accionAlto: 'var(--accion-alto)',
         accionSuave: 'var(--accion-suave)',
+        accionBorde: 'var(--accion-borde)',
         pagadoFondo: 'var(--pagado-fondo)',
         pagadoTinta: 'var(--pagado-tinta)',
         pagadoMarca: 'var(--pagado-marca)',

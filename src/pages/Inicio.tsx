@@ -5,7 +5,7 @@ import { api } from '../api/cliente'
 import type { Resumen } from '../api/tipos'
 import { formatoRD } from '../lib/dinero'
 import { cuentaRegresiva, fechaLarga, fechaRelativa } from '../lib/fechas'
-import { calcularEstado, proporcionPagada } from '../lib/estados'
+import { proporcionPagada } from '../lib/estados'
 import { Boton, EstadoVacio, EtiquetaIglesia, Monto } from '../components/Piezas'
 import { IconoAdelante, IconoAviso, IconoMas, IconoPago } from '../components/Iconos'
 
@@ -103,7 +103,7 @@ export default function Inicio() {
             <span className="text-tinta2">de lo que suman todos los cupos</span>
           </p>
           <p className="text-menuda text-tinta2">
-            <span className="cifra">{formatoRD(totales.recaudado)}</span> de{' '}
+            <span className="cifra">{formatoRD(totales.recaudado_real)}</span> de{' '}
             <span className="cifra">{formatoRD(totales.meta)}</span>
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function Inicio() {
           <div
             className="h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
             style={{
-              background: `var(--${calcularEstado(totales.recaudado, totales.meta)}-marca)`,
+              background: proporcion >= 1 ? 'var(--pagado-marca)' : 'var(--accion)',
               transform: `scaleX(${proporcion})`,
             }}
           />
@@ -225,7 +225,8 @@ export default function Inicio() {
                         <span
                           className="block h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
                           style={{
-                            background: `var(--${calcularEstado(g.meta - g.pendiente, g.meta)}-marca)`,
+                            background:
+                              g.pendiente === 0 ? 'var(--pagado-marca)' : 'var(--accion)',
                             transform: `scaleX(${proporcionPagada(g.meta - g.pendiente, g.meta)})`,
                           }}
                         />
@@ -262,7 +263,9 @@ function Metrica({
   fuerte?: boolean
 }) {
   return (
-    <div className={`hoja p-4 ${fuerte ? 'ring-1 ring-accion/15' : ''}`}>
+    <div
+      className={`hoja p-4 ${fuerte ? '!border-accionBorde bg-accionSuave' : ''}`}
+    >
       <p className="rotulo">{rotulo}</p>
       <p
         className={`cifra mt-1.5 font-semibold leading-none ${

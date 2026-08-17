@@ -307,7 +307,7 @@ export default function FichaPersona() {
                           onClick={() => setAAnular(p)}
                           aria-label={`Anular el pago de ${formatoRD(p.monto)}`}
                           title="Anular este pago"
-                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(138,51,64,0.09)] hover:text-accion"
+                          className="flex h-11 w-11 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(37,99,235,0.09)] hover:text-accion"
                         >
                           <IconoAnular tam={18} />
                         </button>

@@ -756,7 +756,7 @@ function DialogoIglesia({
                 className={[
                   'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda',
                   'border transition-colors duration-150 active:scale-[0.98]',
-                  color === c.valor ? 'border-accion bg-[rgba(138,51,64,0.07)] font-medium' : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
+                  color === c.valor ? 'border-accion bg-[rgba(37,99,235,0.08)] font-medium' : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
                 ].join(' ')}
               >
                 <span

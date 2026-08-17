@@ -18,7 +18,7 @@ type PropsBoton = ButtonHTMLAttributes<HTMLButtonElement> & {
 const VARIANTES: Record<TipoBoton, string> = {
   principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(58,42,28,0.12)]',
   contorno: 'bg-hoja text-tinta border border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
-  suave: 'bg-[rgba(138,51,64,0.07)] text-accion hover:bg-[rgba(138,51,64,0.12)]',
+  suave: 'bg-[rgba(37,99,235,0.08)] text-accion hover:bg-[rgba(37,99,235,0.14)]',
   texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(24,24,27,0.05)]',
 }
 
@@ -89,7 +89,7 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
             'w-full min-h-[46px] rounded-pieza bg-hoja px-3 py-2 text-tinta',
             'border transition-colors duration-150',
             problema ? 'border-accion' : 'border-lineaFuerte hover:border-tinta3',
-            'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(138,51,64,0.18)]',
+            'focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.18)]',
             'placeholder:text-tinta3',
             adorno ? 'pl-10' : '',
             className,
@@ -213,30 +213,29 @@ export function Monto({
  * Colores de etiqueta de iglesia.
  *
  * Ninguno es verde ni ámbar A PROPÓSITO: esos dos ya significan "Pagado" y
- * "Abonando" en toda la app. Un punto verde de identidad al lado de un chip de
- * estado le enseña a leer el verde de dos maneras distintas, y entonces el
- * verde deja de querer decir nada.
+ * "Abonando" en toda la app. Tampoco azul: ese es el acento de las acciones.
+ * Un color que significa dos cosas deja de significar cualquiera.
  */
 const COLORES_IGLESIA: Record<string, string> = {
-  indigo: '#4a5578',
-  pizarra: '#41525c',
-  arcilla: '#8a5a3c',
-  ciruela: '#6d4560',
-  tabaco: '#6b4a2e',
-  humo: '#59555f',
+  purpura: '#7c3aed',
+  rosa: '#db2777',
+  cyan: '#0891b2',
+  pizarra: '#475569',
+  ciruela: '#a21caf',
+  grafito: '#57534e',
 }
 
 export const NOMBRES_COLOR: { valor: string; nombre: string }[] = [
-  { valor: 'indigo', nombre: 'Azul' },
+  { valor: 'purpura', nombre: 'Morado' },
+  { valor: 'rosa', nombre: 'Rosa' },
+  { valor: 'cyan', nombre: 'Turquesa' },
   { valor: 'pizarra', nombre: 'Pizarra' },
-  { valor: 'arcilla', nombre: 'Terracota' },
   { valor: 'ciruela', nombre: 'Ciruela' },
-  { valor: 'tabaco', nombre: 'Tabaco' },
-  { valor: 'humo', nombre: 'Humo' },
+  { valor: 'grafito', nombre: 'Grafito' },
 ]
 
 export function colorIglesia(color: string | null | undefined): string {
-  return COLORES_IGLESIA[color ?? 'arcilla'] ?? COLORES_IGLESIA.arcilla
+  return COLORES_IGLESIA[color ?? 'pizarra'] ?? COLORES_IGLESIA.pizarra
 }
 
 export function EtiquetaIglesia({

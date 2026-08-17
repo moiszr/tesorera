@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-16T21:30:00.000Z",
+  "generatedAt": "2026-08-16T23:10:00.000Z",
   "title": "Design System: Tesorera",
   "extensions": {
     "colorMeta": {
@@ -375,17 +375,18 @@
       "name": "Nota y Aviso",
       "kind": "custom",
       "refersTo": "aviso",
-      "description": "Dos niveles. Nota (sin caja) es el patrón por defecto: informa sin competir con la cifra. Aviso (caja de color, tono neutro o tono ojo) se reserva para lo que sí interrumpe. Si la usuaria puede seguir trabajando sin leerlo, es Nota.",
+      "description": "Dos niveles. Nota (sin caja) es el patrón por defecto y NO es un componente: se escribe inline en la pantalla —IconoAviso de 15px en tinta tercera + texto en menuda tinta segunda—; su instancia viva es la nota al pie del excedente en Inicio.tsx, donde una caja de color competiría con la cifra. Aviso (componente de Piezas.tsx: caja de color, tono neutro o tono ojo) se reserva para lo que sí interrumpe o explica un número que no cuadra, como el excedente y el precio a mano dentro de la cuenta de una persona. Si la usuaria puede seguir trabajando sin leerlo, es Nota.",
       "html": "<p class=\"ds-nota-suelta\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Pagó <strong>RD$ 300</strong> de más.</span></p><p class=\"ds-aviso\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v4.8M12 15.6h.01\"/></svg><span>Esta persona está archivada: no aparece en la lista ni en la búsqueda de pagos. Su historial sigue completo.</span></p>",
       "css": ".ds-nota-suelta { display: flex; align-items: flex-start; gap: 6px; margin: 0 0 12px; font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.35rem; color: var(--tinta-2, #575047); } .ds-nota-suelta svg { flex: none; margin-top: 2px; color: var(--tinta-3, #756b62); } .ds-nota-suelta strong { font-variant-numeric: tabular-nums lining-nums; font-weight: 500; color: var(--tinta, #241f1b); } .ds-aviso { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--abonando-fondo, #fbf0d8); color: var(--abonando-tinta, #77510e); font-family: 'Fira Sans', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.35rem; } .ds-aviso svg { flex: none; margin-top: 2px; }"
     }
   ],
   "narrative": {
     "northStar": "La libreta de tesorería moderna",
-    "overview": "El objeto sigue siendo un libro de caja: lomo de tela oxblood a la izquierda con las cuatro pestañas, hoja de papel cálido a la derecha donde se escribe. Pero el libro dejó de imitarse a sí mismo. La raya roja de margen y la trama alterna de renglones —los dos adornos que hacían 'libro viejo'— se quitaron a propósito, y lo que carga la identidad hoy es material, no ornamento: el papel cálido, la tela oxblood, las cifras tabulares y el hairline. La frase que fija la dirección es del usuario: moderno, no 'hecho para viejitos'. Nadie vuelve a poner una raya roja vertical junto a una tabla ni a rayar los renglones para que 'parezca contabilidad'.\n\nLo que sí quedó del libro es la estructura, y esa es la parte útil: una hoja por bloque, renglones de una sola línea separados por una raya de 1px, columnas de cifras alineadas consigo mismas. Donde un panel de control genérico pondría una retícula de tarjetitas, aquí hay una hoja con renglones. Y donde una tarjeta serviría solo para dibujar un borde alrededor de un número, no hay tarjeta: la cifra recaudada de Inicio vive directamente sobre el papel de la mesa, sin caja, porque es el objeto de la pantalla y meterla en una ficha la degradaba a campo de formulario.\n\nLa densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre raíz de 17px, renglones de 46–52px, barras de herramientas de 44px, todo dentro de 1366×768 sin scroll horizontal. La escala es fija, no fluida: hay un solo dispositivo de destino y la estabilidad de las columnas vale más que la adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px, no 11px y 13px) porque quien lee esto lee con lentes; eso es accesibilidad, no falta de refinamiento.\n\nEl contenido son los números. Toda la dramaturgia tipográfica está reservada al dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las cifras saltan a 30, 42, 59 y 72px. El color se administra con avaricia: un solo acento (la familia oxblood) reservado para acciones, y tres colores de estado que existen únicamente para decir cómo va un pago, siempre acompañados de su texto.",
+    "overview": "El objeto sigue siendo un libro de caja: lomo de tela oxblood a la izquierda con las cuatro pestañas, hoja de papel cálido a la derecha donde se escribe. Pero el libro dejó de imitarse a sí mismo. La raya roja de margen y la trama alterna de renglones —los dos adornos que hacían 'libro viejo'— se quitaron a propósito, y lo que carga la identidad hoy es material, no ornamento: el papel cálido, la tela oxblood, las cifras tabulares y el hairline. La frase que fija la dirección es del usuario: moderno, no 'hecho para viejitos'. Nadie vuelve a poner una raya roja vertical junto a una tabla ni a rayar los renglones para que 'parezca contabilidad'.\n\nLo que sí quedó del libro es la estructura, y esa es la parte útil: una hoja por bloque, renglones de una sola línea separados por una raya de 1px, columnas de cifras alineadas consigo mismas. Donde un panel de control genérico pondría una retícula de tarjetitas, aquí hay una hoja con renglones. Inicio es el caso extremo y la prueba de la idea: no son cuatro tarjetas de resumen, es una sola hoja abierta —cabecera con lo recaudado, renglón de totales y el doblez con dos columnas regladas—, exactamente como se abre un libro de caja por la página del mes.\n\nLa densidad es de herramienta de trabajo, no de landing: texto base de 18px sobre raíz de 17px, renglones de 46–58px, barras de herramientas de 44px, todo dentro de 1366×768 sin scroll horizontal. La escala es fija, no fluida: hay un solo dispositivo de destino y la estabilidad de las columnas vale más que la adaptabilidad. Los dos escalones chicos son deliberadamente grandes (14px y 16px, no 11px y 13px) porque quien lee esto lee con lentes; eso es accesibilidad, no falta de refinamiento.\n\nEl contenido son los números. Toda la dramaturgia tipográfica está reservada al dinero: los pasos de texto son vecinos cercanos (16 → 18 → 20 → 24px) mientras las cifras saltan a 30, 42 y 59px. El color se administra con avaricia: un solo acento (la familia oxblood) reservado para acciones, y tres colores de estado que existen únicamente para decir cómo va un pago, siempre acompañados de su texto.",
     "keyCharacteristics": [
       "Lomo de tela a la izquierda (236px) + hoja de papel a la derecha; una sola hoja por bloque, nunca una hoja dentro de otra.",
-      "La hoja se define por un hairline, no por una sombra; y cuando el contenido no necesita hoja (el titular de Inicio), no lleva hoja.",
+      "La hoja se define por un hairline, no por una sombra, y todo dato vive sobre una hoja. Sobre el papel de la mesa solo van el h1 de la pantalla con su bajada y el enlace de volver.",
+      "Una hoja grande se subdivide por dentro con hairlines, con la hoja segunda y con el doblez (lg:divide-x) — nunca partiéndola en varias superficies.",
       "Renglones de una sola línea separados por una raya fina. Sin trama alterna, sin raya de margen: el adorno de época se retiró y no vuelve.",
       "Una sola familia tipográfica (Fira Sans) con cifras tabulares obligatorias, y rótulos en minúscula (nunca versalitas espaciadas).",
       "Un solo acento (oxblood) para acciones; verde/ámbar/gris solo para estado de pago.",
@@ -441,22 +442,22 @@
       },
       {
         "name": "La regla del 'RD$' pequeño",
-        "body": "El símbolo de moneda nunca compite con el número, y se encoge conforme la cifra crece. El componente Monto es el dueño de esa proporción y la ajusta por escalón: 0.5em en cifra, 0.46em en cifraGrande, 0.42em en cifraEnorme, y tamaño pleno en los escalones de texto — siempre en tinta segunda, peso 500, alineado a la línea base. El titular de Inicio continúa la escalera con 0.34em, y es hoy el único sitio donde la proporción se escribe fuera de Monto, porque Monto todavía no tiene el escalón cifraTitular. Eso es una deuda a saldar dentro de Monto, no permiso para volver a escribir el símbolo a mano en otra pantalla.",
+        "body": "El símbolo de moneda nunca compite con el número, y se encoge conforme la cifra crece. El componente Monto es el dueño único de esa proporción y la ajusta por escalón: 0.5em en cifra, 0.46em en cifraGrande, 0.42em en cifraEnorme, y tamaño pleno en los escalones de texto — siempre en tinta segunda, peso 500, alineado a la línea base. Hoy no queda una sola excepción: todo monto de la app, incluido el de la cabecera de Inicio, sale de Monto, y cifraEnorme es el escalón más grande que Monto acepta. Si una cifra nueva necesita otra proporción, se agrega un escalón a Monto, no se escribe el símbolo a mano en la pantalla.",
         "section": "typography"
       },
       {
         "name": "La regla del drama reservado",
-        "body": "Los escalones de texto son vecinos (16 → 18 → 20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59 → 72px). Si un título de sección quiere ser enorme, la respuesta es no: el número es el contenido.",
+        "body": "Los escalones de texto son vecinos (16 → 18 → 20 → 24px); los saltos grandes pertenecen solo al dinero (30 → 42 → 59px). Si un título de sección quiere ser enorme, la respuesta es no: el número es el contenido.",
         "section": "typography"
       },
       {
         "name": "La regla de la hoja sola",
-        "body": "Nunca una .hoja dentro de otra .hoja. Si un bloque necesita subdividirse, se subdivide con hairlines, con la hoja segunda o con espacio — nunca con una superficie nueva.",
+        "body": "Nunca una .hoja dentro de otra .hoja. Si un bloque necesita subdividirse, se subdivide con hairlines, con la hoja segunda o con espacio — nunca con una superficie nueva. La hoja de Inicio es el ejemplo mayor: tres franjas muy distintas y una sola superficie.",
         "section": "layout"
       },
       {
-        "name": "La regla de la hoja que se gana",
-        "body": "Una hoja existe para agrupar varias cosas que se leen juntas. Un solo número, por importante que sea, no se mete en una caja: la caja lo convierte en un campo de formulario. Si al quitarle el borde a un bloque no se pierde nada, no llevaba borde.",
+        "name": "La regla de la hoja que sostiene",
+        "body": "La hoja no es un marco decorativo alrededor de un número: es el suelo sobre el que el número se apoya. Una cifra, por grande que sea, va sobre una hoja. Se intentó justo lo contrario —sacar lo recaudado de Inicio a la mesa desnuda, sin superficie, con el argumento de que un solo número no se gana una caja— y el usuario lo revirtió: sin la hoja debajo, la cifra quedaba flotando y la pantalla se descosía, porque perdía lo único que ataba el titular, el resumen y las dos listas a un mismo objeto. El contrato de dirección lo deja escrito: quitar la superficie de la hoja fue un paso de más y se revirtió. No se vuelve a intentar. Lo que sí se quitó para siempre es el ornamento de época (raya de margen, trama alterna, folio), no el papel.",
         "section": "layout"
       },
       {
@@ -498,7 +499,8 @@
     "dos": [
       "Do construir toda lista como renglones (.renglon) dentro de una sola .hoja, separados por el hairline de la raya fina y por aire.",
       "Do definir cualquier superficie nueva con una raya de 1px, no con una sombra.",
-      "Do dejar sin hoja lo que es un titular: si al quitarle el borde a un bloque no se pierde nada, no llevaba borde.",
+      "Do poner toda cifra sobre una hoja, incluida la que manda la pantalla; sobre el papel de la mesa solo van el h1 con su bajada y el enlace de volver.",
+      "Do subdividir una hoja grande por dentro —hairlines, hoja segunda, lg:divide-x— antes que partirla en varias superficies.",
       "Do usar el componente Monto para cualquier cantidad de dinero, y .cifra para cualquier número comparable.",
       "Do derivar el color de toda barra de progreso —incluidas las agregadas— de calcularEstado(pagado, precio).",
       "Do dejar exactamente un botón sólido principal por pantalla, y que su texto diga la acción concreta ('Guardar pago', no 'Aceptar').",
@@ -519,7 +521,8 @@
       "Don't poner una clase de display de Tailwind (flex, grid, block) en un <dialog>. Esa regla de autor le gana al dialog:not([open]) { display: none } del navegador y todo diálogo cerrado se queda ocupando su altura en la página, invisible pero clicable (llegó a inflar la página a 3998px para 3239px de contenido). El display: flex se declara solo en dialog.dialogo[open] dentro de src/estilos.css; en el JSX van flex-col y las demás utilidades, nunca flex.",
       "Don't anidar una .hoja dentro de otra, ni convertir un renglón en tarjeta con sombra o borde propio.",
       "Don't devolver el ornamento de libro viejo: ni trama alterna en los renglones de pantalla, ni la raya roja de margen junto a una lista, ni versalitas espaciadas. Se quitaron a propósito y el encargo del usuario es explícito: moderno, no 'hecho para viejitos'.",
-      "Don't meter un número solo en una tarjeta para 'darle importancia': el tamaño y el aire hacen ese trabajo, el borde lo deshace.",
+      "Don't sacar una cifra de su hoja para 'darle aire'. Ya se probó en Inicio y se revirtió por pedido del usuario: el número quedaba flotando sobre la mesa y la pantalla se descosía. La hoja no le quita importancia a la cifra; es lo que la sostiene y lo que une el titular con el resumen y las listas.",
+      "Don't convertir el resumen de Inicio en una retícula de tarjetitas de panel de control: las cuatro cuentas son un renglón de totales dentro de la misma hoja, sobre la hoja segunda y entre dos hairlines.",
       "Don't volver a una rejilla de píldoras o de botones para elegir entre datos que crecen (iglesias, tipos de cupo, pastores): no escala y se come la pantalla.",
       "Don't poner el conteo de resultados en la cara de un botón de filtro, ni pintar como filtro activo un control que siempre tiene valor (el orden).",
       "Don't ponerle velo (::backdrop opaco) a un menú: el velo es del diálogo.",

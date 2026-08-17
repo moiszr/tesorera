@@ -14,23 +14,23 @@
 
   <g clip-path="url(#cubierta)">
     <!-- Cubierta de tela -->
-    <rect width="512" height="512" fill="#47222a" />
+    <rect width="512" height="512" fill="#2563eb" />
 
     <!-- El lomo: banda más oscura con los dos nervios de la encuadernación -->
-    <rect x="0" y="0" width="104" height="512" fill="#35181e" />
-    <rect x="96" y="0" width="8" height="512" fill="#261015" />
-    <rect x="30" y="150" width="44" height="14" rx="7" fill="#5e3038" />
-    <rect x="30" y="348" width="44" height="14" rx="7" fill="#5e3038" />
+    <rect x="0" y="0" width="104" height="512" fill="#1d4ed8" />
+    <rect x="96" y="0" width="8" height="512" fill="#1e40af" />
+    <rect x="30" y="150" width="44" height="14" rx="7" fill="#60a5fa" />
+    <rect x="30" y="348" width="44" height="14" rx="7" fill="#60a5fa" />
 
     <!-- La hoja -->
     <rect x="152" y="96" width="296" height="320" rx="16" fill="#fffdf8" />
 
     <!-- La raya roja de margen del libro mayor.
          Gruesa a propósito: a 32px una raya de 1px desaparece. -->
-    <rect x="194" y="96" width="12" height="320" fill="#a8443c" />
+    <rect x="194" y="96" width="12" height="320" fill="#f59e0b" />
 
     <!-- Los renglones escritos, y el último más corto: una cuenta a medias -->
-    <rect x="236" y="164" width="176" height="22" rx="11" fill="#47222a" />
+    <rect x="236" y="164" width="176" height="22" rx="11" fill="#2563eb" />
     <rect x="236" y="234" width="176" height="22" rx="11" fill="#c9c0b2" />
     <rect x="236" y="304" width="104" height="22" rx="11" fill="#c9c0b2" />
   </g>

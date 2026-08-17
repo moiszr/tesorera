@@ -110,7 +110,7 @@ export function Selector({
           problema
             ? 'border-accion'
             : abierto
-              ? 'border-accion ring-2 ring-[rgba(138,51,64,0.18)]'
+              ? 'border-accion ring-2 ring-[rgba(37,99,235,0.18)]'
               : 'border-lineaFuerte hover:border-tinta3',
         ].join(' ')}
       >
@@ -182,7 +182,7 @@ export function Selector({
                   className={[
                     'flex min-h-[44px] w-full items-center gap-2.5 px-3 py-1.5 text-left',
                     'transition-colors duration-150',
-                    o.id === valor ? 'bg-[rgba(138,51,64,0.08)] text-accion' : 'hover:bg-hoja2',
+                    o.id === valor ? 'bg-[rgba(37,99,235,0.09)] text-accion' : 'hover:bg-hoja2',
                   ].join(' ')}
                 >
                   {o.color && (
