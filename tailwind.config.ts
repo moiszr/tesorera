@@ -36,7 +36,7 @@ const config: Config = {
         avisoTinta: 'var(--aviso-tinta)',
       },
       fontFamily: {
-        sans: ['"Fira Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Escala fija (no fluida): esto es una herramienta de trabajo que se
@@ -46,14 +46,14 @@ const config: Config = {
         // pide la convención tipográfica: quien usa esto lee con lentes, y un
         // rótulo de 11px bonito que ella no distingue es un rótulo inservible.
         // micro = 13.8px, menuda = 15.9px.
-        micro: ['0.8125rem', { lineHeight: '1.15rem', letterSpacing: '0.06em' }],
-        menuda: ['0.9375rem', { lineHeight: '1.35rem' }],
-        base: ['1.0625rem', { lineHeight: '1.55' }],
-        guia: ['1.1875rem', { lineHeight: '1.45' }],
-        titulo: ['1.375rem', { lineHeight: '1.3', letterSpacing: '-0.014em' }],
-        cifra: ['1.5rem', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
-        cifraGrande: ['1.875rem', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
-        cifraEnorme: ['2.25rem', { lineHeight: '1.05', letterSpacing: '-0.028em' }],
+        micro: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.01em' }],
+        menuda: ['0.875rem', { lineHeight: '1.35rem', letterSpacing: '-0.006em' }],
+        base: ['0.9375rem', { lineHeight: '1.55', letterSpacing: '-0.009em' }],
+        guia: ['1.0625rem', { lineHeight: '1.45', letterSpacing: '-0.012em' }],
+        titulo: ['1.3125rem', { lineHeight: '1.28', letterSpacing: '-0.021em' }],
+        cifra: ['1.375rem', { lineHeight: '1.15', letterSpacing: '-0.022em' }],
+        cifraGrande: ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.026em' }],
+        cifraEnorme: ['2.125rem', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
       },
       borderRadius: {
         hoja: '8px',

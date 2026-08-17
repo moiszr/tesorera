@@ -1,7 +1,7 @@
-@import '@fontsource/fira-sans/400.css';
-@import '@fontsource/fira-sans/500.css';
-@import '@fontsource/fira-sans/600.css';
-@import '@fontsource/fira-sans/700.css';
+/* Inter variable: es la tipografía de Linear y el estándar de producto por
+   buenas razones — neutra, con x-height alta que la hace legible en tamaños
+   chicos, y con cifras tabulares impecables, que aquí es innegociable. */
+@import '@fontsource-variable/inter/index.css';
 
 @tailwind base;
 @tailwind components;
@@ -81,11 +81,23 @@
 
 @layer base {
   html {
-    /* 17px de base: la usuaria lee con lentes. */
-    font-size: 17px;
+    /* 16px de base. Inter tiene la x-height más alta que Fira, así que a 16px
+       se lee del mismo tamaño aparente que Fira a 17 —medido, no supuesto— y
+       la interfaz gana la densidad que le faltaba. */
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
+  }
+
+  body {
+    /* cv11 = la 'a' de un solo piso y la 'l' con cola: es lo que le da a Inter
+       el aire geométrico y moderno que tiene en Linear, en vez del look de
+       Helvetica genérica. tnum queda apagado aquí y se enciende solo en .cifra:
+       en prosa las tabulares dejan huecos feos. */
+    font-feature-settings: 'cv11' 1, 'ss01' 1;
+    font-optical-sizing: auto;
+    letter-spacing: -0.011em;
   }
 
   body {
@@ -167,7 +179,9 @@
   /* Cifras: tabulares SIEMPRE, para que las columnas cuadren. */
   .cifra {
     font-variant-numeric: tabular-nums lining-nums;
-    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-feature-settings: 'tnum' 1, 'lnum' 1, 'cv11' 1, 'ss01' 1;
+    /* El dinero no lleva el tracking negativo del texto: aprieta las cifras. */
+    letter-spacing: 0;
   }
 
   /* Rótulo: el que nombra una cifra o una columna.

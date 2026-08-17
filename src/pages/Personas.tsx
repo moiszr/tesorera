@@ -223,8 +223,8 @@ export default function Personas() {
 
       <div className="hoja overflow-hidden">
         <div className="hidden border-b border-linea px-5 py-2.5 sm:flex">
-          <span className="rotulo min-w-[150px] flex-1">Nombre</span>
-          <span className="rotulo hidden w-[220px] shrink-0 pr-4 xl:block">Iglesia</span>
+          <span className="rotulo min-w-[170px] flex-[1.15]">Nombre</span>
+          <span className="rotulo hidden min-w-[180px] flex-1 pr-4 xl:block">Iglesia</span>
           <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
           <span className="rotulo hidden w-[112px] shrink-0 text-right md:block">Su cupo</span>
           <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
@@ -280,12 +280,12 @@ export default function Personas() {
                   to={`/personas/${p.id}`}
                   className="flex min-h-[46px] items-center px-5 py-1.5 transition-colors duration-150 hover:bg-hoja2"
                 >
-                  <span className="min-w-[150px] flex-1 truncate pr-4 font-medium">{p.nombre}</span>
+                  <span className="min-w-[170px] flex-[1.15] truncate pr-4 font-medium">{p.nombre}</span>
 
                   {/* Solo la iglesia. El tipo de cupo no va aquí: su precio ya
                       está en la columna "Su cupo", y meter los dos truncaba
                       ambos hasta dejarlos ilegibles. */}
-                  <span className="hidden w-[220px] shrink-0 overflow-hidden pr-4 xl:block">
+                  <span className="hidden min-w-[180px] flex-1 overflow-hidden pr-4 xl:block">
                     <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} />
                   </span>
 

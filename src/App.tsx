@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import { api } from './api/cliente'
-import type { Evento } from './api/tipos'
 import { Marco } from './components/Marco'
 import Inicio from './pages/Inicio'
 import Personas from './pages/Personas'
@@ -13,19 +10,9 @@ import Comprobante from './pages/Comprobante'
 import Reporte from './pages/Reporte'
 
 export default function App() {
-  const [evento, setEvento] = useState<Evento | null>(null)
-
-  useEffect(() => {
-    // El nombre del evento vive en el lomo del libro; se refresca al navegar.
-    const traer = () => api.eventoActivo().then(setEvento).catch(() => {})
-    traer()
-    const t = setInterval(traer, 30000)
-    return () => clearInterval(t)
-  }, [])
-
   return (
     <>
-      <Marco evento={evento}>
+      <Marco>
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/personas" element={<Personas />} />
@@ -44,12 +31,13 @@ export default function App() {
         toastOptions={{
           style: {
             background: 'var(--hoja)',
-            border: '1px solid var(--linea-fuerte)',
+            border: '1px solid var(--linea)',
             color: 'var(--tinta)',
             fontFamily: '"Fira Sans", system-ui, sans-serif',
             fontSize: '0.9375rem',
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(58,42,28,0.06), 0 14px 32px -14px rgba(58,42,28,0.28)',
+            borderRadius: '8px',
+            boxShadow:
+              '0 1px 2px rgba(24, 24, 27, 0.06), 0 12px 28px -8px rgba(24, 24, 27, 0.18)',
           },
         }}
         className="no-imprimir"

@@ -8,7 +8,14 @@ import { fechaLarga, hoyISO, normalizar } from '../lib/fechas'
 import { calcularEstado } from '../lib/estados'
 import { BarraProgreso, Boton, Campo, ChipEstado, EtiquetaIglesia, Monto } from '../components/Piezas'
 import { DialogoPersona } from '../components/DialogoPersona'
-import { IconoAdelante, IconoBuscar, IconoCheque, IconoImprimir, IconoMas } from '../components/Iconos'
+import {
+  IconoAdelante,
+  IconoBuscar,
+  IconoCheque,
+  IconoImprimir,
+  IconoMas,
+  IconoVolver,
+} from '../components/Iconos'
 
 const METODOS = [
   { valor: 'efectivo', texto: 'Efectivo' },
@@ -119,6 +126,21 @@ export default function RegistrarPago() {
     setUltimo(null)
     requestAnimationFrame(() => campoMonto.current?.focus())
   }
+
+  // Escape sale del formulario y vuelve al buscador: es la tecla que uno
+  // busca por instinto cuando se equivocó de persona.
+  useEffect(() => {
+    if (!elegida) return
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !document.querySelector('dialog[open]')) {
+        e.preventDefault()
+        volverABuscar()
+      }
+    }
+    window.addEventListener('keydown', alTeclear)
+    return () => window.removeEventListener('keydown', alTeclear)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elegida])
 
   function volverABuscar() {
     setElegida(null)
@@ -249,8 +271,13 @@ export default function RegistrarPago() {
                     <span className="text-menuda text-tinta2">{elegida.categoria}</span>
                   </div>
                 </div>
-                <Boton type="button" variante="texto" onClick={volverABuscar}>
-                  Cambiar
+                <Boton
+                  type="button"
+                  variante="contorno"
+                  onClick={volverABuscar}
+                  icono={<IconoVolver tam={16} />}
+                >
+                  Otra persona
                 </Boton>
               </div>
 
@@ -369,9 +396,23 @@ export default function RegistrarPago() {
                     )}
                   </p>
                 )}
-                <Boton type="submit" variante="principal" grande cargando={guardando} className="w-full">
-                  Guardar pago
-                </Boton>
+                <div className="flex flex-wrap gap-2">
+                  <Boton
+                    type="submit"
+                    variante="principal"
+                    grande
+                    cargando={guardando}
+                    className="flex-1"
+                  >
+                    Guardar pago
+                  </Boton>
+                  <Boton type="button" variante="contorno" grande onClick={volverABuscar}>
+                    Cancelar
+                  </Boton>
+                </div>
+                <p className="mt-2 text-center text-menuda text-tinta3">
+                  También puedes pulsar Escape para elegir a otra persona.
+                </p>
               </div>
             </form>
           )}
@@ -645,7 +686,7 @@ const BuscadorPersona = forwardRef<
                 className={[
                   'flex w-full min-h-[62px] items-center gap-3 px-5 py-3 text-left',
                   'transition-colors duration-150',
-                  i === resaltado ? 'bg-[rgba(138,51,64,0.06)]' : 'hover:bg-hoja2',
+                  i === resaltado ? 'bg-accionSuave' : 'hover:bg-hoja2',
                 ].join(' ')}
               >
                 <span className="min-w-0 flex-1">

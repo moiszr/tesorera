@@ -6,7 +6,7 @@ import type { Resumen } from '../api/tipos'
 import { formatoRD } from '../lib/dinero'
 import { cuentaRegresiva, fechaLarga, fechaRelativa } from '../lib/fechas'
 import { proporcionPagada } from '../lib/estados'
-import { Boton, EstadoVacio, EtiquetaIglesia, Monto } from '../components/Piezas'
+import { Boton, EstadoVacio, EtiquetaIglesia, Monto, colorIglesia } from '../components/Piezas'
 import { IconoAdelante, IconoAviso, IconoMas, IconoPago } from '../components/Iconos'
 
 /**
@@ -76,7 +76,6 @@ export default function Inicio() {
           rotulo="Recaudado"
           valor={formatoRD(totales.recaudado_real)}
           apoyo={`${porciento}% de la meta`}
-          fuerte
         />
         <Metrica
           rotulo="Falta por cobrar"
@@ -225,8 +224,10 @@ export default function Inicio() {
                         <span
                           className="block h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
                           style={{
-                            background:
-                              g.pendiente === 0 ? 'var(--pagado-marca)' : 'var(--accion)',
+                            // La barra lleva el color de su iglesia: así la
+                            // fila entera se lee como una unidad y se distingue
+                            // de un vistazo cuál es cuál.
+                            background: colorIglesia(g.color),
                             transform: `scaleX(${proporcionPagada(g.meta - g.pendiente, g.meta)})`,
                           }}
                         />
@@ -251,30 +252,14 @@ export default function Inicio() {
  * Una métrica del panel. Rótulo arriba, cifra en el medio, apoyo debajo: el
  * apoyo es lo que evita que la cifra sea un número sin contexto.
  */
-function Metrica({
-  rotulo,
-  valor,
-  apoyo,
-  fuerte,
-}: {
-  rotulo: string
-  valor: string
-  apoyo: string
-  fuerte?: boolean
-}) {
-  // Las cuatro son idénticas. La jerarquía la da el orden y el tamaño de la
-  // cifra, no pintar una de color: una tarjeta de color entre tres blancas se
-  // lee como "seleccionada", no como "la más importante".
+function Metrica({ rotulo, valor, apoyo }: { rotulo: string; valor: string; apoyo: string }) {
+  // Las cuatro son idénticas: mismo fondo, mismo tamaño de cifra. La jerarquía
+  // la da el orden de lectura y nada más. Pintar una de color la lee como
+  // "seleccionada" y agrandarla rompe la retícula.
   return (
     <div className="hoja p-4">
       <p className="rotulo">{rotulo}</p>
-      <p
-        className={`cifra mt-1.5 font-semibold leading-none ${
-          fuerte ? 'text-cifraGrande' : 'text-cifra'
-        }`}
-      >
-        {valor}
-      </p>
+      <p className="cifra mt-1.5 text-cifra font-semibold leading-none">{valor}</p>
       <p className="mt-1.5 truncate text-menuda text-tinta3">{apoyo}</p>
     </div>
   )

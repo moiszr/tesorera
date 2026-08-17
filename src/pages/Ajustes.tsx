@@ -747,27 +747,58 @@ function DialogoIglesia({
         <div>
           <span className="mb-1.5 block text-menuda font-medium text-tinta2">Color de la etiqueta</span>
           <div className="flex flex-wrap gap-1.5">
+            {/* Automático es lo predeterminado: el sistema reparte el color
+                menos usado para que no se repitan. Elegir uno lo anula. */}
+            <button
+              type="button"
+              onClick={() => setColor('')}
+              aria-pressed={color === ''}
+              className={[
+                'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda',
+                'border transition-colors duration-150 active:scale-[0.98]',
+                color === ''
+                  ? 'border-accion bg-accionSuave font-medium text-accionTexto'
+                  : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
+              ].join(' ')}
+            >
+              <span
+                className="h-4 w-4 rounded-full"
+                style={{
+                  background:
+                    'conic-gradient(#7c3aed, #db2777, #0891b2, #475569, #a21caf, #57534e, #7c3aed)',
+                }}
+                aria-hidden
+              />
+              Automático
+            </button>
+
             {NOMBRES_COLOR.map((c) => (
               <button
                 key={c.valor}
                 type="button"
                 onClick={() => setColor(c.valor)}
                 aria-pressed={color === c.valor}
+                aria-label={c.nombre}
+                title={c.nombre}
                 className={[
-                  'inline-flex min-h-[44px] items-center gap-2 rounded-pieza px-3 text-menuda',
+                  'flex h-11 w-11 items-center justify-center rounded-pieza',
                   'border transition-colors duration-150 active:scale-[0.98]',
-                  color === c.valor ? 'border-accion bg-[rgba(99,91,255,0.09)] font-medium' : 'border-lineaFuerte text-tinta2 hover:border-tinta3',
+                  color === c.valor ? 'border-accion bg-accionSuave' : 'border-linea hover:border-tinta3',
                 ].join(' ')}
               >
                 <span
-                  className="h-3.5 w-3.5 rounded-full"
+                  className="h-4 w-4 rounded-full"
                   style={{ background: colorIglesia(c.valor) }}
                   aria-hidden
                 />
-                {c.nombre}
               </button>
             ))}
           </div>
+          {color === '' && (
+            <p className="mt-1.5 text-menuda text-tinta3">
+              Se le pondrá el color que menos se esté usando.
+            </p>
+          )}
         </div>
         {iglesia && (
           <label className="flex min-h-[44px] cursor-pointer items-center gap-2.5 text-menuda text-tinta2">

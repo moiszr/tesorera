@@ -1,6 +1,6 @@
 ---
 name: Tesorera
-description: Herramienta de cobro moderna — neutros fríos, superficies blancas, un solo acento oxblood y cifras tabulares; densidad de producto de datos, no de facsímil de cuaderno.
+description: Herramienta de cobro moderna — neutros fríos, superficies blancas, un solo acento morado en dos tonos y cifras tabulares; densidad de producto de datos, no de facsímil de cuaderno.
 colors:
   fondo: "#f7f7f8"
   hoja: "#ffffff"
@@ -337,17 +337,21 @@ cómo va un pago.
 
 ### Primary
 
-- **Morado de acción** (`{colors.accion}`): el único acento de la app. Elegido con un
-  dato: a **5.2:1 sobre blanco** funciona igual de fondo de botón que de texto, que
-  es exactamente lo que se le pide. Botón sólido principal, texto de la entrada
-  activa de la lateral, cifra de la métrica destacada, relleno de la barra de
-  progreso agregada mientras no esté completa, borde y texto de lo seleccionado
-  (opción elegida de un menú, filtro puesto, forma de pago elegida), borde y anillo
-  de foco de los campos, enlaces dentro del texto, `caret-color` y `accent-color` del
-  documento. Su versión oscura (`{colors.accion-alto}`) es exclusivamente el hover
-  del botón sólido. Aparece además al 8–18% de opacidad como fondo de opción
-  resaltada, de filtro activo, de botón `suave` y de resultado resaltado en el
-  buscador de cobro.
+- **Morado de superficie** (`{colors.accion}`): el acento brillante, y **solo para
+  superficies**: fondo del botón sólido, relleno de la barra de progreso agregada
+  mientras no esté completa, borde de lo seleccionado (opción elegida, filtro puesto,
+  forma de pago elegida), borde y anillo de foco de los campos, `caret-color` y
+  `accent-color` del documento. Mide 4.70:1 con blanco encima, así que **como fondo
+  con texto blanco pasa AA; como texto sobre las superficies claras de la app, no**
+  (4.16 sobre la lateral, 4.07 sobre su propio fondo lavado). Aparece además al 9–18%
+  de opacidad como fondo de opción resaltada, de filtro activo, de botón `suave` y de
+  resultado resaltado en el buscador de cobro. Su versión oscura
+  (`{colors.accion-alto}`) es exclusivamente el hover del botón sólido.
+- **Morado de texto** (`{colors.accion-texto}`): el mismo morado un paso más oscuro,
+  y **solo para texto sobre fondos claros**: mensajes de error de los campos, texto de
+  la opción elegida en menús y selectores, texto del botón `suave`, enlaces y hovers
+  de enlace, y el icono de cheque de la opción elegida. Mide **4.9–5.7:1 sobre los
+  cuatro fondos** de la app, que es justo lo que el brillante no da.
 - **Acento lavado** (`{colors.accion-suave}`) y **borde de acento**
   (`{colors.accion-borde}`): la pareja que viste lo que está *señalado sin ser
   pulsado*. Juntos hacen el fondo y el contorno de la **entrada activa de la lateral**
@@ -437,12 +441,22 @@ familia morada. Si una pantalla nueva necesita "otro color para destacar algo", 
 respuesta es jerarquía tipográfica, un rótulo o el acento — nunca un color nuevo.
 Prueba concreta: en cualquier captura debe haber **un solo botón sólido**.
 
-**La regla del acento que se usa de las dos formas.** El acento se eligió para poder
-ser fondo *y* texto (5.2:1 sobre blanco). Por eso el sistema tiene dos registros y
-solo dos: **sólido** (`{colors.accion}` de fondo con texto blanco) para la acción que
-se pulsa, y **lavado** (`{colors.accion-suave}` de fondo con `{colors.accion-borde}`
-de contorno y texto de acento) para lo que está señalado sin ser pulsado — la entrada
-activa de la lateral y la métrica destacada. Un tercer registro intermedio no existe.
+**La regla del acento en dos tonos.** El acento son **dos** tonos del mismo morado y
+no son intercambiables: `{colors.accion}` (brillante) es de **superficie** —fondo de
+botón, píldora activa, relleno de barra— y `{colors.accion-texto}` (oscuro) es de
+**texto** sobre fondos claros. No es capricho: el brillante mide 4.70:1 con blanco
+encima, pero como texto cae a 4.16 sobre la lateral y 4.07 sobre su propio fondo
+lavado, o sea por debajo de AA justo en los sitios donde la app lo pondría. Prueba
+concreta: **si el morado es el color de unas letras sobre fondo claro, tiene que ser
+`{colors.accion-texto}`**; si es el fondo debajo de letras blancas, `{colors.accion}`.
+Un tercer tono no existe.
+
+**La regla de los dos registros del acento.** Además de los dos tonos, el acento tiene
+dos formas de vestir un elemento y solo dos: **sólido** (`{colors.accion}` de fondo con
+texto blanco) para la acción que se pulsa, y **lavado** (`{colors.accion-suave}` de
+fondo con `{colors.accion-borde}` de contorno y texto en `{colors.accion-texto}`) para
+lo que está señalado sin ser pulsado — la entrada activa de la lateral y la métrica
+destacada. Un registro intermedio no existe.
 
 **La regla de la lateral callada.** La navegación es del tono del lienzo y se separa
 del cuerpo con una raya, no con un bloque de color. Un panel saturado a la izquierda

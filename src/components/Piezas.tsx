@@ -16,7 +16,7 @@ type PropsBoton = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const VARIANTES: Record<TipoBoton, string> = {
-  principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(58,42,28,0.12)]',
+  principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(99,91,255,0.35)]',
   contorno: 'bg-hoja text-tinta border border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
   suave: 'bg-[rgba(99,91,255,0.09)] text-accionTexto hover:bg-[rgba(99,91,255,0.15)]',
   texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(24,24,27,0.05)]',

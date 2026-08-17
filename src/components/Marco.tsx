@@ -1,8 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { IconoAjustes, IconoInicio, IconoPago, IconoPersonas } from './Iconos'
-import { cuentaRegresiva } from '../lib/fechas'
-import type { Evento } from '../api/tipos'
 
 const ENTRADAS = [
   { a: '/', texto: 'Inicio', Icono: IconoInicio },
@@ -17,7 +15,7 @@ const ENTRADAS = [
  * pantalla: pesa mucho, compite con el contenido y no lo hace ninguna
  * herramienta actual. El acento se guarda para la entrada activa.
  */
-export function Marco({ evento, children }: { evento: Evento | null; children: ReactNode }) {
+export function Marco({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
 
   return (
@@ -27,20 +25,7 @@ export function Marco({ evento, children }: { evento: Evento | null; children: R
         aria-label="Secciones"
       >
         <div className="px-5 pb-2 pt-5">
-          <p className="text-[1.0625rem] font-semibold tracking-[-0.012em] text-tinta">Tesorera</p>
-          {evento ? (
-            <p className="mt-0.5 text-menuda leading-snug text-tinta3">
-              {evento.nombre}
-              {evento.fecha_inicio && (
-                <>
-                  <br />
-                  {cuentaRegresiva(evento.fecha_inicio)}
-                </>
-              )}
-            </p>
-          ) : (
-            <p className="mt-0.5 text-menuda text-tinta3">Sin evento todavía</p>
-          )}
+          <p className="text-[1.0625rem] font-semibold tracking-[-0.018em] text-tinta">Tesorera</p>
         </div>
 
         <ul className="mt-4 flex flex-col gap-0.5 px-3">
