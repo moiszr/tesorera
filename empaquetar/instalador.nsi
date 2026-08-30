@@ -79,7 +79,12 @@ Section "Uninstall"
   ; —que es lo normal— no se toca, y ese es exactamente el objetivo.
   RMDir "$INSTDIR"
 
-  IfFileExists "$INSTDIR\data\*.*" 0 +2
+  ; El aviso solo si hay alguien mirando. En modo silencioso (/S) nadie puede
+  ; cerrar un MessageBox, asi que el desinstalador se quedaria colgado para
+  ; siempre esperando un clic que no llega.
+  IfSilent fin
+  IfFileExists "$INSTDIR\data\*.*" 0 fin
     MessageBox MB_OK|MB_ICONINFORMATION \
       "Tesorera se desinstaló, pero los pagos NO se borraron.$\r$\n$\r$\nSiguen guardados en:$\r$\n$INSTDIR\data$\r$\n$\r$\nSi vuelves a instalar Tesorera, aparecerán solos."
+  fin:
 SectionEnd
