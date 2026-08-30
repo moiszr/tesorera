@@ -58,6 +58,10 @@ jobs:
         with:
           name: portable
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: instalador
+
       - name: Descomprimir
         run: Expand-Archive Tesorera-portable.zip -DestinationPath .
 
@@ -121,6 +125,59 @@ jobs:
           }
           Write-Host "OK: el icono del Escritorio abre Tesorera."
           Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
+
+      # Hasta aqui se probo que la app arranca. Esto prueba lo otro: que el
+      # instalador instala. Son cosas distintas, y la segunda es la que el va a
+      # ejecutar en la laptop de ella.
+      - name: Instalar de verdad y comprobar que quedo usable
+        run: |
+          # /S = instalacion silenciosa. /D = destino (sin comillas, y ultimo:
+          # asi lo exige NSIS).
+          $destino = "$env:LOCALAPPDATA\Programs\Tesorera"
+          Start-Process -Wait -FilePath ".\Tesorera-Instalador.exe" -ArgumentList "/S", "/D=$destino"
+
+          foreach ($f in @('node.exe', 'Tesorera.vbs', 'tesorera.ico', 'app\iniciar.mjs', 'dist\index.html', 'Desinstalar.exe')) {
+            if (-not (Test-Path "$destino\$f")) { throw "El instalador no dejo $f" }
+          }
+          Write-Host "OK: los archivos quedaron en $destino"
+
+          # El acceso directo del Escritorio es la unica forma en que ella abre
+          # la app: si no queda, la instalacion no le sirve de nada.
+          $lnk = [Environment]::GetFolderPath('Desktop') + "\Tesorera.lnk"
+          if (-not (Test-Path $lnk)) { throw "No quedo el icono en el Escritorio" }
+          $atajo = (New-Object -ComObject WScript.Shell).CreateShortcut($lnk)
+          if ($atajo.TargetPath -ne "$destino\Tesorera.vbs") { throw "El icono apunta a $($atajo.TargetPath)" }
+          Write-Host "OK: el icono del Escritorio apunta al lanzador"
+
+          # Y que la app instalada abra, que es distinto de que abra el zip.
+          $env:PORT = '5177'
+          Start-Process -FilePath "wscript.exe" -ArgumentList "//B", "//Nologo", "$destino\Tesorera.vbs"
+          $ok = $false
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            try {
+              if ((Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break }
+            } catch { }
+          }
+          if (-not $ok) {
+            Get-Content "$destino\data\ultimo-arranque.txt" -EA SilentlyContinue
+            throw "La app instalada no abrio"
+          }
+          Write-Host "OK: la app instalada abre y responde."
+          Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
+
+      # Los datos son sagrados: desinstalar no puede llevarselos por delante.
+      - name: Desinstalar sin borrar los pagos
+        run: |
+          $destino = "$env:LOCALAPPDATA\Programs\Tesorera"
+          if (-not (Test-Path "$destino\data\tesorera.db")) { throw "No hay base que preservar" }
+
+          Start-Process -Wait -FilePath "$destino\Desinstalar.exe" -ArgumentList "/S"
+          Start-Sleep -Seconds 5
+
+          if (Test-Path "$destino\node.exe") { throw "El desinstalador dejo el programa" }
+          if (-not (Test-Path "$destino\data\tesorera.db")) { throw "EL DESINSTALADOR SE LLEVO LOS PAGOS" }
+          Write-Host "OK: el programa se fue y la base de datos sigue ahi."
 
   publicar:
     name: Publicar en Releases
