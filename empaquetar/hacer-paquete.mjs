@@ -19,9 +19,15 @@ const RAIZ = join(AQUI, '..')
 const SALIDA = join(AQUI, 'salida')
 const APP = join(SALIDA, 'Tesorera')
 
-// Node 20 LTS: la misma línea que pide package.json. Se fija la versión a
-// propósito — que el paquete de mañana no cambie de motor sin que nadie lo note.
-const NODE = 'v20.18.1'
+// Node 24 LTS. La versión se fija a propósito: que el paquete de mañana no
+// cambie de motor sin que nadie lo note.
+//
+// Tiene que ser 22 o más. better-sqlite3 v13 declara `engines: node >=22`, y
+// esto no es una recomendación: su binario compilado para Windows cargado bajo
+// Node 20 revienta con violación de acceso (0xC0000005). Al ser un crash
+// nativo, el proceso muere sin excepción, sin stderr y sin registro — la app
+// simplemente "no abre", sin dejar rastro de por qué.
+const NODE = 'v24.20.0'
 const NODE_EXE = `https://nodejs.org/dist/${NODE}/win-x64/node.exe`
 
 const paso = (t) => console.log(`\n▸ ${t}`)

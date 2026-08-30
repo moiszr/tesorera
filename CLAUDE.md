@@ -36,7 +36,9 @@ está mal diseñado.
 ## Stack
 
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind CSS
-- **Backend:** Hono sobre Node 20 (`@hono/node-server`) + `better-sqlite3` (sin ORM)
+- **Backend:** Hono sobre Node 24 (`@hono/node-server`) + `better-sqlite3` (sin ORM).
+  Node 22 es el mínimo: lo exige `better-sqlite3` v13, y por debajo su binario
+  para Windows revienta con un crash nativo, sin excepción ni rastro.
 - **Base de datos:** SQLite en `data/tesorera.db` — respaldos en `data/respaldos/`
 - **Una sola app en producción:** el servidor Hono sirve `/api/*` y el frontend
   compilado (`dist/`) en el puerto **5177**

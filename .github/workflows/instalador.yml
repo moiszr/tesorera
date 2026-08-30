@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - run: npm ci
@@ -60,23 +60,6 @@ jobs:
 
       - name: Descomprimir
         run: Expand-Archive Tesorera-portable.zip -DestinationPath .
-
-      - name: Diagnostico del paquete
-        shell: cmd
-        run: |
-          cd Tesorera
-          echo === carga de better-sqlite3 ===
-          .\node.exe --input-type=module -e "import D from 'better-sqlite3'; const d = new D(':memory:'); d.exec('create table t(a)'); console.log('SQLITE VIVO')" > sql.txt 2>&1
-          echo codigo de salida: %ERRORLEVEL%
-          type sql.txt
-          echo.
-          echo === carga del servidor ===
-          cd app
-          ..\node.exe -e "import('./servidor.mjs').then(function(){console.log('SERVIDOR CARGADO')}).catch(function(e){console.log('ERROR: ' + e.message); console.log(e.stack)})" > srv.txt 2>&1
-          echo codigo de salida: %ERRORLEVEL%
-          type srv.txt
-          exit /b 0
-        continue-on-error: true
 
       # Estas son las pruebas que no se pueden hacer desde un Mac: que el
       # node.exe empaquetado, el binario de SQLite para Windows y las

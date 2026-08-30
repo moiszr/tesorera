@@ -9,7 +9,7 @@ El contexto de producto está en [PRODUCT.md](PRODUCT.md), el plan en
 
 ## Stack
 
-React 18 + Vite + TypeScript + Tailwind al frente · Hono sobre Node 20 y
+React 18 + Vite + TypeScript + Tailwind al frente · Hono sobre Node 24 y
 `better-sqlite3` (sin ORM) atrás · SQLite en `data/tesorera.db`.
 
 En producción hay **un solo proceso**: Hono sirve `/api/*` y el `dist/` compilado
@@ -52,7 +52,7 @@ npm run paquete   # deja la carpeta en empaquetar/salida/Tesorera/
 cd empaquetar && makensis -DVERSION=1.0.0 instalador.nsi
 ```
 
-Lo que viaja dentro: `node.exe` (Node 20 LTS, con la versión fijada a propósito),
+Lo que viaja dentro: `node.exe` (Node 24 LTS, con la versión fijada a propósito),
 el frontend compilado, el servidor empaquetado en un solo `.mjs` con esbuild, y
 `better-sqlite3` con **solo** el binario de Windows —los otros siete prebuilds
 son 15 MB de peso muerto—.
