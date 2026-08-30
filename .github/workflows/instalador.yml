@@ -61,13 +61,17 @@ jobs:
       - name: Descomprimir
         run: Expand-Archive Tesorera-portable.zip -DestinationPath .
 
-      # Esta es la prueba que no se puede hacer desde un Mac: que el node.exe
-      # empaquetado, el binario de SQLite para Windows y las migraciones
-      # arranquen juntos en el sistema operativo al que van dirigidos.
-      - name: Arrancar la app y comprobar que responde
+      # Estas son las pruebas que no se pueden hacer desde un Mac: que el
+      # node.exe empaquetado, el binario de SQLite para Windows y las
+      # migraciones arranquen juntos en el sistema al que van dirigidos.
+      - name: Arrancar el motor y comprobar que responde
         run: |
           $env:PORT = '5177'
+          # -WorkingDirectory es obligatorio: Start-Process NO hereda el
+          # directorio actual, y sin el Node busca app\iniciar.mjs donde no esta
+          # y muere antes incluso de poder anotar el error.
           $p = Start-Process -PassThru -WindowStyle Hidden `
+            -WorkingDirectory ".\Tesorera" `
             -FilePath ".\Tesorera\node.exe" -ArgumentList "app\iniciar.mjs"
 
           $ok = $false
@@ -89,6 +93,34 @@ jobs:
           if (-not (Test-Path ".\Tesorera\data\tesorera.db")) { throw "No creo la base de datos" }
           Write-Host "OK: arranca, responde y crea su base de datos."
           Stop-Process -Id $p.Id -Force -EA SilentlyContinue
+          Start-Sleep -Seconds 3
+
+      # Y esta prueba el camino de verdad: el mismo .vbs que ejecuta el icono
+      # del Escritorio. Es el unico que comprueba que el lanzador encuentra
+      # node.exe y se situa en su carpeta; lo demas seria fiarse de que mi
+      # imitacion en PowerShell se parece al original.
+      - name: Arrancar por el lanzador real (Tesorera.vbs)
+        run: |
+          Remove-Item ".\Tesorera\data\ultimo-arranque.txt" -EA SilentlyContinue
+          Start-Process -FilePath "wscript.exe" `
+            -ArgumentList "//B", "//Nologo", "$(Resolve-Path '.\Tesorera\Tesorera.vbs')"
+
+          $ok = $false
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            try {
+              $r = Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5
+              if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch { }
+          }
+
+          if (-not $ok) {
+            Write-Host "--- ultimo-arranque.txt ---"
+            Get-Content ".\Tesorera\data\ultimo-arranque.txt" -EA SilentlyContinue
+            throw "El lanzador Tesorera.vbs no levanto la app"
+          }
+          Write-Host "OK: el icono del Escritorio abre Tesorera."
+          Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
 
   publicar:
     name: Publicar en Releases
