@@ -62,30 +62,20 @@ jobs:
         run: Expand-Archive Tesorera-portable.zip -DestinationPath .
 
       - name: Diagnostico del paquete
+        shell: cmd
         run: |
-          Write-Host "=== estructura de app\ ==="
-          Get-ChildItem ".\Tesorera\app" -Recurse -Depth 3 -Force |
-            Select-Object FullName, Length | Format-Table -AutoSize | Out-String -Width 200 | Write-Host
-
-          Push-Location ".\Tesorera\app"
-          Write-Host "=== better-sqlite3 desde app\ (que es donde vive servidor.mjs) ==="
-          & "..\node.exe" --input-type=module -e "import D from 'better-sqlite3'; const d=new D(':memory:'); d.exec('create table t(a)'); console.log('sqlite vivo')" *>&1 |
-            Out-String | Write-Host
-          Pop-Location
-
-          Write-Host "=== iniciar.mjs, con la salida capturada a archivo ==="
-          Push-Location ".\Tesorera"
-          $env:PORT = '5177'
-          $p = Start-Process -PassThru -NoNewWindow -WorkingDirectory (Get-Location) `
-            -FilePath ".\node.exe" -ArgumentList "app\iniciar.mjs" `
-            -RedirectStandardOutput "salida.txt" -RedirectStandardError "errores.txt"
-          Start-Sleep -Seconds 12
-          Write-Host "--- salida ---";  Get-Content "salida.txt"  -EA SilentlyContinue | Out-String | Write-Host
-          Write-Host "--- errores ---"; Get-Content "errores.txt" -EA SilentlyContinue | Out-String | Write-Host
-          Write-Host "--- registro ---"; Get-Content ".\data\ultimo-arranque.txt" -EA SilentlyContinue | Out-String | Write-Host
-          Write-Host "--- vive el proceso? ---"; Write-Host (-not $p.HasExited)
-          Stop-Process -Id $p.Id -Force -EA SilentlyContinue
-          Pop-Location
+          cd Tesorera
+          echo === carga de better-sqlite3 ===
+          .\node.exe --input-type=module -e "import D from 'better-sqlite3'; const d = new D(':memory:'); d.exec('create table t(a)'); console.log('SQLITE VIVO')" > sql.txt 2>&1
+          echo codigo de salida: %ERRORLEVEL%
+          type sql.txt
+          echo.
+          echo === carga del servidor ===
+          cd app
+          ..\node.exe -e "import('./servidor.mjs').then(function(){console.log('SERVIDOR CARGADO')}).catch(function(e){console.log('ERROR: ' + e.message); console.log(e.stack)})" > srv.txt 2>&1
+          echo codigo de salida: %ERRORLEVEL%
+          type srv.txt
+          exit /b 0
         continue-on-error: true
 
       # Estas son las pruebas que no se pueden hacer desde un Mac: que el
