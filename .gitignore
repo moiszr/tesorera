@@ -7,3 +7,4 @@ data/*
 .impeccable/config.local.json
 .impeccable/review/
 .impeccable/mocks/
+empaquetar/salida/

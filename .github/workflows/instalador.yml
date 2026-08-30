@@ -1,0 +1,118 @@
+name: Instalador de Windows
+
+# Se dispara al publicar una version (tag v1.2.3) o a mano desde la pestana
+# Actions. El resultado queda en Releases, listo para bajar y ejecutar.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  construir:
+    name: Construir el instalador
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Armar la carpeta que se instala
+        run: node empaquetar/hacer-paquete.mjs
+
+      - name: Instalar NSIS
+        run: sudo apt-get update && sudo apt-get install -y nsis
+
+      - name: Compilar el instalador
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          cd empaquetar && makensis -DVERSION="$VERSION" instalador.nsi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instalador
+          path: empaquetar/salida/Tesorera-Instalador.exe
+
+      # La carpeta cruda tambien se sube: es lo que prueba el job de Windows,
+      # y sirve de plan B si alguna vez el instalador da problemas.
+      - name: Comprimir la carpeta portable
+        run: cd empaquetar/salida && zip -qr Tesorera-portable.zip Tesorera
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portable
+          path: empaquetar/salida/Tesorera-portable.zip
+
+  probar:
+    name: Probarlo en Windows de verdad
+    needs: construir
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable
+
+      - name: Descomprimir
+        run: Expand-Archive Tesorera-portable.zip -DestinationPath .
+
+      # Esta es la prueba que no se puede hacer desde un Mac: que el node.exe
+      # empaquetado, el binario de SQLite para Windows y las migraciones
+      # arranquen juntos en el sistema operativo al que van dirigidos.
+      - name: Arrancar la app y comprobar que responde
+        run: |
+          $env:PORT = '5177'
+          $p = Start-Process -PassThru -WindowStyle Hidden `
+            -FilePath ".\Tesorera\node.exe" -ArgumentList "app\iniciar.mjs"
+
+          $ok = $false
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            try {
+              $web = Invoke-WebRequest "http://localhost:5177/" -UseBasicParsing -TimeoutSec 5
+              $api = Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5
+              if ($web.StatusCode -eq 200 -and $api.StatusCode -eq 200) { $ok = $true; break }
+            } catch { }
+          }
+
+          if (-not $ok) {
+            Write-Host "--- ultimo-arranque.txt ---"
+            Get-Content ".\Tesorera\data\ultimo-arranque.txt" -EA SilentlyContinue
+            throw "Tesorera no respondio en Windows"
+          }
+
+          if (-not (Test-Path ".\Tesorera\data\tesorera.db")) { throw "No creo la base de datos" }
+          Write-Host "OK: arranca, responde y crea su base de datos."
+          Stop-Process -Id $p.Id -Force -EA SilentlyContinue
+
+  publicar:
+    name: Publicar en Releases
+    needs: [construir, probar]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            instalador/Tesorera-Instalador.exe
+            portable/Tesorera-portable.zip
+          body: |
+            ## Instalar Tesorera
+
+            Baja **Tesorera-Instalador.exe** y ábrelo. No hace falta instalar
+            nada más: ni Node, ni Git, ni programas raros.
+
+            Windows va a avisar que el programa no es conocido (no está firmado).
+            Toca **Más información → Ejecutar de todas formas**.
+
+            Al terminar quedan el icono en el Escritorio y Tesorera en el menú
+            de inicio.
+
+            > Actualizar es volver a instalar encima: **los pagos no se tocan**.
+            > Desinstalar tampoco los borra.

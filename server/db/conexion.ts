@@ -4,7 +4,19 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const aqui = dirname(fileURLToPath(import.meta.url))
-export const RAIZ = join(aqui, '..', '..')
+
+/**
+ * Dónde vive la app y dónde viven sus migraciones.
+ *
+ * Corriendo desde el repo, ambas se deducen de este archivo y no hay nada que
+ * configurar. Pero el instalador de Windows empaqueta el servidor como un solo
+ * .js junto a `node.exe`, y ahí "dos carpetas arriba" ya no es la raíz ni las
+ * migraciones están en `db/migraciones`. Por eso las dos rutas se pueden fijar
+ * por variable de entorno: es el empaquetado el que sabe dónde puso las cosas,
+ * no este archivo.
+ */
+export const RAIZ = process.env.TESORERA_RAIZ ?? join(aqui, '..', '..')
+const CARPETA_MIGRACIONES = process.env.TESORERA_MIGRACIONES ?? join(aqui, 'migraciones')
 export const CARPETA_DATOS = join(RAIZ, 'data')
 export const CARPETA_RESPALDOS = join(CARPETA_DATOS, 'respaldos')
 export const ARCHIVO_DB = process.env.TESORERA_DB ?? join(CARPETA_DATOS, 'tesorera.db')
@@ -33,7 +45,7 @@ function migrar(base: Database.Database) {
     aplicada_en TEXT NOT NULL DEFAULT (datetime('now'))
   )`)
 
-  const carpeta = join(aqui, 'migraciones')
+  const carpeta = CARPETA_MIGRACIONES
   if (!existsSync(carpeta)) return
 
   const yaAplicadas = new Set(

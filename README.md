@@ -28,43 +28,43 @@ en el puerto **5177**.
 
 ## Instalar en la laptop de ella (Windows)
 
-Requisitos: **Node LTS** y **Git** instalados.
+**No hace falta instalar nada previo.** Ni Node, ni Git, ni npm.
 
-```bat
-git clone <url-del-repo> C:\Tesorera
-cd C:\Tesorera
-npm install
+1. Ir a [Releases](../../releases) y bajar **`Tesorera-Instalador.exe`** (~19 MB).
+2. Abrirlo. Windows avisa que el programa no es conocido —no está firmado—:
+   **Más información → Ejecutar de todas formas**.
+3. Listo: queda el icono en el Escritorio y en el menú de inicio.
+
+El instalador lleva dentro el motor de Node y la app ya compilada. Se instala en
+`%LOCALAPPDATA%\Programs\Tesorera`, en la carpeta del usuario y no en Archivos de
+programa: así no pide permisos de administrador —ella no los tiene y no sabría
+qué contestarle a la ventana azul— y la app puede escribir su base de datos al
+lado suyo sin pelearse con los permisos de Windows.
+
+### Cómo se arma ese instalador
+
+Lo construye solo GitHub Actions al publicar un tag `v*`, y antes de publicarlo
+lo **arranca en un Windows de verdad** para comprobar que responde y crea su base
+de datos — que es justo lo que no se puede verificar desde un Mac.
+
+```bash
+npm run paquete   # deja la carpeta en empaquetar/salida/Tesorera/
+cd empaquetar && makensis -DVERSION=1.0.0 instalador.nsi
 ```
 
-Después, doble clic en `launchers\Crear acceso directo.bat` **una sola vez**.
-Deja en el Escritorio un icono llamado **Tesorera**, con el icono propio de la
-app, que apunta a `Tesorera.vbs` — no al `.bat`. Esa es la diferencia entre que
-ella vea una ventana negra al abrir o no la vea: el `.vbs` corre el `.bat`
-escondido y, si algo falla, le enseña un mensaje en español en vez de dejarla
-mirando una consola.
+Lo que viaja dentro: `node.exe` (Node 20 LTS, con la versión fijada a propósito),
+el frontend compilado, el servidor empaquetado en un solo `.mjs` con esbuild, y
+`better-sqlite3` con **solo** el binario de Windows —los otros siete prebuilds
+son 15 MB de peso muerto—.
 
-El launcher hace `git pull` silencioso (si hay internet), `npm install` si
-cambió `package.json`, y `npm start`.
-
-> **El repo es privado.** El `git clone` inicial te va a pedir tu cuenta de
-> GitHub: hazlo tú desde su laptop la primera vez. Windows guarda la credencial
-> y a partir de ahí el `git pull` del launcher corre solo. Si prefieres no dejar
-> tu cuenta en su máquina, copia la carpeta por USB — la app funciona igual,
-> solo pierde la actualización automática.
-
-> `.gitattributes` fuerza CRLF en los `.bat`. No lo quites: un `.bat` con
-> finales de línea LF no corre en Windows.
+> `.gitattributes` fuerza CRLF en los `.bat` y `.vbs`. No lo quites: con finales
+> de línea LF no corren en Windows.
 
 ## Actualizar la app en su laptop
 
-Con internet, el propio launcher hace `git pull` al abrir. Si hace falta a mano:
-
-```bat
-cd C:\Tesorera
-git pull
-npm install
-npm run build
-```
+Bajar el instalador nuevo y volver a instalar encima. **Los pagos no se tocan**:
+el instalador sobrescribe archivo por archivo y en ningún momento borra la
+carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borra.
 
 ## Decisiones que conviene no romper
 

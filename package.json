@@ -13,7 +13,8 @@
     "seed": "tsx server/db/seed.ts",
     "reset": "tsx server/db/reset.ts",
     "test": "vitest run",
-    "test:mirar": "vitest"
+    "test:mirar": "vitest",
+    "paquete": "node empaquetar/hacer-paquete.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

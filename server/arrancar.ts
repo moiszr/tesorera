@@ -34,6 +34,11 @@ async function main() {
 }
 
 function hayQueCompilar(): boolean {
+  // En la app instalada no viajan las fuentes ni npm: viene compilada de
+  // fábrica y no hay nada que rehacer. Sin esta salida, el arranque intentaría
+  // un `npm run build` que ahí no existe y moriría en la cara de ella.
+  if (!existsSync(join(RAIZ, 'src'))) return false
+
   const indice = join(DIST, 'index.html')
   if (!existsSync(indice)) return true
   const compilado = statSync(indice).mtimeMs
