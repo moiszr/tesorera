@@ -63,26 +63,28 @@ jobs:
 
       - name: Diagnostico del paquete
         run: |
-          Write-Host "=== que hay dentro ==="
-          Get-ChildItem ".\Tesorera" | Select-Object Name, Length | Format-Table
-          Write-Host "=== el motor arranca? ==="
-          & ".\Tesorera\node.exe" --version
-          Write-Host "=== ejecuta javascript? ==="
-          & ".\Tesorera\node.exe" -e "console.log('node vivo:', process.platform, process.arch)"
-          Write-Host "=== carga better-sqlite3? ==="
+          Write-Host "=== estructura de app\ ==="
+          Get-ChildItem ".\Tesorera\app" -Recurse -Depth 3 -Force |
+            Select-Object FullName, Length | Format-Table -AutoSize | Out-String -Width 200 | Write-Host
+
+          Push-Location ".\Tesorera\app"
+          Write-Host "=== better-sqlite3 desde app\ (que es donde vive servidor.mjs) ==="
+          & "..\node.exe" --input-type=module -e "import D from 'better-sqlite3'; const d=new D(':memory:'); d.exec('create table t(a)'); console.log('sqlite vivo')" *>&1 |
+            Out-String | Write-Host
+          Pop-Location
+
+          Write-Host "=== iniciar.mjs, con la salida capturada a archivo ==="
           Push-Location ".\Tesorera"
-          & ".\node.exe" --input-type=module -e "import D from 'better-sqlite3'; const d=new D(':memory:'); d.exec('create table t(a)'); console.log('sqlite vivo')" 2>&1 | Out-String | Write-Host
-          Write-Host "=== arranca iniciar.mjs? (10s en primer plano) ==="
           $env:PORT = '5177'
-          $j = Start-Job -ScriptBlock {
-            Set-Location $using:PWD
-            & ".\node.exe" "app\iniciar.mjs" 2>&1
-          }
-          Start-Sleep -Seconds 10
-          Receive-Job $j | Out-String | Write-Host
-          Stop-Job $j -EA SilentlyContinue
-          Write-Host "=== registro ==="
-          Get-Content ".\data\ultimo-arranque.txt" -EA SilentlyContinue | Out-String | Write-Host
+          $p = Start-Process -PassThru -NoNewWindow -WorkingDirectory (Get-Location) `
+            -FilePath ".\node.exe" -ArgumentList "app\iniciar.mjs" `
+            -RedirectStandardOutput "salida.txt" -RedirectStandardError "errores.txt"
+          Start-Sleep -Seconds 12
+          Write-Host "--- salida ---";  Get-Content "salida.txt"  -EA SilentlyContinue | Out-String | Write-Host
+          Write-Host "--- errores ---"; Get-Content "errores.txt" -EA SilentlyContinue | Out-String | Write-Host
+          Write-Host "--- registro ---"; Get-Content ".\data\ultimo-arranque.txt" -EA SilentlyContinue | Out-String | Write-Host
+          Write-Host "--- vive el proceso? ---"; Write-Host (-not $p.HasExited)
+          Stop-Process -Id $p.Id -Force -EA SilentlyContinue
           Pop-Location
         continue-on-error: true
 
