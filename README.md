@@ -30,7 +30,8 @@ en el puerto **5177**.
 
 **No hace falta instalar nada previo.** Ni Node, ni Git, ni npm.
 
-1. Ir a [Releases](../../releases) y bajar **`Tesorera-Instalador.exe`** (~19 MB).
+1. Bajar **[`Tesorera-Instalador.exe`](https://github.com/moiszr/tesorera/releases/latest/download/Tesorera-Instalador.exe)**
+   (~24 MB). Ese enlace apunta siempre a la última versión y no pide cuenta.
 2. Abrirlo. Windows avisa que el programa no es conocido —no está firmado—:
    **Más información → Ejecutar de todas formas**.
 3. Listo: queda el icono en el Escritorio y en el menú de inicio.
