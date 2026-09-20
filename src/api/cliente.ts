@@ -1,4 +1,18 @@
-import type { Categoria, Conteos, Evento, Ficha, Iglesia, Pastor, PersonaEnLista, Resumen } from './tipos'
+import { ordenarPorNombre } from '../lib/orden'
+import type {
+  HabitacionesDatos,
+  DatosHabitacion,
+  PlanHabitacion,
+  ReporteDatos,
+  Categoria,
+  Conteos,
+  Evento,
+  Ficha,
+  Iglesia,
+  Pastor,
+  PersonaEnLista,
+  Resumen,
+} from './tipos'
 
 /**
  * Si el servidor responde con un error, ese error ya viene escrito en español
@@ -39,11 +53,12 @@ export const api = {
   categorias: (eventoId: number) => pedir<Categoria[]>(`/eventos/${eventoId}/categorias`),
   crearCategoria: (eventoId: number, datos: Record<string, unknown>) =>
     enviar(`/eventos/${eventoId}/categorias`, 'POST', datos),
-  editarCategoria: (id: number, datos: Record<string, unknown>) => enviar(`/categorias/${id}`, 'PATCH', datos),
+  editarCategoria: (id: number, datos: Record<string, unknown>) =>
+    enviar(`/categorias/${id}`, 'PATCH', datos),
   afectadas: (id: number) => pedir<{ cuantas: number; precio: number }>(`/categorias/${id}/afectadas`),
   aplicarPrecio: (id: number) => enviar(`/categorias/${id}/aplicar-precio`, 'POST'),
 
-  iglesias: () => pedir<Iglesia[]>('/iglesias'),
+  iglesias: () => pedir<Iglesia[]>('/iglesias').then(ordenarPorNombre),
   pastores: () => pedir<Pastor[]>('/pastores'),
   crearIglesia: (datos: Record<string, unknown>) => enviar('/iglesias', 'POST', datos),
   editarIglesia: (id: number, datos: Record<string, unknown>) => enviar(`/iglesias/${id}`, 'PATCH', datos),
@@ -62,8 +77,8 @@ export const api = {
   editarPersona: (id: number, datos: Record<string, unknown>) => enviar(`/personas/${id}`, 'PATCH', datos),
   editarInscripcion: (id: number, datos: Record<string, unknown>) =>
     enviar(`/inscripciones/${id}`, 'PATCH', datos),
-  inscribir: (personaId: number, categoriaId: number) =>
-    enviar(`/personas/${personaId}/inscribir`, 'POST', { categoria_id: categoriaId }),
+  inscribir: (personaId: number, categoriaId: number, precio?: number) =>
+    enviar(`/personas/${personaId}/inscribir`, 'POST', { categoria_id: categoriaId, precio }),
 
   registrarPago: (datos: Record<string, unknown>) =>
     enviar('/pagos', 'POST', datos) as Promise<{ id: number; ficha: Ficha }>,
@@ -73,5 +88,12 @@ export const api = {
 
   respaldar: () => enviar('/respaldo', 'POST') as Promise<{ nombre: string; carpeta: string }>,
   respaldos: () => pedir<{ carpeta: string; respaldos: { nombre: string; cuando: string }[] }>('/respaldos'),
-  reporte: () => pedir<any>('/reporte'),
+  habitaciones: () => pedir<HabitacionesDatos>('/habitaciones'),
+  revisarHabitacion: (datos: DatosHabitacion) =>
+    enviar('/habitaciones/revisar', 'POST', datos) as Promise<PlanHabitacion>,
+  guardarHabitacion: (datos: DatosHabitacion, firma: string) =>
+    enviar('/habitaciones/guardar', 'POST', { datos, firma }) as Promise<{ id: number }>,
+  archivarHabitacion: (id: number, archivada: boolean) =>
+    enviar(`/habitaciones/${id}/archivo`, 'PATCH', { archivada }),
+  reporte: (parametros: string = '') => pedir<ReporteDatos>(`/reporte${parametros ? '?' + parametros : ''}`),
 }

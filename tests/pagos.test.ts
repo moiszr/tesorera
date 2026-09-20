@@ -57,11 +57,14 @@ beforeEach(() => {
   db.prepare('DELETE FROM iglesias').run()
 
   eventoId = Number(
-    db.prepare("INSERT INTO eventos (nombre, activo) VALUES ('Convención de prueba', 1)").run().lastInsertRowid,
+    db.prepare("INSERT INTO eventos (nombre, activo) VALUES ('Convención de prueba', 1)").run()
+      .lastInsertRowid,
   )
   catFamiliar = Number(
     db
-      .prepare("INSERT INTO categorias (evento_id, nombre, precio, orden) VALUES (?, 'Adulto — familiar', 450000, 1)")
+      .prepare(
+        "INSERT INTO categorias (evento_id, nombre, precio, orden) VALUES (?, 'Adulto — familiar', 450000, 1)",
+      )
       .run(eventoId).lastInsertRowid,
   )
   catNino = Number(
@@ -243,17 +246,23 @@ describe('búsqueda y totales', () => {
     // tuviera una sola iglesia, filtrar por pastor sería filtrar por iglesia.
     const iglesiaA = Number(
       db
-        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Central', 'Ramón Guzmán', 'ramon guzman')")
+        .prepare(
+          "INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Central', 'Ramón Guzmán', 'ramon guzman')",
+        )
         .run().lastInsertRowid,
     )
     const iglesiaB = Number(
       db
-        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Anexo', 'Ramón Guzmán', 'ramon guzman')")
+        .prepare(
+          "INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Anexo', 'Ramón Guzmán', 'ramon guzman')",
+        )
         .run().lastInsertRowid,
     )
     const otra = Number(
       db
-        .prepare("INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Monte Sinaí', 'Wilfredo Peña', 'wilfredo pena')")
+        .prepare(
+          "INSERT INTO iglesias (nombre, pastor, pastor_busqueda) VALUES ('Monte Sinaí', 'Wilfredo Peña', 'wilfredo pena')",
+        )
         .run().lastInsertRowid,
     )
 
@@ -286,5 +295,64 @@ describe('búsqueda y totales', () => {
 
     const orden = listarPersonas({ orden: 'menos_pagado' }).map((p) => p.nombre)
     expect(orden[0]).toBe('Debe mucho')
+  })
+})
+
+describe('personas archivadas en el espacio de cobro', () => {
+  it('permite encontrarlas explícitamente sin perder su cuenta ni sus pagos', () => {
+    const { personaId, inscripcionId } = crearPersona('Ana archivada', catFamiliar, 450000)
+    pagar(inscripcionId, 100000)
+    db.prepare('UPDATE personas SET archivada = 1 WHERE id = ?').run(personaId)
+    expect(listarPersonas({})).toHaveLength(0)
+    const lista = listarPersonas({ incluir_archivadas: true })
+    expect(lista).toHaveLength(1)
+    expect(lista[0]).toMatchObject({ id: personaId, archivada: 1, pagado: 100000, balance: 350000 })
+    expect(fichaPersona(personaId)!.pagos).toHaveLength(1)
+    db.prepare('UPDATE personas SET archivada = 0 WHERE id = ?').run(personaId)
+    expect(listarPersonas({})[0]).toMatchObject({ id: personaId, archivada: 0, pagado: 100000 })
+  })
+})
+
+describe('inscribir desde la cuenta de la persona', () => {
+  it('guarda el precio personalizado ofrecido por el formulario', async () => {
+    const { rutasPersonas } = await import('../server/rutas/personas')
+    const personaId = Number(
+      db.prepare("INSERT INTO personas (nombre, nombre_busqueda) VALUES ('Ana nueva', 'ana nueva')").run()
+        .lastInsertRowid,
+    )
+    const respuesta = await rutasPersonas.request(`/personas/${personaId}/inscribir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoria_id: catFamiliar, precio: 200000 }),
+    })
+    expect(respuesta.status).toBe(201)
+    expect(fichaPersona(personaId)!.inscripcion).toMatchObject({ precio: 200000, precio_a_mano: 1 })
+    db.prepare('UPDATE categorias SET precio = 600000 WHERE id = ?').run(catFamiliar)
+    aplicarPrecioDeCategoria(catFamiliar)
+    expect(fichaPersona(personaId)!.cuenta.precio).toBe(200000)
+  })
+
+  it('rechaza precios inválidos y cupos archivados sin crear una inscripción', async () => {
+    const { rutasPersonas } = await import('../server/rutas/personas')
+    const personaId = Number(
+      db.prepare("INSERT INTO personas (nombre, nombre_busqueda) VALUES ('Luis nuevo', 'luis nuevo')").run()
+        .lastInsertRowid,
+    )
+    for (const precio of [-1, 'no es un precio', 1.5]) {
+      const r = await rutasPersonas.request(`/personas/${personaId}/inscribir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoria_id: catFamiliar, precio }),
+      })
+      expect(r.status).toBe(400)
+    }
+    db.prepare('UPDATE categorias SET archivada = 1 WHERE id = ?').run(catFamiliar)
+    const r = await rutasPersonas.request(`/personas/${personaId}/inscribir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoria_id: catFamiliar }),
+    })
+    expect(r.status).toBe(400)
+    expect(fichaPersona(personaId)!.inscripcion).toBeNull()
   })
 })

@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { normalizar } from '../lib/fechas'
-import { IconoBuscar, IconoCerrar, IconoBajar } from './Iconos'
+import { IconoBuscar, IconoBajar } from './Iconos'
 
 export type OpcionFiltro = {
   valor: string | number
@@ -115,11 +115,7 @@ export function FiltroMenu({
         ].join(' ')}
       >
         {elegida?.color && (
-          <span
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ background: elegida.color }}
-            aria-hidden
-          />
+          <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: elegida.color }} aria-hidden />
         )}
         <span className="truncate">
           {elegida ? (
@@ -131,29 +127,7 @@ export function FiltroMenu({
             etiqueta
           )}
         </span>
-        {activo && permiteTodas ? (
-          <span
-            role="button"
-            tabIndex={0}
-            aria-label={`Quitar el filtro ${etiqueta}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              alElegir(undefined)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                e.stopPropagation()
-                alElegir(undefined)
-              }
-            }}
-            className="-mr-1 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-[rgba(99,91,255,0.17)]"
-          >
-            <IconoCerrar tam={14} />
-          </span>
-        ) : (
-          <IconoBajar tam={15} className="-mr-0.5 shrink-0 opacity-60" />
-        )}
+        <IconoBajar tam={15} className="-mr-0.5 shrink-0 opacity-60" />
       </button>
 
       <div

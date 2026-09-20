@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { conectar, RAIZ } from './db/conexion'
 import { hacerRespaldo } from './db/respaldo'
+import { rutasHabitaciones } from './rutas/habitaciones'
 import { rutasDatos } from './rutas/datos'
 import { rutasEventos } from './rutas/eventos'
 import { rutasIglesias } from './rutas/iglesias'
@@ -19,6 +20,7 @@ export function crearApp() {
 
   const api = new Hono()
   api.route('/', rutasDatos)
+  api.route('/', rutasHabitaciones)
   api.route('/', rutasEventos)
   api.route('/', rutasIglesias)
   api.route('/', rutasPersonas)

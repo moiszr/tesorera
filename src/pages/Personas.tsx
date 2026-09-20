@@ -1,413 +1,479 @@
+import { PersonasArchivadas } from '../components/PersonasArchivadas'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '../api/cliente'
-import type { Conteos, Evento, Iglesia, Pastor, PersonaEnLista } from '../api/tipos'
+import type { Conteos, Evento, Iglesia, Pastor, PersonaEnLista, Habitacion } from '../api/tipos'
 import { NOMBRE_ESTADO, type Estado } from '../lib/estados'
-import { normalizar } from '../lib/fechas'
-import {
-  Boton,
-  ChipEstado,
-  EstadoVacio,
-  EtiquetaIglesia,
-  Monto,
-  colorIglesia,
-} from '../components/Piezas'
+import { Boton, ChipEstado, EstadoVacio, Monto, colorIglesia } from '../components/Piezas'
 import { DialogoPersona } from '../components/DialogoPersona'
+import { PanelPersona } from '../components/PanelPersona'
 import { FiltroMenu } from '../components/FiltroMenu'
-import { IconoBuscar, IconoMas } from '../components/Iconos'
+import { IconoBuscar, IconoMas, IconoPersonas, IconoPago } from '../components/Iconos'
 
-type Orden = 'nombre' | 'menos_pagado' | 'recientes'
-
-/**
- * Quién enseña botón de cobrar en su renglón: el que está inscrito y todavía
- * debe algo. Vive aquí, en una sola definición, porque la regla se usa dos
- * veces en la fila (el botón y su zona de clic) y separarlas dejaría huecos
- * muertos sobre el enlace del renglón.
- *
- * Se mira el estado y no el balance: un cupo de precio 0 también tiene balance
- * 0, pero ahí el chip dice "Sin pagos" y cobrarle sí tiene sentido.
- */
-function puedeCobrar(p: PersonaEnLista): boolean {
-  return p.inscripcion_id !== null && p.estado !== 'pagado'
-}
-
-const ORDENES: { valor: Orden; texto: string }[] = [
-  { valor: 'nombre', texto: 'Por nombre' },
-  { valor: 'menos_pagado', texto: 'Los que más deben' },
-  { valor: 'recientes', texto: 'Agregados hace poco' },
-]
+const ESTADOS: Estado[] = ['pagado', 'abonando', 'sinpagos']
+const numero = (v: string | null) =>
+  v && Number.isSafeInteger(Number(v)) && Number(v) > 0 ? Number(v) : undefined
 
 export default function Personas() {
   const [params, setParams] = useSearchParams()
+  const buscar = params.get('buscar') ?? ''
+  const iglesia = numero(params.get('iglesia'))
+  const categoria = numero(params.get('categoria_id'))
+  const habitacion = params.get('habitacion') ?? undefined
+  const estado = ESTADOS.find((e) => e === params.get('estado'))
+  const pastor = params.get('pastor') ?? undefined
+  const orden = params.get('orden') ?? 'nombre'
+  const seleccionada = numero(params.get('persona'))
+  const archivadas = params.get('archivadas') === '1'
   const [personas, setPersonas] = useState<PersonaEnLista[]>([])
   const [conteos, setConteos] = useState<Conteos | null>(null)
   const [iglesias, setIglesias] = useState<Iglesia[]>([])
   const [evento, setEvento] = useState<Evento | null>(null)
-  const [cargando, setCargando] = useState(true)
-  const [nuevaAbierta, setNuevaAbierta] = useState(params.get('nueva') === '1')
-
-  const [buscar, setBuscar] = useState('')
-  const [iglesia, setIglesia] = useState<number | undefined>()
-  const [categoriaId, setCategoriaId] = useState<number | undefined>()
-  const [estado, setEstado] = useState<Estado | undefined>()
-  const [orden, setOrden] = useState<Orden>('nombre')
-  const [nombreParaCrear, setNombreParaCrear] = useState('')
-  const [pastor, setPastor] = useState<string | undefined>()
+  const [habitaciones, setHabitaciones] = useState<Habitacion[]>([])
   const [pastores, setPastores] = useState<Pastor[]>([])
-
+  const [cargando, setCargando] = useState(true)
+  const [preparando, setPreparando] = useState(true)
+  const [error, setError] = useState('')
+  const [errorOpciones, setErrorOpciones] = useState('')
+  const [revision, setRevision] = useState(0)
+  const [solicitudCobro, setSolicitudCobro] = useState(0)
+  const [ocupado, setOcupado] = useState(false)
+  const [nombreParaCrear, setNombreParaCrear] = useState('')
+  const [nueva, setNueva] = useState(params.get('nueva') === '1')
   const campoBuscar = useRef<HTMLInputElement>(null)
+  const ultimoDisparador = useRef<HTMLElement | null>(null)
 
-  const cargar = useCallback(async () => {
-    const [r, gs, ev, ps] = await Promise.all([
-      api.personas({ buscar, iglesia, pastor, categoria_id: categoriaId, estado, orden }),
-      api.iglesias(),
-      api.eventoActivo(),
-      api.pastores(),
-    ])
-    setPersonas(r.personas)
-    setConteos(r.conteos)
-    setIglesias(gs.filter((g) => !g.archivada))
-    setEvento(ev)
-    setPastores(ps)
-  }, [buscar, iglesia, pastor, categoriaId, estado, orden])
-
+  function parametro(clave: string, valor: string | number | undefined) {
+    setParams(
+      (anterior) => {
+        const p = new URLSearchParams(anterior)
+        if (valor === undefined || valor === '') p.delete(clave)
+        else p.set(clave, String(valor))
+        return p
+      },
+      { replace: true },
+    )
+  }
+  const cargarOpciones = useCallback(async () => {
+    setPreparando(true)
+    try {
+      const [g, e, p, h] = await Promise.all([
+        api.iglesias(),
+        api.eventoActivo(),
+        api.pastores(),
+        api.habitaciones(),
+      ])
+      setHabitaciones(h.habitaciones.filter((h) => !h.archivada))
+      setIglesias(g)
+      setEvento(e)
+      setPastores(p)
+      setErrorOpciones('')
+    } catch (e) {
+      setErrorOpciones(e instanceof Error ? e.message : 'No pude cargar los cupos y las iglesias.')
+    } finally {
+      setPreparando(false)
+    }
+  }, [])
   useEffect(() => {
+    void cargarOpciones()
+  }, [cargarOpciones])
+  useEffect(() => {
+    let vigente = true
     setCargando(true)
-    const t = setTimeout(() => {
-      cargar()
-        .catch((e) => toast.error(e.message))
-        .finally(() => setCargando(false))
-    }, buscar ? 90 : 0)
-    return () => clearTimeout(t)
-  }, [cargar, buscar])
-
+    const timer = setTimeout(
+      () => {
+        api
+          .personas({
+            buscar,
+            iglesia,
+            categoria_id: categoria,
+            habitacion,
+            estado,
+            pastor,
+            orden,
+            archivadas: undefined,
+          })
+          .then((r) => {
+            if (vigente) {
+              setPersonas(r.personas)
+              setConteos(r.conteos)
+              setError('')
+            }
+          })
+          .catch((e) => {
+            if (vigente) setError(e.message)
+          })
+          .finally(() => {
+            if (vigente) setCargando(false)
+          })
+      },
+      buscar ? 120 : 0,
+    )
+    return () => {
+      vigente = false
+      clearTimeout(timer)
+    }
+  }, [buscar, iglesia, categoria, estado, pastor, orden, habitacion, revision])
   useEffect(() => {
-    campoBuscar.current?.focus()
+    if (!seleccionada && !nueva) campoBuscar.current?.focus({ preventScroll: true })
   }, [])
 
-  // Las categorías archivadas solo se muestran si alguien inscrito todavía las usa.
-  const categoriasVisibles = (evento?.categorias ?? []).filter(
-    (c) => !c.archivada || (conteos?.categoria?.[c.id] ?? 0) > 0,
-  )
-
-  const cuantosFiltros = [iglesia, categoriaId, estado, pastor].filter(Boolean).length
-  const hayFiltro = cuantosFiltros > 0 || Boolean(buscar)
-
+  function abrir(p: PersonaEnLista, pagar: boolean, disparador: HTMLElement) {
+    if (ocupado) return
+    ultimoDisparador.current = disparador
+    if (pagar) setSolicitudCobro((n) => n + 1)
+    setParams(
+      (anterior) => {
+        const q = new URLSearchParams(anterior)
+        q.delete('archivadas')
+        q.set('persona', String(p.id))
+        if (pagar) q.set('pagar', '1')
+        else q.delete('pagar')
+        return q
+      },
+      { replace: true },
+    )
+  }
+  function cerrarPanel() {
+    if (ocupado) return
+    setParams(
+      (anterior) => {
+        const q = new URLSearchParams(anterior)
+        q.delete('persona')
+        q.delete('pagar')
+        return q
+      },
+      { replace: true },
+    )
+    requestAnimationFrame(() => {
+      if (ultimoDisparador.current?.isConnected) ultimoDisparador.current.focus({ preventScroll: true })
+      else campoBuscar.current?.focus({ preventScroll: true })
+    })
+  }
+  const refrescar = useCallback(() => setRevision((r) => r + 1), [])
+  function cerrarNueva() {
+    setNueva(false)
+    parametro('nueva', undefined)
+  }
+  const hayFiltro = Boolean(buscar || iglesia || categoria || estado || pastor || habitacion)
   function limpiar() {
-    setPastor(undefined)
-    setIglesia(undefined)
-    setCategoriaId(undefined)
-    setEstado(undefined)
-    setBuscar('')
+    setParams(
+      (anterior) => {
+        const p = new URLSearchParams(anterior)
+        ;['buscar', 'iglesia', 'categoria_id', 'estado', 'pastor', 'archivadas', 'habitacion'].forEach((k) =>
+          p.delete(k),
+        )
+        return p
+      },
+      { replace: true },
+    )
     campoBuscar.current?.focus()
   }
-
-  function cerrarNueva() {
-    setNuevaAbierta(false)
-    if (params.get('nueva')) {
-      params.delete('nueva')
-      setParams(params, { replace: true })
-    }
-  }
+  const opcionesCupo = evento?.categorias.filter((c) => !c.archivada || c.inscritos > 0) ?? []
 
   return (
-    <div className="entra-hoja">
-      <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <header className="cabecera-pagina">
         <div>
-          <h1 className="text-titulo font-semibold">Personas</h1>
-          <p className="mt-0.5 text-tinta2">
-            {conteos ? (
-              <>
-                <span className="cifra">{personas.length}</span>
-                {hayFiltro ? ` de ${conteos.total}` : personas.length === 1 ? ' persona' : ' personas'}
-                {hayFiltro && ' con estos filtros'}
-              </>
-            ) : (
-              ' '
-            )}
-          </p>
+          <h1>Personas</h1>
+          <p>Sus cupos, sus pagos y lo que falta. Todo en el mismo lugar.</p>
         </div>
         <Boton
           variante="principal"
-          icono={<IconoMas tam={19} />}
+          icono={<IconoMas />}
+          disabled={preparando || !!errorOpciones || ocupado}
           onClick={() => {
             setNombreParaCrear(buscar.trim())
-            setNuevaAbierta(true)
+            setNueva(true)
           }}
         >
           Agregar persona
         </Boton>
       </header>
-
-      {/* Barra de herramientas: una sola fila. Antes esto eran cinco filas de
-          píldoras con una columna de etiquetas al lado, que ocupaban media
-          pantalla y encima no escalaban al crecer las iglesias o los cupos.
-          Cada filtro muestra en el propio botón lo que está filtrando. */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative min-w-[220px] flex-1">
-          <IconoBuscar
-            tam={20}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta3"
-          />
-          <input
-            ref={campoBuscar}
-            type="search"
-            value={buscar}
-            onChange={(e) => setBuscar(e.target.value)}
-            placeholder="Buscar por nombre…"
-            aria-label="Buscar persona por nombre"
-            className="h-[44px] w-full rounded-pieza border border-linea bg-hoja pl-11 pr-4 text-guia transition-colors duration-150 placeholder:text-tinta3 focus:border-accion focus:outline-none focus:ring-2 focus:ring-[rgba(99,91,255,0.18)]"
-          />
+      {errorOpciones && (
+        <div className="aviso-carga" role="alert">
+          <span>{errorOpciones}</span>
+          <Boton onClick={cargarOpciones}>Volver a intentar</Boton>
         </div>
-
-        <FiltroMenu
-          etiqueta="Cómo va"
-          valor={estado}
-          alElegir={(v) => setEstado(v as Estado | undefined)}
-          textoTodas="Todos"
-          opciones={(['pagado', 'abonando', 'sinpagos'] as Estado[]).map((e) => ({
-            valor: e,
-            etiqueta: NOMBRE_ESTADO[e],
-            cuenta: conteos?.estado?.[e],
-          }))}
-        />
-
-        {categoriasVisibles.length > 0 && (
-          <FiltroMenu
-            etiqueta="Cupo"
-            valor={categoriaId}
-            alElegir={(v) => setCategoriaId(v as number | undefined)}
-            ancho={320}
-            opciones={categoriasVisibles.map((c) => ({
-              valor: c.id,
-              etiqueta: c.nombre,
-              cuenta: conteos?.categoria?.[c.id] ?? 0,
-            }))}
-          />
-        )}
-
-        {pastores.length > 0 && (
-          <FiltroMenu
-            etiqueta="Pastor"
-            valor={pastor}
-            alElegir={(v) => setPastor(v as string | undefined)}
-            textoTodas="Todos"
-            ancho={320}
-            opciones={pastores.map((ps) => ({
-              valor: ps.nombre,
-              etiqueta: ps.nombre,
-              nota: ps.iglesias > 1 ? `${ps.iglesias} iglesias` : undefined,
-              cuenta: conteos?.pastor?.[normalizar(ps.nombre)] ?? 0,
-            }))}
-          />
-        )}
-
-        {iglesias.length > 0 && (
-          <FiltroMenu
-            etiqueta="Iglesia"
-            valor={iglesia}
-            alElegir={(v) => setIglesia(v as number | undefined)}
-            ancho={340}
-            opciones={iglesias.map((g) => ({
-              valor: g.id,
-              etiqueta: g.nombre,
-              color: colorIglesia(g.color),
-              cuenta: conteos?.iglesia?.[g.id] ?? 0,
-            }))}
-          />
-        )}
-
-        {/* El orden no es un filtro: va aparte, al final. */}
-        <FiltroMenu
-          etiqueta="Orden"
-          valor={orden}
-          alElegir={(v) => setOrden((v as Orden) ?? 'nombre')}
-          permiteTodas={false}
-          opciones={ORDENES.map((o) => ({ valor: o.valor, etiqueta: o.texto }))}
-        />
-
-        {hayFiltro && (
-          <Boton variante="texto" onClick={limpiar} className="text-menuda">
-            Limpiar
-          </Boton>
-        )}
-      </div>
-
-      <div className="hoja overflow-hidden">
-        <div className="hidden border-b border-linea px-5 py-2.5 text-base sm:flex">
-          <span className="rotulo min-w-[170px] flex-[1.15]">Nombre</span>
-          <span className="rotulo hidden min-w-[180px] flex-1 pr-4 xl:block">Iglesia</span>
-          <span className="rotulo w-[112px] shrink-0 text-right">Ha pagado</span>
-          <span className="rotulo hidden w-[112px] shrink-0 text-right md:block">Su cupo</span>
-          <span className="rotulo w-[128px] shrink-0 pl-5">Cómo va</span>
-          <span className="w-[112px] shrink-0" aria-hidden />
+      )}
+      {!preparando && !errorOpciones && (!evento || !opcionesCupo.some((c) => !c.archivada)) && (
+        <div className="aviso-carga">
+          <span>
+            {!evento
+              ? 'Primero prepara el evento para inscribir personas.'
+              : 'Agrega un tipo de cupo con su precio para empezar.'}
+          </span>
+          <Link className="enlace-accion" to="/cupos">
+            Preparar los cupos
+          </Link>
         </div>
-
-        {cargando && personas.length === 0 ? (
-          <ListaEsqueleto />
-        ) : personas.length === 0 ? (
-          hayFiltro ? (
-            <EstadoVacio
-              titulo={buscar.trim() ? `No hay nadie llamado “${buscar.trim()}”` : 'No encontré a nadie así'}
-              explicacion={
-                buscar.trim()
-                  ? 'Puedes agregarla ahora mismo con ese nombre, o revisar si está escrito distinto.'
-                  : 'Prueba quitando algún filtro.'
-              }
-              accion={
-                <div className="flex flex-wrap justify-center gap-2">
-                  {buscar.trim() && (
+      )}
+      <div className="espacio-personas">
+        {seleccionada && (
+          <PanelPersona
+            key={seleccionada}
+            personaId={seleccionada}
+            solicitudCobro={solicitudCobro}
+            cobrar={params.get('pagar') === '1'}
+            evento={evento}
+            iglesias={iglesias.filter((g) => !g.archivada)}
+            alCerrar={cerrarPanel}
+            alCambiar={refrescar}
+            alOcupar={setOcupado}
+          />
+        )}
+        <div className="columna-personas">
+          <div className="personas-herramientas">
+            <div className="busqueda-personas hoja">
+              <IconoBuscar tam={22} />
+              <input
+                ref={campoBuscar}
+                type="search"
+                value={buscar}
+                onChange={(e) => parametro('buscar', e.target.value)}
+                placeholder="Buscar una persona…"
+                aria-label="Buscar persona por nombre"
+              />
+            </div>
+            <div className="filtros-personas">
+              <FiltroMenu
+                etiqueta="Estado de pago"
+                valor={estado}
+                alElegir={(v) => parametro('estado', v)}
+                textoTodas="Todos los estados"
+                opciones={ESTADOS.map((e) => ({
+                  valor: e,
+                  etiqueta: NOMBRE_ESTADO[e],
+                  cuenta: conteos?.estado[e],
+                }))}
+              />
+              <FiltroMenu
+                etiqueta="Iglesia"
+                valor={iglesia}
+                alElegir={(v) => parametro('iglesia', v)}
+                opciones={iglesias.map((g) => ({
+                  valor: g.id,
+                  etiqueta: g.nombre,
+                  color: colorIglesia(g.color),
+                }))}
+                ancho={340}
+              />
+              <FiltroMenu
+                etiqueta="Tipo de cupo"
+                valor={categoria}
+                alElegir={(v) => parametro('categoria_id', v)}
+                opciones={opcionesCupo.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+                ancho={340}
+              />
+              <FiltroMenu
+                etiqueta="Habitación"
+                valor={habitacion}
+                alElegir={(v) => parametro('habitacion', v)}
+                opciones={[
+                  { valor: 'sin', etiqueta: 'Sin habitación asignada' },
+                  ...habitaciones.map((h) => ({ valor: String(h.id), etiqueta: h.nombre })),
+                ]}
+              />
+              <FiltroMenu
+                etiqueta="Pastor"
+                valor={pastor}
+                alElegir={(v) => parametro('pastor', v)}
+                textoTodas="Todos los pastores"
+                opciones={pastores.map((p) => ({ valor: p.nombre, etiqueta: p.nombre }))}
+                ancho={320}
+              />
+              {hayFiltro && (
+                <Boton variante="texto" onClick={limpiar}>
+                  Limpiar filtros
+                </Boton>
+              )}
+            </div>
+          </div>
+          <div className="lista-controles">
+            <p role="status">
+              {cargando
+                ? 'Actualizando…'
+                : `${personas.length} ${personas.length === 1 ? 'persona' : 'personas'}${hayFiltro ? ' en esta lista' : ''}`}
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Boton variante="texto" disabled={ocupado} onClick={() => parametro('archivadas', '1')}>
+                Archivadas
+              </Boton>
+              <FiltroMenu
+                etiqueta="Orden"
+                valor={orden}
+                permiteTodas={false}
+                alElegir={(v) => parametro('orden', v)}
+                opciones={[
+                  { valor: 'nombre', etiqueta: 'Por nombre' },
+                  { valor: 'menos_pagado', etiqueta: 'Mayor saldo pendiente' },
+                  { valor: 'recientes', etiqueta: 'Agregadas hace poco' },
+                ]}
+              />
+            </div>
+          </div>
+          <div className="lista-personas hoja" aria-busy={cargando}>
+            {error ? (
+              <EstadoVacio
+                titulo="No pude cargar las personas"
+                explicacion={error}
+                accion={<Boton onClick={refrescar}>Volver a intentar</Boton>}
+              />
+            ) : cargando && personas.length === 0 ? (
+              <div className="p-8" role="status">
+                Cargando personas…
+              </div>
+            ) : personas.length === 0 ? (
+              <EstadoVacio
+                titulo={hayFiltro ? 'No encontré personas con esos filtros' : 'Aquí empieza tu lista'}
+                explicacion={
+                  hayFiltro
+                    ? 'Prueba con otro nombre o quita los filtros para ver más personas.'
+                    : 'Agrega una persona y su cupo. Después podrás registrar sus abonos aquí mismo.'
+                }
+                accion={
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {hayFiltro && <Boton onClick={limpiar}>Quitar filtros</Boton>}
                     <Boton
                       variante="principal"
-                      icono={<IconoMas tam={18} />}
+                      disabled={preparando || !!errorOpciones}
                       onClick={() => {
                         setNombreParaCrear(buscar.trim())
-                        setNuevaAbierta(true)
+                        setNueva(true)
                       }}
                     >
-                      Agregar a “{buscar.trim()}”
+                      Agregar persona
                     </Boton>
-                  )}
-                  <Boton onClick={limpiar}>Quitar filtros</Boton>
+                  </div>
+                }
+              />
+            ) : (
+              <>
+                <div className="fila-persona encabezado-lista" aria-hidden>
+                  <span>Persona e iglesia</span>
+                  <span className="col-pagado">Ha pagado</span>
+                  <span>Le falta</span>
+                  <span className="col-estado">Estado</span>
+                  <span />
                 </div>
-              }
-            />
-          ) : (
-            <EstadoVacio
-              titulo="Todavía no hay personas"
-              explicacion="Agrega a la primera persona con su iglesia y su tipo de cupo. La app le lleva la cuenta desde el primer abono."
-              accion={
-                <Boton variante="principal" grande onClick={() => setNuevaAbierta(true)}>
-                  Agregar la primera persona
-                </Boton>
-              }
-            />
-          )
-        ) : (
-          <ul>
-            {personas.map((p, i) => (
-              <li
-                key={p.id}
-                style={{ ['--i' as string]: Math.min(i, 12) }}
-                className="entra-renglon renglon group relative"
-              >
-                {/* El enlace cubre la fila entera por detrás y el contenido no
-                    intercepta clics; así se puede hacer clic en cualquier punto
-                    del renglón y el botón de cobrar sigue siendo suyo. */}
-                <Link
-                  to={`/personas/${p.id}`}
-                  className="absolute inset-0 z-0 transition-colors duration-150 group-hover:bg-hoja2"
-                  aria-label={`Ver la ficha de ${p.nombre}`}
-                />
-
-                <div className="pointer-events-none relative z-10 flex min-h-[52px] items-center px-5 py-1">
-                  {/* Una sola escala en toda la fila: el nombre pesa más por su
-                      grosor, no por su tamaño. Mezclar tamaños entre columnas
-                      hace que la tabla se lea desnivelada. */}
-                  <span className="min-w-[170px] flex-[1.15] truncate pr-4 font-semibold">{p.nombre}</span>
-
-                  {/* Solo la iglesia. El tipo de cupo no va aquí: su precio ya
-                      está en la columna "Su cupo", y meter los dos truncaba
-                      ambos hasta dejarlos ilegibles. */}
-                  <span className="hidden min-w-[180px] flex-1 overflow-hidden pr-4 xl:block">
-                    <EtiquetaIglesia nombre={p.iglesia} color={p.iglesia_color} className="!text-base" />
-                  </span>
-
-                  {/* Dos columnas de cifras, cada una alineada consigo misma.
-                      Antes iban pegadas en un solo bloque y lo pagado bailaba
-                      de izquierda a derecha según lo largo que fuera el precio. */}
-                  {p.inscripcion_id ? (
-                    <>
-                      <span className="w-[112px] shrink-0 text-right">
+                <ul>
+                  {personas.map((p) => (
+                    <li key={p.id} className={`fila-persona ${seleccionada === p.id ? 'seleccionada' : ''}`}>
+                      <button
+                        disabled={ocupado || cargando}
+                        className="persona-identidad"
+                        aria-label={`Ver cuenta de ${p.nombre}`}
+                        aria-pressed={seleccionada === p.id}
+                        onClick={(e) => abrir(p, false, e.currentTarget)}
+                      >
+                        <span className="avatar-persona" aria-hidden>
+                          {p.nombre
+                            .split(' ')
+                            .filter(Boolean)
+                            .slice(0, 2)
+                            .map((n) => n[0])
+                            .join('')}
+                        </span>
+                        <span className="persona-nombres">
+                          <strong>{p.nombre}</strong>
+                          <span className="persona-contexto">
+                            <span>{p.iglesia ?? 'Sin iglesia asignada'}</span>
+                            {p.habitacion && <span className="persona-habitacion">{p.habitacion}</span>}
+                          </span>
+                        </span>
+                      </button>
+                      <span className="col-pagado importe-lista">
                         <Monto centavos={p.pagado} />
                       </span>
-                      <span className="hidden w-[112px] shrink-0 text-right md:block">
-                        <Monto centavos={p.precio} tenue />
+                      <span className="importe-lista">
+                        {p.inscripcion_id ? (
+                          <Monto
+                            centavos={p.balance}
+                            className={p.balance > 0 ? 'font-semibold' : 'text-tinta2'}
+                          />
+                        ) : (
+                          <span className="text-menuda text-tinta2">Sin cupo</span>
+                        )}
                       </span>
-                    </>
-                  ) : (
-                    <span className="w-[112px] shrink-0 text-right text-tinta2 md:w-[224px]">
-                      Sin inscribir
-                    </span>
-                  )}
-
-                  <span className="w-[128px] shrink-0 pl-5">
-                    <ChipEstado estado={p.estado} />
-                  </span>
-
-                  {/* Cobrar desde la fila, pero solo donde queda algo por
-                      cobrar. Un renglón que dice "Pagado" y al lado ofrece
-                      "Cobrar" se contradice a sí mismo. Y hay premio: mostrando
-                      el botón solo donde falta, la columna deja de ser una pared
-                      de botones que grita más que los propios números y pasa a
-                      decir de un vistazo a quién hay que cobrarle.
-                      A quien ya pagó se le sigue pudiendo cobrar —un abono de
-                      más, una corrección—: el renglón entero es un enlace a su
-                      ficha, y allí "Registrar abono" está siempre, con el total
-                      pagado y el excedente delante antes de tocar nada.
-                      La caja de 112px se queda aunque el botón no esté: es lo
-                      que mantiene las columnas a plomo. Lo que no se queda es su
-                      captura de clics, o serían 112px muertos encima del enlace
-                      de la fila.
-                      Contorno blanco en vez de relleno: 64 botones con fondo de
-                      color forman una columna que le grita más fuerte que los
-                      propios números. Sin icono —el billete a 16px se leía como
-                      un rectangulito sucio y la palabra ya lo dice todo—, y el
-                      relleno del acento se reserva para el hover, que es cuando
-                      hay UN botón mirándote y no sesenta y cuatro.
-                      El ::before le devuelve los 46px de zona de clic que la
-                      caja de 34px no tiene, sin deformarla ni salirse de la fila. */}
-                  <span
-                    className={`flex w-[112px] shrink-0 justify-end pl-3 ${
-                      puedeCobrar(p) ? 'pointer-events-auto' : ''
-                    }`}
-                  >
-                    {puedeCobrar(p) && (
-                      <Link
-                        to={`/registrar-pago?persona=${p.id}`}
-                        aria-label={`Registrar un abono de ${p.nombre}`}
-                        className="relative inline-flex h-[34px] items-center rounded-pieza border border-linea bg-hoja px-3.5 text-menuda font-medium text-tinta shadow-[0_1px_1px_rgba(24,24,27,0.04)] transition-colors duration-150 before:absolute before:inset-x-0 before:-inset-y-[6px] before:content-[''] group-hover:border-lineaFuerte hover:!border-accion hover:!bg-accion hover:!text-white active:scale-[0.97]"
+                      <span className="col-estado">
+                        {p.archivada ? (
+                          <span className="text-menuda text-tinta2">Archivada</span>
+                        ) : p.inscripcion_id ? (
+                          <ChipEstado estado={p.estado} />
+                        ) : (
+                          <span className="text-menuda text-tinta2">Sin inscribir</span>
+                        )}
+                      </span>
+                      <button
+                        className="cobrar-fila"
+                        disabled={ocupado || cargando}
+                        aria-label={`${p.inscripcion_id && !p.archivada && p.estado !== 'pagado' ? 'Registrar pago de' : 'Ver cuenta de'} ${p.nombre}`}
+                        onClick={(e) =>
+                          abrir(
+                            p,
+                            Boolean(p.inscripcion_id && !p.archivada && p.estado !== 'pagado'),
+                            e.currentTarget,
+                          )
+                        }
                       >
-                        Cobrar
-                      </Link>
-                    )}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+                        {p.inscripcion_id && !p.archivada && p.estado !== 'pagado' ? (
+                          <>
+                            <IconoPago tam={18} />
+                            <span>Cobrar</span>
+                          </>
+                        ) : (
+                          <span>Ver cuenta</span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+        {!seleccionada && (
+          <div className="ayuda-personas">
+            <IconoPersonas tam={19} />
+            <span>
+              Selecciona una persona para ver su cuenta, o pulsa <strong>Cobrar</strong> para registrar un
+              abono.
+            </span>
+          </div>
         )}
       </div>
-
-      {/* Si venía buscando un nombre que no existe, el diálogo abre con ese
-          nombre ya escrito: no se escribe dos veces lo mismo. */}
+      <PersonasArchivadas
+        abierto={archivadas}
+        revision={revision}
+        alCerrar={() => parametro('archivadas', undefined)}
+        alAbrir={(p, boton) => abrir(p, false, boton)}
+      />
       <DialogoPersona
-        abierto={nuevaAbierta}
+        abierto={nueva && !preparando && !errorOpciones}
         alCerrar={cerrarNueva}
-        iglesias={iglesias}
+        iglesias={iglesias.filter((g) => !g.archivada)}
         evento={evento}
         personas={personas}
         nombreInicial={nombreParaCrear}
-        alGuardar={() => {
-          cerrarNueva()
-          setBuscar('')
-          cargar()
+        iglesiaInicial={iglesia}
+        categoriaInicial={categoria}
+        alGuardar={(creada) => {
+          setNueva(false)
+          setParams(
+            (anterior) => {
+              const p = new URLSearchParams(anterior)
+              p.delete('nueva')
+              p.set('persona', String(creada.id))
+              p.set('pagar', '1')
+              return p
+            },
+            { replace: true },
+          )
+          refrescar()
+          if (hayFiltro) toast.info('La persona se agregó. Los filtros de tu lista se conservan.')
         }}
       />
     </div>
-  )
-}
-
-function ListaEsqueleto() {
-  return (
-    <ul aria-busy="true" aria-label="Cargando personas">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <li key={i} className="renglon flex min-h-[62px] items-center gap-4 px-5 py-3">
-          <span className="h-4 flex-1 animate-pulse rounded bg-linea" style={{ maxWidth: 220 }} />
-          <span className="h-4 w-28 animate-pulse rounded bg-linea" />
-        </li>
-      ))}
-    </ul>
   )
 }

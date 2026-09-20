@@ -50,7 +50,7 @@ de datos — que es justo lo que no se puede verificar desde un Mac.
 
 ```bash
 npm run paquete   # deja la carpeta en empaquetar/salida/Tesorera/
-cd empaquetar && makensis -DVERSION=1.0.0 instalador.nsi
+cd empaquetar && makensis -DVERSION=1.1.0 instalador.nsi
 ```
 
 Lo que viaja dentro: `node.exe` (Node 24 LTS, con la versión fijada a propósito),
@@ -63,7 +63,7 @@ son 15 MB de peso muerto—.
 
 ## Actualizar la app en su laptop
 
-Bajar el instalador nuevo y volver a instalar encima. **Los pagos no se tocan**:
+Hacer un respaldo desde Ajustes, reiniciar Windows y ejecutar el instalador nuevo en la misma carpeta. **Los pagos no se tocan**:
 el instalador sobrescribe archivo por archivo y en ningún momento borra la
 carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borra.
 

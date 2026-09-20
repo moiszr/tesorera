@@ -205,3 +205,20 @@ export function IconoFiltro({ className, tam = 20 }: Props) {
     </svg>
   )
 }
+
+export function IconoCupo({ className, tam = 20 }: Props) {
+  return (
+    <svg {...base(tam)} className={className}>
+      <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z" />
+      <path d="M14 8v2m0 4v2" />
+    </svg>
+  )
+}
+
+export function IconoHabitacion({ className, tam = 20 }: Props) {
+  return (
+    <svg {...base(tam)} className={className}>
+      <path d="M3 18v-9m18 9v-7a2 2 0 0 0-2-2H3m0 6h18M6 9V6h5v3m2 0V6h5v3M3 15v5m18-5v5" />
+    </svg>
+  )
+}

@@ -5,10 +5,12 @@ name: Instalador de Windows
 on:
   push:
     tags: ['v*']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   construir:
@@ -22,6 +24,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Comprobar tipos y pruebas
+        run: npx tsc --noEmit && npm test
 
       - name: Armar la carpeta que se instala
         run: node empaquetar/hacer-paquete.mjs
@@ -54,6 +59,7 @@ jobs:
     needs: construir
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: portable
@@ -166,6 +172,30 @@ jobs:
           Write-Host "OK: la app instalada abre y responde."
           Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
 
+      - name: Actualizar una base de la versión anterior sin perder pagos
+        run: |
+          $destino = "$env:RUNNER_TEMP\Tesorera-actualizacion"
+          & ".\Tesorera\node.exe" empaquetar/probar-actualizacion.cjs preparar $destino ".\Tesorera"
+          if ($LASTEXITCODE -ne 0) { throw "No se pudo preparar la base anterior" }
+          Start-Process -Wait -FilePath ".\Tesorera-Instalador.exe" -ArgumentList "/S", "/D=$destino"
+          $p = Start-Process -PassThru -WindowStyle Hidden -WorkingDirectory $destino `
+            -FilePath "$destino\node.exe" -ArgumentList "app\iniciar.mjs"
+          try {
+            $ok = $false
+            foreach ($i in 1..30) {
+              Start-Sleep -Seconds 2
+              try {
+                $r = Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5
+                if ($r.StatusCode -eq 200) { $ok = $true; break }
+              } catch { }
+            }
+            if (-not $ok) { throw "La actualización no abrió" }
+            & ".\Tesorera\node.exe" empaquetar/probar-actualizacion.cjs verificar $destino ".\Tesorera"
+            if ($LASTEXITCODE -ne 0) { throw "La actualización no conservó los pagos o el respaldo" }
+          } finally {
+            Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
+          }
+
       # Los datos son sagrados: desinstalar no puede llevarselos por delante.
       - name: Desinstalar sin borrar los pagos
         run: |
@@ -181,6 +211,8 @@ jobs:
 
   publicar:
     name: Publicar en Releases
+    permissions:
+      contents: write
     needs: [construir, probar]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest

@@ -1,71 +1,83 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
-import { IconoAjustes, IconoInicio, IconoPago, IconoPersonas } from './Iconos'
+import { useEffect, useState, type ReactNode } from 'react'
+import { api } from '../api/cliente'
+import {
+  IconoAjustes,
+  IconoInicio,
+  IconoPersonas,
+  IconoIglesia,
+  IconoCupo,
+  IconoExportar,
+  IconoHabitacion,
+} from './Iconos'
 
 const ENTRADAS = [
   { a: '/', texto: 'Inicio', Icono: IconoInicio },
   { a: '/personas', texto: 'Personas', Icono: IconoPersonas },
-  { a: '/registrar-pago', texto: 'Registrar pago', Icono: IconoPago },
-  { a: '/ajustes', texto: 'Ajustes', Icono: IconoAjustes },
+  { a: '/iglesias', texto: 'Iglesias', Icono: IconoIglesia },
+  { a: '/habitaciones', texto: 'Habitaciones', Icono: IconoHabitacion },
+  { a: '/cupos', texto: 'Cupos', Icono: IconoCupo },
+  { a: '/reporte', texto: 'Reportes', Icono: IconoExportar },
 ]
 
-/**
- * Barra lateral clara, del mismo tono que el lienzo y separada por una raya
- * fina. Un bloque de color saturado a la izquierda es lo que más envejecía la
- * pantalla: pesa mucho, compite con el contenido y no lo hace ninguna
- * herramienta actual. El acento se guarda para la entrada activa.
- */
 export function Marco({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [pathname])
+  const [evento, setEvento] = useState('Tu convención')
+  useEffect(() => {
+    let vigente = true
+    api
+      .eventoActivo()
+      .then((e) => {
+        if (vigente) setEvento(e?.nombre ?? 'Prepara tu evento')
+      })
+      .catch(() => {})
+    return () => {
+      vigente = false
+    }
+  }, [pathname])
   return (
-    <div className="flex min-h-screen">
-      <nav
-        className="no-imprimir sticky top-0 flex h-screen w-[236px] shrink-0 flex-col border-r border-linea bg-lomo"
-        aria-label="Secciones"
-      >
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[1.0625rem] font-semibold tracking-[-0.018em] text-tinta">Tesorera</p>
+    <div className="app-marco">
+      <a href="#contenido" className="saltar-contenido">
+        Ir al contenido
+      </a>
+      <aside className="lateral no-imprimir">
+        <NavLink to="/" className="marca" aria-label="Tesorera, inicio">
+          <span className="marca-simbolo">
+            <IconoInicio tam={25} />
+          </span>
+          <span>
+            Tesorera<span className="marca-apoyo">Control de pagos</span>
+          </span>
+        </NavLink>
+        <div className="evento-lateral">
+          <span className="evento-punto" aria-hidden />
+          <span>{evento}</span>
         </div>
-
-        <ul className="mt-4 flex flex-col gap-0.5 px-3">
+        <nav aria-label="Secciones" className="navegacion">
           {ENTRADAS.map(({ a, texto, Icono }) => (
-            <li key={a}>
-              <NavLink
-                to={a}
-                end={a === '/'}
-                className={({ isActive }) =>
-                  [
-                    'flex min-h-[44px] items-center gap-2.5 rounded-pieza px-2.5 text-menuda',
-                    'transition-colors duration-150',
-                    // Píldora sólida en el acento. Fondo suave + borde + texto
-                    // de color eran tres señales para decir una cosa y se veía
-                    // recargado; y el blanco sobre gris no se distinguía. Una
-                    // píldora llena no deja duda y es lo que hacen las
-                    // herramientas actuales.
-                    isActive
-                      ? 'bg-accion font-semibold text-white shadow-[0_1px_2px_rgba(99,91,255,0.35)]'
-                      : 'font-medium text-tinta2 hover:bg-[rgba(24,24,27,0.05)] hover:text-tinta',
-                  ].join(' ')
-                }
-              >
-                <Icono tam={18} className="shrink-0" />
-                {texto}
-              </NavLink>
-            </li>
+            <NavLink
+              key={a}
+              to={a}
+              end={a === '/'}
+              className={({ isActive }) => `enlace-nav ${isActive ? 'activo' : ''}`}
+            >
+              <Icono tam={21} />
+              <span>{texto}</span>
+            </NavLink>
           ))}
-        </ul>
-
-        <div className="mt-auto px-5 pb-4 pt-4">
-          <p className="text-menuda text-tinta3">Se respalda sola al abrir</p>
+        </nav>
+        <div className="lateral-pie">
+          <NavLink to="/ajustes" className={({ isActive }) => `enlace-nav ${isActive ? 'activo' : ''}`}>
+            <IconoAjustes tam={21} />
+            Ajustes
+          </NavLink>
         </div>
-      </nav>
-
-      <main
-        className="min-w-0 flex-1 px-7 py-6 xl:px-9"
-        key={pathname === '/registrar-pago' ? 'pago' : pathname}
-      >
-        <div className="mx-auto w-full max-w-[1120px]">{children}</div>
+      </aside>
+      <main id="contenido" className="contenido" tabIndex={-1}>
+        <div className="contenido-interior">{children}</div>
       </main>
     </div>
   )

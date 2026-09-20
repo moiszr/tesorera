@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useId, type ReactNode } from 'react'
 import { Boton } from './Piezas'
 import { IconoCerrar } from './Iconos'
 
@@ -16,6 +16,12 @@ export function Dialogo({
   children,
   pie,
   ancho = 460,
+  ocupado = false,
+  lateral = false,
+  className = '',
+  descripcion,
+  icono,
+  accionesCabecera,
 }: {
   abierto: boolean
   alCerrar: () => void
@@ -23,13 +29,23 @@ export function Dialogo({
   children: ReactNode
   pie?: ReactNode
   ancho?: number
+  ocupado?: boolean
+  lateral?: boolean
+  className?: string
+  descripcion?: ReactNode
+  icono?: ReactNode
+  accionesCabecera?: ReactNode
 }) {
   const ref = useRef<HTMLDialogElement>(null)
+  const tituloId = useId()
 
   useEffect(() => {
     const d = ref.current
     if (!d) return
-    if (abierto && !d.open) d.showModal()
+    if (abierto && !d.open) {
+      d.showModal()
+      d.querySelector<HTMLInputElement>('[data-autofocus]')?.focus()
+    }
     if (!abierto && d.open) d.close()
   }, [abierto])
 
@@ -38,31 +54,44 @@ export function Dialogo({
     if (!d) return
     const alCancelar = (e: Event) => {
       e.preventDefault()
-      alCerrar()
+      if (!ocupado) alCerrar()
     }
     d.addEventListener('cancel', alCancelar)
     return () => d.removeEventListener('cancel', alCancelar)
-  }, [alCerrar])
+  }, [alCerrar, ocupado])
 
   return (
     <dialog
       ref={ref}
-      className="dialogo m-auto max-h-[86vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-hoja bg-hoja p-0 text-tinta shadow-dialogo backdrop:bg-[rgba(40,28,18,0.42)]"
+      aria-labelledby={tituloId}
+      className={`${className} ${lateral ? 'dialogo-lateral' : ''} dialogo m-auto max-h-[86vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-hoja bg-hoja p-0 text-tinta shadow-dialogo backdrop:bg-[rgba(40,28,18,0.42)]`}
       style={{ maxWidth: ancho }}
       onClick={(e) => {
-        if (e.target === ref.current) alCerrar()
+        if (!ocupado && e.target === ref.current) alCerrar()
       }}
     >
       <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-1 pt-5">
-        <h2 className="text-guia font-semibold leading-snug">{titulo}</h2>
-        <button
-          type="button"
-          onClick={alCerrar}
-          aria-label="Cerrar"
-          className="-mr-1.5 -mt-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(24,24,27,0.06)] hover:text-tinta"
-        >
-          <IconoCerrar tam={18} />
-        </button>
+        <div className="dialogo-identidad">
+          {icono}
+          <div className="dialogo-titulos">
+            <h2 id={tituloId} className="text-guia font-semibold leading-snug">
+              {titulo}
+            </h2>
+            {descripcion && <div className="dialogo-descripcion">{descripcion}</div>}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          {accionesCabecera}
+          <button
+            type="button"
+            onClick={alCerrar}
+            disabled={ocupado}
+            aria-label="Cerrar"
+            className="-mr-1.5 -mt-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-pieza text-tinta2 transition-colors hover:bg-[rgba(24,24,27,0.06)] hover:text-tinta"
+          >
+            <IconoCerrar tam={18} />
+          </button>
+        </div>
       </div>
 
       {/* El cuerpo hace scroll y el pie se queda quieto: con muchas iglesias o
@@ -102,9 +131,10 @@ export function Confirmacion({
       abierto={abierto}
       alCerrar={alCerrar}
       titulo={titulo}
+      ocupado={cargando}
       pie={
         <>
-          <Boton variante="texto" onClick={alCerrar}>
+          <Boton variante="texto" onClick={alCerrar} disabled={cargando}>
             No, dejarlo así
           </Boton>
           <Boton variante="principal" onClick={alConfirmar} cargando={cargando}>

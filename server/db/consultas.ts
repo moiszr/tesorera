@@ -23,6 +23,8 @@ export type Categoria = {
   orden: number
   archivada: number
   inscritos: number
+  incluye_alojamiento: number
+  extra_privado: number | null
 }
 
 export type Evento = {
@@ -36,6 +38,7 @@ export type Evento = {
 
 export type PersonaEnLista = {
   id: number
+  archivada: number
   nombre: string
   telefono: string | null
   iglesia_id: number | null
@@ -46,6 +49,11 @@ export type PersonaEnLista = {
   categoria_id: number | null
   categoria: string | null
   precio: number
+  incluye_alojamiento: number
+  precio_base: number
+  extra_habitacion: number
+  habitacion_id: number | null
+  habitacion: string | null
   pagado: number
   balance: number
   excedente: number
@@ -110,7 +118,7 @@ export function inscripcionesAfectadas(categoriaId: number, db: Database.Databas
         WHERE i.categoria_id = @cat
           AND i.precio_a_mano = 0
           AND i.precio <> @precio
-          AND ${PAGADO_SQL} < i.precio`,
+          AND ${PAGADO_SQL} < (i.precio + i.extra_habitacion)`,
     )
     .get({ cat: categoriaId, precio: cat.precio }) as any
   return { cuantas: fila.cuantas as number, precio: cat.precio }
@@ -128,7 +136,7 @@ export function aplicarPrecioDeCategoria(categoriaId: number, db: Database.Datab
           AND precio <> @precio
           AND id IN (
             SELECT i.id FROM inscripciones i
-             WHERE i.categoria_id = @cat AND ${PAGADO_SQL} < i.precio
+             WHERE i.categoria_id = @cat AND ${PAGADO_SQL} < (i.precio + i.extra_habitacion)
           )`,
     )
     .run({ cat: categoriaId, precio: cat.precio })
@@ -184,6 +192,7 @@ export type FiltrosPersonas = {
   categoria_id?: number
   estado?: Estado
   orden?: 'nombre' | 'menos_pagado' | 'recientes'
+  habitacion?: number | 'sin'
   incluir_archivadas?: boolean
 }
 
@@ -196,11 +205,13 @@ export function listarPersonas(
 
   const filas = db
     .prepare(
-      `SELECT p.id, p.nombre, p.telefono, p.iglesia_id,
+      `SELECT p.id, p.nombre, p.telefono, p.iglesia_id, p.archivada,
               g.nombre AS iglesia, g.color AS iglesia_color, g.pastor AS pastor,
               i.id AS inscripcion_id, i.categoria_id,
-              c.nombre AS categoria,
-              COALESCE(i.precio, 0) AS precio,
+              c.nombre AS categoria, c.incluye_alojamiento,
+              COALESCE(i.precio, 0) + COALESCE(i.extra_habitacion, 0) AS precio,
+              COALESCE(i.precio, 0) AS precio_base, COALESCE(i.extra_habitacion, 0) AS extra_habitacion,
+              i.habitacion_id, h.nombre AS habitacion,
               ${PAGADO_SQL} AS pagado,
               (SELECT MAX(pg.fecha) FROM pagos pg
                 WHERE pg.inscripcion_id = i.id AND pg.anulado = 0) AS ultimo_pago,
@@ -209,6 +220,7 @@ export function listarPersonas(
          LEFT JOIN iglesias g ON g.id = p.iglesia_id
          LEFT JOIN inscripciones i ON i.persona_id = p.id AND i.evento_id = @evento
          LEFT JOIN categorias c ON c.id = i.categoria_id
+         LEFT JOIN habitaciones h ON h.id = i.habitacion_id
         WHERE (@archivadas = 1 OR p.archivada = 0)`,
     )
     .all({ evento: eventoId, archivadas: filtros.incluir_archivadas ? 1 : 0 }) as any[]
@@ -218,6 +230,7 @@ export function listarPersonas(
     const pagado = f.pagado ?? 0
     return {
       id: f.id,
+      archivada: f.archivada,
       nombre: f.nombre,
       telefono: f.telefono,
       iglesia_id: f.iglesia_id,
@@ -228,6 +241,11 @@ export function listarPersonas(
       categoria_id: f.categoria_id,
       categoria: f.categoria,
       precio,
+      incluye_alojamiento: f.incluye_alojamiento ?? 0,
+      precio_base: f.precio_base,
+      extra_habitacion: f.extra_habitacion,
+      habitacion_id: f.habitacion_id,
+      habitacion: f.habitacion,
       pagado,
       balance: calcularBalance(pagado, precio),
       excedente: calcularExcedente(pagado, precio),
@@ -249,6 +267,9 @@ export function listarPersonas(
     lista = lista.filter((p) => normalizar(p.pastor ?? '') === pastor)
   }
   if (filtros.categoria_id) lista = lista.filter((p) => p.categoria_id === filtros.categoria_id)
+  if (filtros.habitacion === 'sin')
+    lista = lista.filter((p) => p.inscripcion_id && p.incluye_alojamiento && !p.habitacion_id)
+  else if (filtros.habitacion) lista = lista.filter((p) => p.habitacion_id === filtros.habitacion)
   if (filtros.estado) lista = lista.filter((p) => p.estado === filtros.estado)
 
   const orden = filtros.orden ?? 'nombre'
@@ -270,7 +291,7 @@ function compararNombre(a: { nombre: string }, b: { nombre: string }) {
   return normalizar(a.nombre).localeCompare(normalizar(b.nombre), 'es')
 }
 
-export function fichaPersona(id: number, db: Database.Database = conectar()) {
+export function fichaPersona(id: number, db: Database.Database = conectar(), eventoId?: number) {
   const persona = db
     .prepare(
       `SELECT p.*, g.nombre AS iglesia, g.color AS iglesia_color, g.pastor AS pastor
@@ -280,13 +301,16 @@ export function fichaPersona(id: number, db: Database.Database = conectar()) {
     .get(id) as any
   if (!persona) return null
 
-  const evento = eventoActivo(db)
+  const evento = eventoId
+    ? (db.prepare('SELECT * FROM eventos WHERE id=?').get(eventoId) as Evento | undefined)
+    : eventoActivo(db)
   const inscripcion = evento
     ? (db
         .prepare(
-          `SELECT i.*, c.nombre AS categoria, c.precio AS precio_categoria, c.archivada AS categoria_archivada
+          `SELECT i.*, c.nombre AS categoria, c.precio AS precio_categoria, c.archivada AS categoria_archivada, c.incluye_alojamiento, h.nombre AS habitacion
              FROM inscripciones i
              LEFT JOIN categorias c ON c.id = i.categoria_id
+             LEFT JOIN habitaciones h ON h.id = i.habitacion_id
             WHERE i.persona_id = ? AND i.evento_id = ?`,
         )
         .get(id, evento.id) as any)
@@ -298,7 +322,7 @@ export function fichaPersona(id: number, db: Database.Database = conectar()) {
         .all(inscripcion.id) as any[])
     : []
 
-  const precio = inscripcion?.precio ?? 0
+  const precio = (inscripcion?.precio ?? 0) + (inscripcion?.extra_habitacion ?? 0)
   const pagado = pagos.filter((p) => !p.anulado).reduce((s, p) => s + p.monto, 0)
 
   return {
@@ -319,7 +343,11 @@ export function fichaPersona(id: number, db: Database.Database = conectar()) {
           id: inscripcion.id,
           categoria_id: inscripcion.categoria_id,
           categoria: inscripcion.categoria,
-          precio,
+          precio: inscripcion.precio,
+          incluye_alojamiento: inscripcion.incluye_alojamiento,
+          extra_habitacion: inscripcion.extra_habitacion,
+          habitacion_id: inscripcion.habitacion_id,
+          habitacion: inscripcion.habitacion,
           precio_categoria: inscripcion.precio_categoria,
           precio_a_mano: inscripcion.precio_a_mano,
           categoria_archivada: inscripcion.categoria_archivada,
@@ -344,7 +372,7 @@ export function resumen(db: Database.Database = conectar()) {
     return { evento: null, totales: null, ultimos_pagos: [], iglesias: [], categorias: [] }
   }
 
-  const personas = listarPersonas({}, db).filter((p) => p.inscripcion_id != null)
+  const personas = listarPersonas({ incluir_archivadas: true }, db).filter((p) => p.inscripcion_id != null)
 
   const meta = personas.reduce((s, p) => s + p.precio, 0)
   const recaudado = personas.reduce((s, p) => s + Math.min(p.pagado, p.precio), 0)

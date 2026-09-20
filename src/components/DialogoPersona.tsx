@@ -24,6 +24,8 @@ export function DialogoPersona({
   evento,
   personas,
   nombreInicial = '',
+  iglesiaInicial,
+  categoriaInicial,
   alGuardar,
 }: {
   abierto: boolean
@@ -33,6 +35,8 @@ export function DialogoPersona({
   /** Para avisar de un posible duplicado mientras escribe, no después de guardar. */
   personas: PersonaEnLista[]
   nombreInicial?: string
+  iglesiaInicial?: number
+  categoriaInicial?: number
   alGuardar: (personaCreada: { id: number; nombre: string }) => void
 }) {
   const [nombre, setNombre] = useState('')
@@ -53,18 +57,28 @@ export function DialogoPersona({
     // Se propone lo último que usó: inscribiendo a media iglesia de un tirón,
     // esto ahorra dos toques por persona. Sigue siendo cambiable.
     setIglesiaId(
-      iglesias.length === 1
-        ? iglesias[0].id
-        : iglesias.some((g) => g.id === ultimas.iglesiaId)
-          ? ultimas.iglesiaId
-          : undefined,
+      iglesias.some((g) => g.id === iglesiaInicial)
+        ? iglesiaInicial
+        : iglesias.length === 1
+          ? iglesias[0].id
+          : iglesias.some((g) => g.id === ultimas.iglesiaId)
+            ? ultimas.iglesiaId
+            : undefined,
     )
-    setCategoriaId(categorias.some((c) => c.id === ultimas.categoriaId) ? ultimas.categoriaId : undefined)
+    setCategoriaId(
+      categorias.some((c) => c.id === categoriaInicial)
+        ? categoriaInicial
+        : categorias.some((c) => c.id === ultimas.categoriaId)
+          ? ultimas.categoriaId
+          : categorias.length === 1
+            ? categorias[0].id
+            : undefined,
+    )
     setTelefono('')
     setNotas('')
     setProblema(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [abierto, nombreInicial, iglesias, evento])
+  }, [abierto, nombreInicial, iglesias, evento, iglesiaInicial, categoriaInicial])
 
   // Aviso de repetida MIENTRAS escribe. Avisar después de guardar llega tarde:
   // el duplicado ya está creado y hay que ir a archivarlo.
@@ -121,7 +135,7 @@ export function DialogoPersona({
   }
 
   return (
-    <Dialogo abierto={abierto} alCerrar={alCerrar} titulo="Agregar persona" ancho={520}>
+    <Dialogo ocupado={guardando} abierto={abierto} alCerrar={alCerrar} titulo="Agregar persona" ancho={520}>
       <form onSubmit={guardar} className="space-y-4">
         <Campo
           etiqueta="Nombre completo"
@@ -154,7 +168,7 @@ export function DialogoPersona({
 
         {sinCategorias ? (
           <Aviso tono="ojo">
-            Este evento todavía no tiene tipos de cupo. Créalos en Ajustes y después vuelve aquí.
+            Este evento todavía no tiene tipos de cupo. Créalos en Cupos y después vuelve aquí.
           </Aviso>
         ) : (
           opcionesCupo.length > 0 && (
@@ -195,10 +209,10 @@ export function DialogoPersona({
         {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
 
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
-          <Boton type="button" variante="texto" onClick={alCerrar}>
+          <Boton type="button" variante="texto" onClick={alCerrar} disabled={guardando}>
             Cancelar
           </Boton>
-          <Boton type="submit" variante="principal" cargando={guardando}>
+          <Boton type="submit" variante="principal" cargando={guardando} disabled={sinCategorias || !evento}>
             Guardar persona
           </Boton>
         </div>

@@ -36,7 +36,7 @@ const config: Config = {
         avisoTinta: 'var(--aviso-tinta)',
       },
       fontFamily: {
-        sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Manrope Variable"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Escala fija (no fluida): esto es una herramienta de trabajo que se
@@ -47,17 +47,17 @@ const config: Config = {
         // rótulo de 11px bonito que ella no distingue es un rótulo inservible.
         // micro = 13.8px, menuda = 15.9px.
         micro: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.01em' }],
-        menuda: ['0.875rem', { lineHeight: '1.35rem', letterSpacing: '-0.006em' }],
-        base: ['0.9375rem', { lineHeight: '1.55', letterSpacing: '-0.009em' }],
+        menuda: ['0.9375rem', { lineHeight: '1.35rem', letterSpacing: '-0.006em' }],
+        base: ['1.0625rem', { lineHeight: '1.55', letterSpacing: '-0.009em' }],
         guia: ['1.0625rem', { lineHeight: '1.45', letterSpacing: '-0.012em' }],
-        titulo: ['1.3125rem', { lineHeight: '1.28', letterSpacing: '-0.021em' }],
+        titulo: ['1.875rem', { lineHeight: '1.28', letterSpacing: '-0.021em' }],
         cifra: ['1.375rem', { lineHeight: '1.15', letterSpacing: '-0.022em' }],
         cifraGrande: ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.026em' }],
         cifraEnorme: ['2.125rem', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
       },
       borderRadius: {
-        hoja: '8px',
-        pieza: '6px',
+        hoja: '20px',
+        pieza: '11px',
       },
       boxShadow: {
         // Sombras con desplazamiento real y difusión suave; nunca un halo plano.

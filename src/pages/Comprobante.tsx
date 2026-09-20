@@ -60,9 +60,7 @@ export default function Comprobante() {
                 <p className="rotulo">Comprobante de abono</p>
                 <h1 className="mt-0.5 text-guia font-semibold leading-snug">{pago.evento}</h1>
               </div>
-              <p className="cifra shrink-0 text-menuda text-tinta2">
-                No. {String(pago.id).padStart(5, '0')}
-              </p>
+              <p className="cifra shrink-0 text-menuda text-tinta2">No. {String(pago.id).padStart(5, '0')}</p>
             </div>
           </div>
 
@@ -82,11 +80,17 @@ export default function Comprobante() {
             {pago.nota && <Renglon rotulo="Nota">{pago.nota}</Renglon>}
           </div>
 
-          {/* El estado de cuenta después de este abono */}
+          {/* La cuenta actual del evento al emitir el comprobante */}
           <div className="border-t border-linea bg-hoja2 px-7 py-5">
-            <p className="rotulo mb-3">Cómo va su cupo</p>
+            <p className="rotulo mb-3">Estado actual de su cuenta</p>
             <dl className="space-y-1.5">
-              <ParClave clave="Precio del cupo" valor={formatoRD(cuenta.precio)} />
+              {!!pago.extra_habitacion && (
+                <>
+                  <ParClave clave="Precio del cupo" valor={formatoRD(pago.precio)} />
+                  <ParClave clave="Extra de habitación" valor={formatoRD(pago.extra_habitacion)} />
+                </>
+              )}
+              <ParClave clave="Total de su cuenta" valor={formatoRD(cuenta.precio)} />
               <ParClave clave="Ha pagado" valor={formatoRD(cuenta.pagado)} />
               <div className="flex items-baseline justify-between gap-4 border-t border-linea pt-2 text-guia">
                 <dt className="font-medium">
