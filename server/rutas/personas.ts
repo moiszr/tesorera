@@ -23,6 +23,7 @@ function filtrosDesdeUrl(c: any): FiltrosPersonas {
     pastor: q.pastor || undefined,
     categoria_id: entero(q.categoria_id) ?? undefined,
     estado,
+    habitacion: q.habitacion === 'sin' ? 'sin' : (entero(q.habitacion) ?? undefined),
     orden,
     incluir_archivadas: q.archivadas === '1',
   }
@@ -89,6 +90,17 @@ rutasPersonas.patch('/personas/:id', async (c) => {
   const actual = db.prepare('SELECT * FROM personas WHERE id = ?').get(id) as any
   if (!actual) return error(c, 'No encontré esa persona.', 404)
 
+  if (
+    cuerpo.archivada &&
+    db
+      .prepare(
+        'SELECT id FROM inscripciones WHERE persona_id = ? AND habitacion_id IS NOT NULL AND evento_id = (SELECT id FROM eventos WHERE activo=1 ORDER BY id DESC LIMIT 1)',
+      )
+      .get(id)
+  ) {
+    return error(c, 'Primero retira a esta persona de su habitación y revisa el reparto del extra.')
+  }
+
   const nombre = cuerpo.nombre !== undefined ? texto(cuerpo.nombre) : actual.nombre
   if (!nombre) return error(c, 'El nombre no puede quedar vacío.')
 
@@ -125,6 +137,11 @@ rutasPersonas.patch('/inscripciones/:id', async (c) => {
       .prepare('SELECT * FROM categorias WHERE id = ? AND evento_id = ?')
       .get(entero(cuerpo.categoria_id), actual.evento_id) as any
     if (!nueva) return error(c, 'Ese tipo de cupo no es de este evento.')
+    if (!nueva.incluye_alojamiento && actual.habitacion_id)
+      return error(
+        c,
+        'Primero retira a esta persona de su habitación y revisa el extra antes de elegir un cupo sin alojamiento.',
+      )
     categoriaId = nueva.id
     // Solo se arrastra el precio nuevo si nadie lo había tocado a mano.
     if (!actual.precio_a_mano && cuerpo.precio === undefined) precio = nueva.precio
@@ -160,7 +177,12 @@ rutasPersonas.post('/personas/:id/inscribir', async (c) => {
   const cat = db
     .prepare('SELECT * FROM categorias WHERE id = ? AND evento_id = ?')
     .get(categoriaId, evento.id) as any
-  if (!cat) return error(c, 'Elige el tipo de cupo de esta persona.')
+  if (!cat || cat.archivada) return error(c, 'Elige un tipo de cupo disponible para esta persona.')
+
+  if (cuerpo.precio !== undefined && !Number.isSafeInteger(cuerpo.precio))
+    return error(c, 'Escribe un precio válido para esta persona.')
+  const precio = cuerpo.precio === undefined ? cat.precio : entero(cuerpo.precio)
+  if (precio === null || precio < 0) return error(c, 'Escribe un precio válido para esta persona.')
 
   const ya = db
     .prepare('SELECT id FROM inscripciones WHERE persona_id = ? AND evento_id = ?')
@@ -168,7 +190,9 @@ rutasPersonas.post('/personas/:id/inscribir', async (c) => {
   if (ya) return error(c, 'Esta persona ya está inscrita en el evento.')
 
   const res = db
-    .prepare('INSERT INTO inscripciones (persona_id, evento_id, categoria_id, precio) VALUES (?, ?, ?, ?)')
-    .run(personaId, evento.id, cat.id, cat.precio)
+    .prepare(
+      'INSERT INTO inscripciones (persona_id, evento_id, categoria_id, precio, precio_a_mano) VALUES (?, ?, ?, ?, ?)',
+    )
+    .run(personaId, evento.id, cat.id, precio, precio !== cat.precio ? 1 : 0)
   return c.json({ id: Number(res.lastInsertRowid) }, 201)
 })

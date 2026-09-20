@@ -23,6 +23,8 @@ export type Categoria = {
   orden: number
   archivada: number
   inscritos: number
+  incluye_alojamiento: number
+  extra_privado: number | null
 }
 
 export type Evento = {
@@ -36,6 +38,7 @@ export type Evento = {
 
 export type PersonaEnLista = {
   id: number
+  archivada: number
   nombre: string
   telefono: string | null
   iglesia_id: number | null
@@ -46,6 +49,11 @@ export type PersonaEnLista = {
   categoria_id: number | null
   categoria: string | null
   precio: number
+  incluye_alojamiento: number
+  precio_base: number
+  extra_habitacion: number
+  habitacion_id: number | null
+  habitacion: string | null
   pagado: number
   balance: number
   excedente: number
@@ -100,6 +108,10 @@ export type Ficha = {
     categoria_id: number
     categoria: string
     precio: number
+    incluye_alojamiento: number
+    extra_habitacion: number
+    habitacion_id: number | null
+    habitacion: string | null
     precio_categoria: number
     precio_a_mano: number
     categoria_archivada: number
@@ -128,6 +140,41 @@ export type Resumen = {
     persona_id: number
     persona: string
   }[]
-  iglesias: { nombre: string; color: string; meta: number; recaudado: number; pendiente: number; personas: number }[]
-  categorias: { id: number; nombre: string; personas: number; meta: number; recaudado: number; pendiente: number }[]
+  iglesias: {
+    nombre: string
+    color: string
+    meta: number
+    recaudado: number
+    pendiente: number
+    personas: number
+  }[]
+  categorias: {
+    id: number
+    nombre: string
+    personas: number
+    meta: number
+    recaudado: number
+    pendiente: number
+  }[]
 }
+
+export type DatosHabitacion = import('../../server/db/habitaciones').DatosHabitacion
+export type PlanHabitacion = ReturnType<typeof import('../../server/db/habitaciones').prepararHabitacion>
+export type Habitacion = {
+  id: number
+  nombre: string
+  capacidad: number
+  categoria_privada_id: number | null
+  extra_total: number
+  notas: string | null
+  archivada: number
+  revision: number
+  cupo_privado: string | null
+  integrantes: PersonaEnLista[]
+}
+export type HabitacionesDatos = {
+  evento: Evento | null
+  habitaciones: Habitacion[]
+  personas: PersonaEnLista[]
+}
+export type ReporteDatos = ReturnType<typeof import('../../server/db/informes').informe>

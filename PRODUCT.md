@@ -8,15 +8,16 @@ web
 
 ## Stack
 
-Decidido antes de este init y registrado en CLAUDE.md / PLAN.md §3:
+Stack y distribución actuales, según `package.json`, `README.md` y `empaquetar/`:
 
 - Frontend: React 18 + Vite + TypeScript + Tailwind CSS
-- Backend: Hono sobre Node 20 (`@hono/node-server`) + `better-sqlite3`, sin ORM
+- Backend: Hono sobre Node 24 (mínimo 22; `@hono/node-server`) + `better-sqlite3`, sin ORM
 - Datos: SQLite en `data/tesorera.db`, respaldos en `data/respaldos/`
 - Un solo proceso en producción: Hono sirve `/api/*` y el `dist/` compilado en el puerto 5177
-- Distribución: `git clone` en la laptop + launcher de doble clic (`Tesorera.bat` es el
-  principal; la laptop destino es Windows). El launcher abre Chrome/Edge en modo
-  `--app=` para que se sienta una ventana de aplicación, no una pestaña.
+- Distribución: instalador Windows `Tesorera-Instalador.exe`, con Node y la app
+  compilada incluidos. No requiere instalar Git, Node ni npm. Crea accesos directos
+  al lanzador `Tesorera.vbs` y se instala en la carpeta de la usuaria, sin permisos
+  de administrador. El lanzador abre la app local en una ventana del navegador.
 - Sin login, sin usuarios, sin roles: una sola usuaria en una sola máquina.
 
 ## Users
@@ -77,7 +78,9 @@ inmediatamente después de guardar, sin volver al inicio ni buscar el botón otr
 
 **Cuando una persona paga por varias** (una mamá que abona por ella y sus hijos):
 sí ocurre, pero registrarlo persona por persona es aceptable siempre que el flujo
-sea rápido y encadenable. **No se modela el concepto de familia ni de grupo.**
+sea rápido y encadenable. No se modela una cuenta familiar ni un pago colectivo.
+Los grupos de alojamiento sí se organizan en Habitaciones; cada integrante
+conserva su cuenta y sus pagos individuales.
 
 **Entorno:** laptop Windows, offline. La app se abre con doble clic en un ícono
 llamado "Tesorera" y se cierra cerrando la ventana. No hay servidor, ni cuenta,
@@ -97,26 +100,82 @@ ni sincronización que ella deba entender o mantener.
 - Personas con nombre completo, iglesia, categoría de cupo, teléfono y notas.
 - Eventos con nombre y fechas. Un solo evento activo a la vez.
 - **Categorías de cupo configurables por evento**, cada una con su propio precio.
+  En la interfaz se presentan como "tipos de cupo", dentro de Cupos.
   El precio del cupo no depende solo de la edad sino del tipo de alojamiento
   ("Adulto — habitación familiar", "Adulto — habitación compartida", "Niño", …),
   y la usuaria puede agregar tipos nuevos hasta el día del evento sin que nadie
-  toque código. Se gestionan en Ajustes: agregar, renombrar, cambiar precio,
+  toque código. Se gestionan en Cupos: agregar, renombrar, cambiar precio,
   reordenar, archivar.
 - El precio se copia como foto en la inscripción y es editable (descuentos,
   becas); cambiar el precio de una categoría nunca reescribe inscripciones
   existentes en silencio — hay un botón explícito para aplicarlo a quienes no han
   pagado completo, y avisa a cuántas personas afectará.
-- Iglesias como etiqueta y filtro, con color propio.
+- Cada tipo de cupo indica si incluye alojamiento y puede ofrecer un extra
+  total configurable para una habitación privada. Este extra es el total de la
+  habitación, no un importe por persona. Las habitaciones tienen nombre, capacidad
+  e integrantes; el extra se reparte entre ellos en centavos, sin alterar el
+  precio base, el descuento ni los pagos de cada inscripción.
+- Antes de guardar una habitación o cambiar sus integrantes se revisan los
+  importes afectados. Si cambió la información desde la revisión, se exige
+  revisarla otra vez. Los traslados se guardan completos o no se guardan; el
+  historial de cambios se conserva. La habitación mantiene la foto del extra
+  elegido y cualquier actualización posterior exige una decisión explícita.
+- Iglesias como etiqueta y filtro, con color propio y una sección Iglesias para
+  administrarlas y abrir sus personas. Cada iglesia muestra recaudado, por cobrar,
+  total, cantidades por estado y cualquier excedente. Participantes y Archivadas
+  separan sus listas; los importes incluyen las cuentas archivadas para conservar
+  el total recaudado. Los nombres siguen un orden natural en español, también
+  en los selectores: iglesia 9 antes de iglesia 10.
+- Navegación: Inicio, Personas, Iglesias, Habitaciones, Cupos y Reportes; Ajustes queda separado.
+  Habitaciones también se abre desde Personas y desde la cuenta individual.
+- Personas conserva búsqueda y filtros al abrir la cuenta, cobrar, crear o editar.
+  La cuenta abre en el diálogo compartido, lateral de hasta 560px por defecto
+  o centrado de hasta 640px, con el nombre real fijo arriba y el contenido
+  desplazable. El icono Centrar / Al lateral permite elegir la posición y recordarla
+  sin perder el abono en curso; en móvil se oculta esta opción y ambas posiciones
+  se adaptan al mismo espacio. Cobrar, ver
+  historial, editar y anular conservan ese contexto; cerrar vuelve a la lista.
+  Pagos muestra el historial y el número de pagos válidos; Datos reúne estado de
+  pago, iglesia, teléfono, tipo y precio del cupo, extra privado cuando corresponde,
+  habitación y notas. Los valores editables abren el editor correspondiente;
+  iglesia, teléfono y notas enfocan el campo elegido. Registrar pago, Editar y
+  Archivar o Devolver a la lista comparten el pie fijo de Pagos y Datos. En móvil
+  Registrar pago ocupa una fila sobre las otras acciones. Al abrir el formulario
+  el pie se oculta para dejar Guardar pago como acción principal. Cada pago
+  tiene un menú para ver su comprobante o anularlo con confirmación. Registrar
+  pago abre el monto enfocado y Guardar pago confirma el abono. Crear abre un
+  diálogo sin perder filtros. Tras guardar, la misma cuenta confirma el pago y
+  ofrece comprobante, continuar con otra persona o registrar otro abono aquí.
+- Personas archivadas tiene una lista lateral con búsqueda propia, independiente
+  de los filtros de personas activas. Permite abrir cada cuenta y devolverla a la
+  lista mediante una acción visible con confirmación.
+- Habitaciones muestra personas pagadas y saldo por cobrar al grupo en tarjetas
+  de altura uniforme, con espacios libres y extra total juntos. Ver integrantes
+  abre el diálogo lateral compartido de hasta 560px; Editar y Archivar o Devolver
+  siguen visibles a la izquierda. Las habitaciones activas y archivadas se
+  consultan por separado.
+- Iglesias y Habitaciones comparten la escala de cifras y las acciones de
+  Personas: Ver, Editar y Archivar o Devolver. En Iglesias, recaudado, por cobrar
+  y total tienen la misma jerarquía.
+- Cupos presenta una tabla con el ritmo de Personas, acciones explícitas Editar
+  y Archivar y el botón principal Agregar tipo de cupo en el encabezado exterior.
+  El editor conserva su disposición y ancho máximo de 820px.
 - Abonos parciales con monto, fecha, método (efectivo / transferencia / otro) y nota.
-- Estados derivados, nunca almacenados: **Pagado** (pagado ≥ precio) ·
-  **Abonando** (0 < pagado < precio) · **Sin pagos** (pagado = 0). El excedente se
-  avisa con discreción, no como error.
+  Los campos de dinero muestran RD$, agrupan miles con coma y usan punto decimal
+  mientras se escribe, conservan el cursor y permiten pegar importes válidos.
+- Estados derivados, nunca almacenados, sobre el total de precio base más extra
+  de habitación: **Pagado** (pagado ≥ total) · **Abonando** (0 < pagado < total) ·
+  **Sin pagos** (pagado = 0). El excedente se avisa con discreción, no como error.
 - Búsqueda que ignora tildes y mayúsculas ("jose" encuentra "José").
 - **Comprobante para el hermano que abona**: cuánto pagó y cuánto le falta, en algo
   que ella pueda imprimir o mandar por WhatsApp. *(Confirmado en este init; deja de
   ser un extra opcional.)*
-- **Reporte para el pastor o comité**: lo recaudado, separado por iglesia.
-  *(Confirmado en este init.)*
+- **Reportes para el pastor o comité**: vistas por iglesia, pagos recibidos,
+  pendientes y habitaciones; resumen visual de estados, métodos de pago y cobros
+  por mes. Se puede filtrar por iglesia y período, descargar la tabla en CSV e
+  imprimir. Las fechas filtran solo los cobros: recaudado acumulado y pendiente
+  siguen mostrando los saldos actuales, incluyendo personas archivadas para no
+  ocultar dinero. Los pagos anulados se excluyen de lo recaudado.
 - Exportar a CSV y respaldar la base con un botón.
 
 **Restricciones duras:**
@@ -145,13 +204,9 @@ ORMs, Redux, Next.js o UI kits grandes; pantallas de configuración complejas
 **Abierto, no decidido:**
 
 - Si el comprobante se entrega impreso, como imagen para WhatsApp, o ambas.
-- Si el reporte al pastor es al cierre del evento o periódico.
-- Qué tan seguido y de qué forma le piden cuentas (define si el reporte necesita
-  rango de fechas o solo el total acumulado).
+- Qué tan seguido le piden cuentas; los reportes ya permiten elegir un período
+  para cobros y muestran por separado los saldos acumulados actuales.
 - Cuántas categorías de cupo tendrá el evento real y cómo se llaman.
-- **Cómo llamarlas en la interfaz.** "Categoría" es el nombre en el código, pero
-  puede sonar a jerga para ella; el rótulo en pantalla podría ser "tipo de cupo"
-  o el que ella use hablando. Decidir con el usuario antes de maquetar Ajustes.
 
 ## Brand Commitments
 

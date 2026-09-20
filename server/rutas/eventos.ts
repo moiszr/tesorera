@@ -44,9 +44,7 @@ rutasEventos.patch('/eventos/:id', async (c) => {
 
   db.transaction(() => {
     if (cuerpo.activo) db.prepare('UPDATE eventos SET activo = 0').run()
-    db.prepare(
-      'UPDATE eventos SET nombre = ?, fecha_inicio = ?, fecha_fin = ?, activo = ? WHERE id = ?',
-    ).run(
+    db.prepare('UPDATE eventos SET nombre = ?, fecha_inicio = ?, fecha_fin = ?, activo = ? WHERE id = ?').run(
       nombre,
       cuerpo.fecha_inicio !== undefined ? texto(cuerpo.fecha_inicio) : actual.fecha_inicio,
       cuerpo.fecha_fin !== undefined ? texto(cuerpo.fecha_fin) : actual.fecha_fin,
@@ -60,15 +58,17 @@ rutasEventos.patch('/eventos/:id', async (c) => {
 
 // ── Categorías del evento (aquí viven los precios) ────────────────────────
 
-rutasEventos.get('/eventos/:id/categorias', (c) =>
-  c.json(categoriasDeEvento(Number(c.req.param('id')))),
-)
+rutasEventos.get('/eventos/:id/categorias', (c) => c.json(categoriasDeEvento(Number(c.req.param('id')))))
 
 rutasEventos.post('/eventos/:id/categorias', async (c) => {
   const eventoId = Number(c.req.param('id'))
   const cuerpo = await c.req.json().catch(() => ({}))
   const nombre = texto(cuerpo.nombre)
   const precio = entero(cuerpo.precio)
+  const alojamiento = cuerpo.incluye_alojamiento === undefined ? 1 : cuerpo.incluye_alojamiento ? 1 : 0
+  const extra = alojamiento ? (cuerpo.extra_privado ?? null) : null
+  if (extra !== null && (!Number.isSafeInteger(extra) || extra < 0))
+    return error(c, 'Escribe un extra válido por habitación.')
 
   if (!nombre) return error(c, 'Ponle nombre al tipo de cupo, por ejemplo "Adulto — habitación familiar".')
   if (precio === null || precio < 0) return error(c, 'Escribe cuánto cuesta este tipo de cupo.')
@@ -87,8 +87,10 @@ rutasEventos.post('/eventos/:id/categorias', async (c) => {
     .get(eventoId) as any
 
   const res = db
-    .prepare('INSERT INTO categorias (evento_id, nombre, precio, orden) VALUES (?, ?, ?, ?)')
-    .run(eventoId, nombre, precio, entero(cuerpo.orden) ?? siguiente.n)
+    .prepare(
+      'INSERT INTO categorias (evento_id, nombre, precio, orden, extra_privado, incluye_alojamiento) VALUES (?, ?, ?, ?, ?, ?)',
+    )
+    .run(eventoId, nombre, precio, entero(cuerpo.orden) ?? siguiente.n, extra, alojamiento)
 
   return c.json({ id: Number(res.lastInsertRowid) }, 201)
 })
@@ -113,11 +115,33 @@ rutasEventos.patch('/categorias/:id', async (c) => {
   const precio = cuerpo.precio !== undefined ? entero(cuerpo.precio) : actual.precio
   if (precio === null || precio < 0) return error(c, 'El precio no puede quedar vacío.')
 
-  db.prepare('UPDATE categorias SET nombre = ?, precio = ?, orden = ?, archivada = ? WHERE id = ?').run(
+  const alojamiento =
+    cuerpo.incluye_alojamiento === undefined ? actual.incluye_alojamiento : cuerpo.incluye_alojamiento ? 1 : 0
+  if (
+    !alojamiento &&
+    db.prepare('SELECT id FROM inscripciones WHERE categoria_id=? AND habitacion_id IS NOT NULL').get(id)
+  )
+    return error(
+      c,
+      'Este cupo tiene personas en habitaciones. Retíralas de sus habitaciones antes de quitar el alojamiento.',
+    )
+  const extra = alojamiento
+    ? cuerpo.extra_privado === undefined
+      ? actual.extra_privado
+      : cuerpo.extra_privado
+    : null
+  if (extra !== null && (!Number.isSafeInteger(extra) || extra < 0))
+    return error(c, 'Escribe un extra válido por habitación.')
+
+  db.prepare(
+    'UPDATE categorias SET nombre = ?, precio = ?, orden = ?, archivada = ?, extra_privado = ?, incluye_alojamiento = ? WHERE id = ?',
+  ).run(
     nombre,
     precio,
     cuerpo.orden !== undefined ? entero(cuerpo.orden) : actual.orden,
     cuerpo.archivada !== undefined ? (cuerpo.archivada ? 1 : 0) : actual.archivada,
+    extra,
+    alojamiento,
     id,
   )
   return c.json({ ok: true })

@@ -16,8 +16,7 @@ rutasPagos.post('/pagos', async (c) => {
   if (monto === null || monto <= 0) return error(c, 'Escribe cuánto está abonando.')
 
   const db = conectar()
-  const inscripcion = db
-    .prepare('SELECT * FROM inscripciones WHERE id = ?').get(inscripcionId) as any
+  const inscripcion = db.prepare('SELECT * FROM inscripciones WHERE id = ?').get(inscripcionId) as any
   if (!inscripcion) return error(c, 'Esta persona no está inscrita en el evento.', 404)
 
   const metodo = String(cuerpo.metodo ?? 'efectivo')
@@ -64,7 +63,7 @@ rutasPagos.get('/pagos/:id/comprobante', (c) => {
   const pago = db
     .prepare(
       `SELECT pg.*, per.id AS persona_id, per.nombre AS persona,
-              g.nombre AS iglesia, c.nombre AS categoria, i.precio,
+              g.nombre AS iglesia, c.nombre AS categoria, i.precio, i.evento_id, i.extra_habitacion,
               e.nombre AS evento, e.fecha_inicio
          FROM pagos pg
          JOIN inscripciones i ON i.id = pg.inscripcion_id
@@ -77,7 +76,7 @@ rutasPagos.get('/pagos/:id/comprobante', (c) => {
     .get(id) as any
   if (!pago) return error(c, 'No encontré ese pago.', 404)
 
-  const ficha = fichaPersona(pago.persona_id)
+  const ficha = fichaPersona(pago.persona_id, db, pago.evento_id)
   // Cuánto llevaba pagado hasta ese pago, incluyéndolo (los anulados no cuentan).
   const hasta = db
     .prepare(

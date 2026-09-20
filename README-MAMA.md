@@ -1,123 +1,61 @@
 # Tesorera — guía rápida
 
-Esta app lleva la cuenta de lo que cada hermano va abonando para la convención.
-Todo se guarda en esta laptop. No hace falta internet.
+Tesorera lleva la cuenta de los pagos de la convención. Todo se guarda en esta laptop; no hace falta internet para usarla.
 
----
+## Abrir Tesorera
 
-## Para abrir la app
+Haz doble clic en el icono **Tesorera** del Escritorio.
 
-Haz **doble clic en el ícono "Tesorera"** del Escritorio.
+## Registrar un pago
 
-La primera vez tarda como un minuto en abrir; después abre rápido. Si ves una
-ventana negra un momento, es normal — no la cierres, se va sola.
+1. Entra a **Personas**, busca el nombre y toca **Cobrar**.
+2. Escribe cuánto está abonando. El monto se acomoda solo, por ejemplo **1,500.50**. También puedes usar **Usar el saldo pendiente**.
+3. Toca **Guardar pago**.
 
-**Para cerrarla:** cierra la ventana de Tesorera como cualquier otra ventana.
+La cuenta confirma el pago y muestra cuánto falta. Puedes abrir **Ver comprobante**, registrar otro abono o tocar **Cobrar a otra persona**.
 
----
+Si necesitas cambiar la fecha, la forma de pago o añadir una nota, abre **Fecha, forma de pago y nota** antes de guardar.
 
-## Registrar un pago (lo que más vas a hacer)
+## Agregar o consultar una persona
 
-1. Toca **Registrar pago** en la barra de la izquierda.
-2. **Escribe el nombre** de quien está pagando. No hace falta poner tildes: si
-   escribes *jose* aparece *José*. Toca a la persona en la lista.
-3. **Escribe cuánto está abonando.** También puedes tocar uno de los botones de
-   monto rápido, o **Saldar** si va a pagar todo lo que le falta.
-4. Toca **Guardar pago**.
+En **Personas → Agregar persona**, escribe su nombre, elige su iglesia y su tipo de cupo. El teléfono y las notas son opcionales.
 
-Listo. A la derecha aparece cuánto lleva pagado y cuánto le falta, y la pantalla
-queda lista para el siguiente de la fila sin que toques nada.
+Toca el nombre de una persona para abrir su cuenta. **Pagos** muestra sus abonos; **Datos** reúne estado, iglesia, teléfono, cupo, habitación y notas. Puedes tocar el lápiz de un dato para editarlo, o usar **Editar** al pie.
 
-> **Truco:** puedes hacerlo todo sin soltar el teclado. Escribe el nombre, presiona
-> **Enter**, escribe el monto, presiona **Enter** otra vez.
+El icono junto al cierre permite centrar el detalle o volver a ponerlo al lado. La app recuerda esa elección.
 
----
+## Corregir un pago
 
-## Agregar una persona nueva
+1. Abre la cuenta y entra a **Pagos**.
+2. Toca los **tres puntos** del pago y elige **Anular pago**.
+3. Revisa el monto y confirma con **Sí, anular pago**.
 
-1. Toca **Personas** y después **Agregar persona**.
-2. Escribe el **nombre completo**.
-3. Toca la **iglesia** a la que pertenece.
-4. Toca el **tipo de cupo** (cada botón dice cuánto cuesta).
-5. Toca **Guardar persona**.
+El pago queda tachado, no se borra. La cuenta se corrige sola. En ese mismo menú está **Ver comprobante** para consultar o imprimir un recibo anterior.
 
-El teléfono y las notas son opcionales.
+## Iglesias
 
----
+En **Iglesias** puedes agregar o editar las iglesias y consultar su total, lo recaudado y lo pendiente. **Ver** abre sus personas.
 
-## Buscar a alguien y ver su cuenta
+## Cupos y habitaciones
 
-Toca **Personas** y escribe el nombre arriba. Toca a la persona para ver su ficha:
-cuánto cuesta su cupo, cuánto ha pagado, cuánto le falta y todos sus abonos con
-la fecha.
+- **Cupos** permite agregar tipos, precios y si incluyen alojamiento. Si un tipo permite habitación privada, puedes indicar el extra total del grupo.
+- **Habitaciones** permite crear un grupo, indicar su capacidad y asignar integrantes. También puedes asignar una habitación desde **Datos** de una persona.
+- El extra de una habitación privada se reparte entre sus integrantes: si el extra es RD$ 1,000, esos RD$ 1,000 son del grupo completo. Antes de guardar, la app muestra cómo cambia la cuenta de cada integrante.
+- Cambiar el precio de un tipo de cupo no cambia las cuentas existentes en silencio. La opción de aplicar el precio muestra primero a quién afecta.
 
-También puedes filtrar tocando los botoncitos de arriba: por cómo va (Pagado,
-Abonando, Sin pagos), por tipo de cupo o por iglesia.
+## Consultar lo recaudado
 
----
+En **Reportes** puedes consultar lo recaudado por iglesia, los pagos recibidos, los saldos pendientes y las habitaciones. Puedes elegir fechas e iglesia, imprimir o exportar la información.
 
-## Me equivoqué en un pago
+## Archivar y recuperar
 
-Ningún pago se borra, pero se puede **anular**, que es lo mismo que tacharlo:
+**Archivar** oculta una persona de la lista activa; sus pagos se conservan. Para recuperarla, abre **Archivadas** y elige **Devolver a la lista**. Iglesias y habitaciones también tienen su propia lista de archivadas.
 
-1. Entra a la ficha de la persona.
-2. En el historial, busca el pago malo y toca el círculo tachado **⊘** a la derecha.
-3. Te pregunta si estás segura. Puedes escribir por qué (por ejemplo:
-   *"me equivoqué de persona"*).
-4. Toca **Sí, anular este pago**.
+## Respaldar y actualizar
 
-El pago queda tachado en el historial y la cuenta se corrige sola.
+- Se crea un respaldo al abrir la app. También puedes hacerlo en **Ajustes → Hacer respaldo ahora**.
+- **Ajustes → Exportar a Excel** permite guardar una copia de la información para consultar.
+- Para actualizar desde una versión anterior, haz un respaldo, reinicia Windows y ejecuta el instalador nuevo en la misma carpeta. No desinstales ni borres la carpeta de Tesorera: allí están tus datos.
+- El instalador nuevo conserva los pagos de la instalación anterior.
 
----
-
-## Darle un comprobante a quien pagó
-
-Después de guardar un pago, a la derecha aparece **Comprobante para [nombre]**.
-Tócalo y verás el recibo.
-
-- Para **imprimirlo**: toca *Imprimir comprobante*.
-- Para **mandarlo por WhatsApp**: tómale una foto a la pantalla.
-
-También puedes sacar el comprobante de cualquier pago viejo desde la ficha de la
-persona, con el botón de la impresora al lado del pago.
-
----
-
-## Rendir cuentas al pastor
-
-Toca **Ajustes** y después **Reporte por iglesia**. Ahí sale lo recaudado, lo que
-falta, y todo separado por iglesia y por tipo de cupo. Tiene una línea al final
-para firmar. Tócale *Imprimir reporte*.
-
----
-
-## Cambiar precios o agregar un tipo de cupo
-
-Todo eso está en **Ajustes**:
-
-- **Tipos de cupo y precios**: aquí agregas un tipo nuevo, le cambias el nombre o
-  el precio, o lo archivas si ya no se usa.
-- Si **cambias un precio**, la app te pregunta primero si se lo aplica a los que
-  todavía no han pagado completo, y te dice a cuántas personas les cambiaría.
-  **Nadie cambia sin que tú digas que sí.**
-- Quien ya pagó completo nunca cambia. Quien tenga una beca (precio puesto a
-  mano) tampoco.
-
----
-
-## Tus datos están seguros
-
-- La app hace un **respaldo sola cada vez que la abres**, y guarda los últimos 30.
-- Si quieres hacer uno ahora mismo: **Ajustes → Hacer respaldo ahora**.
-- Para pasarle los datos a alguien en Excel: **Ajustes → Exportar a Excel**.
-- **Nada se borra nunca.** Los pagos se anulan (quedan tachados) y las personas
-  se archivan (dejan de aparecer, pero su historial sigue completo).
-
----
-
-## Si algo se ve raro
-
-Cierra la ventana de Tesorera y vuelve a abrirla con el ícono del Escritorio.
-Tus datos no se pierden.
-
-Si sigue raro, llama a Moisés y dile qué estabas haciendo cuando pasó.
+Si algo no funciona, avisa a Moisés y dile qué estabas haciendo.

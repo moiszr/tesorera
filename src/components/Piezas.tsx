@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useId, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { NOMBRE_ESTADO, proporcionPagada, type Estado } from '../lib/estados'
 import { formatoRD, soloNumero } from '../lib/dinero'
 import { IconoAviso } from './Iconos'
@@ -16,9 +16,9 @@ type PropsBoton = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const VARIANTES: Record<TipoBoton, string> = {
-  principal: 'bg-accion text-white hover:bg-accionAlto shadow-[0_1px_2px_rgba(99,91,255,0.35)]',
+  principal: 'bg-accion text-white hover:bg-accionAlto ',
   contorno: 'bg-hoja text-tinta border border-lineaFuerte hover:border-tinta3 hover:bg-hoja2',
-  suave: 'bg-[rgba(99,91,255,0.09)] text-accionTexto hover:bg-[rgba(99,91,255,0.15)]',
+  suave: 'bg-accionSuave text-accionTexto hover:bg-accionSuave',
   texto: 'text-tinta2 hover:text-tinta hover:bg-[rgba(24,24,27,0.05)]',
 }
 
@@ -50,7 +50,13 @@ function Girador() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden className="animate-spin">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.4" opacity="0.25" fill="none" />
-      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        fill="none"
+      />
     </svg>
   )
 }
@@ -68,7 +74,8 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
   { etiqueta, ayuda, problema, adorno, className = '', id, ...resto },
   ref,
 ) {
-  const idCampo = id ?? `campo-${resto.name ?? etiqueta?.replace(/\s+/g, '-').toLowerCase()}`
+  const unico = useId()
+  const idCampo = id ?? `campo-${unico}`
   return (
     <div className="w-full">
       {etiqueta && (
@@ -78,12 +85,16 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
       )}
       <div className="relative">
         {adorno && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tinta3">{adorno}</span>
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tinta3">
+            {adorno}
+          </span>
         )}
         <input
           ref={ref}
           id={idCampo}
           {...resto}
+          data-autofocus={resto.autoFocus || undefined}
+          aria-describedby={problema || ayuda ? `${idCampo}-ayuda` : resto['aria-describedby']}
           aria-invalid={problema ? true : undefined}
           className={[
             'w-full min-h-[46px] rounded-pieza bg-hoja px-3 py-2 text-tinta',
@@ -97,12 +108,14 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
         />
       </div>
       {problema ? (
-        <p className="mt-1.5 flex items-start gap-1.5 text-menuda text-accionTexto">
+        <p id={`${idCampo}-ayuda`} className="mt-1.5 flex items-start gap-1.5 text-menuda text-accionTexto">
           <IconoAviso tam={15} className="mt-0.5 shrink-0" />
           {problema}
         </p>
       ) : ayuda ? (
-        <p className="mt-1.5 text-menuda text-tinta2">{ayuda}</p>
+        <p id={`${idCampo}-ayuda`} className="mt-1.5 text-menuda text-tinta2">
+          {ayuda}
+        </p>
       ) : null}
     </div>
   )
@@ -113,15 +126,23 @@ export const Campo = forwardRef<HTMLInputElement, PropsCampo>(function Campo(
 
 const COLOR_ESTADO: Record<Estado, { fondo: string; tinta: string; marca: string }> = {
   pagado: { fondo: 'var(--pagado-fondo)', tinta: 'var(--pagado-tinta)', marca: 'var(--pagado-marca)' },
-  abonando: { fondo: 'var(--abonando-fondo)', tinta: 'var(--abonando-tinta)', marca: 'var(--abonando-marca)' },
-  sinpagos: { fondo: 'var(--sinpagos-fondo)', tinta: 'var(--sinpagos-tinta)', marca: 'var(--sinpagos-marca)' },
+  abonando: {
+    fondo: 'var(--abonando-fondo)',
+    tinta: 'var(--abonando-tinta)',
+    marca: 'var(--abonando-marca)',
+  },
+  sinpagos: {
+    fondo: 'var(--sinpagos-fondo)',
+    tinta: 'var(--sinpagos-tinta)',
+    marca: 'var(--sinpagos-marca)',
+  },
 }
 
 export function ChipEstado({ estado, className = '' }: { estado: Estado; className?: string }) {
   const c = COLOR_ESTADO[estado]
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-1 text-base font-medium ${className}`}
+      className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-1 text-menuda font-medium ${className}`}
       style={{ background: c.fondo, color: c.tinta }}
     >
       <span className="h-[7px] w-[7px] rounded-full" style={{ background: c.marca }} aria-hidden />
@@ -161,7 +182,7 @@ export function BarraProgreso({
       style={{ height: alto, background: 'var(--linea)' }}
     >
       <div
-        className="h-full origin-left rounded-full transition-transform duration-[420ms] ease-salida"
+        className="h-full origin-left rounded-full transition-transform duration-[240ms] ease-salida"
         style={{ background: c.marca, transform: `scaleX(${proporcion})` }}
       />
     </div>
@@ -249,7 +270,9 @@ export function EtiquetaIglesia({
 }) {
   if (!nombre) return <span className="text-menuda text-tinta3">Sin iglesia</span>
   return (
-    <span className={`inline-flex min-w-0 max-w-full items-center gap-1.5 text-menuda text-tinta2 ${className}`}>
+    <span
+      className={`inline-flex min-w-0 max-w-full items-center gap-1.5 text-menuda text-tinta2 ${className}`}
+    >
       <span
         className="h-2 w-2 shrink-0 rounded-full"
         style={{ background: colorIglesia(color) }}
@@ -286,13 +309,17 @@ export function EstadoVacio({
 function RayasDecorativas() {
   return (
     <svg width="64" height="48" viewBox="0 0 64 48" aria-hidden className="text-linea">
-      <rect x="0.75" y="0.75" width="62.5" height="46.5" rx="5" fill="var(--hoja-2)" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M14 16h36M14 25h26M14 34h18"
+      <rect
+        x="0.75"
+        y="0.75"
+        width="62.5"
+        height="46.5"
+        rx="5"
+        fill="var(--hoja-2)"
         stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
+        strokeWidth="1.5"
       />
+      <path d="M14 16h36M14 25h26M14 34h18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   )
 }

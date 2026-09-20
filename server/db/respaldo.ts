@@ -1,6 +1,6 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
-import { ARCHIVO_DB, CARPETA_RESPALDOS } from './conexion'
+import { ARCHIVO_DB, CARPETA_RESPALDOS, conectar } from './conexion'
 
 const CUANTOS_GUARDAR = 30
 
@@ -16,10 +16,15 @@ export function hacerRespaldo(): { ruta: string; nombre: string } | null {
   const d = new Date()
   const p = (n: number) => String(n).padStart(2, '0')
   const sello = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`
-  const nombre = `tesorera-${sello}.db`
+  let nombre = `tesorera-${sello}.db`
+  for (let n = 2; existsSync(join(CARPETA_RESPALDOS, nombre)); n++) {
+    nombre = `tesorera-${sello}-${n}.db`
+  }
   const ruta = join(CARPETA_RESPALDOS, nombre)
 
-  copyFileSync(ARCHIVO_DB, ruta)
+  // SQLite incluye también los cambios confirmados que siguen en el WAL.
+  // Copiar solo tesorera.db puede producir un respaldo incompleto.
+  conectar().prepare('VACUUM INTO ?').run(ruta)
   limpiarViejos()
   return { ruta, nombre }
 }
