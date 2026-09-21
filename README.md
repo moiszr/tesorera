@@ -63,9 +63,9 @@ son 15 MB de peso muerto—.
 
 ## Actualizar la app en su laptop
 
-Hacer un respaldo desde Ajustes, reiniciar Windows y ejecutar el instalador nuevo en la misma carpeta. **Los pagos no se tocan**:
-el instalador sobrescribe archivo por archivo y en ningún momento borra la
-carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borra.
+Guardar los cambios, cerrar la ventana de Tesorera y ejecutar el instalador nuevo. Recuerda la carpeta anterior y cierra únicamente el motor de esa instalación antes de reemplazar los archivos. **Las cuentas activas se conservan**; no sobrescribe `data\` y desinstalar tampoco la borra.
+
+En 1.2.0 se eliminan las personas archivadas y sus pagos una sola vez al arrancar, por decisión explícita del usuario. Antes se crea una copia SQLite íntegra `data/respaldos/tesorera-antes-v1.2.0-…db`, excluida de la rotación cotidiana. Si falla el respaldo o la limpieza, la transición no se confirma. Los extras de las habitaciones afectadas se reparten entre quienes permanecen.
 
 ## Decisiones que conviene no romper
 
