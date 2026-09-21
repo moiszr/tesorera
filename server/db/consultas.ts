@@ -1,4 +1,5 @@
 import type Database from 'better-sqlite3'
+import { firmaDePago } from './firma'
 import { conectar } from './conexion'
 import { calcularBalance, calcularEstado, calcularExcedente, type Estado } from '../../src/lib/estados'
 import { normalizar } from '../../src/lib/fechas'
@@ -85,7 +86,7 @@ export function categoriasDeEvento(eventoId: number, db: Database.Database = con
   return db
     .prepare(
       `SELECT c.*,
-              (SELECT COUNT(*) FROM inscripciones i WHERE i.categoria_id = c.id) AS inscritos
+              (SELECT COUNT(*) FROM inscripciones i JOIN personas p ON p.id=i.persona_id WHERE i.categoria_id = c.id AND p.archivada=0) AS inscritos
          FROM categorias c
         WHERE c.evento_id = ?
         ORDER BY c.archivada ASC, c.orden ASC, c.id ASC`,
@@ -97,7 +98,7 @@ export function categoria(id: number, db: Database.Database = conectar()): Categ
   const fila = db
     .prepare(
       `SELECT c.*,
-              (SELECT COUNT(*) FROM inscripciones i WHERE i.categoria_id = c.id) AS inscritos
+              (SELECT COUNT(*) FROM inscripciones i JOIN personas p ON p.id=i.persona_id WHERE i.categoria_id = c.id AND p.archivada=0) AS inscritos
          FROM categorias c WHERE c.id = ?`,
     )
     .get(id) as Categoria | undefined
@@ -115,7 +116,7 @@ export function inscripcionesAfectadas(categoriaId: number, db: Database.Databas
   const fila = db
     .prepare(
       `SELECT COUNT(*) AS cuantas FROM inscripciones i
-        WHERE i.categoria_id = @cat
+        WHERE i.categoria_id = @cat AND EXISTS (SELECT 1 FROM personas per WHERE per.id=i.persona_id AND per.archivada=0)
           AND i.precio_a_mano = 0
           AND i.precio <> @precio
           AND ${PAGADO_SQL} < (i.precio + i.extra_habitacion)`,
@@ -136,7 +137,7 @@ export function aplicarPrecioDeCategoria(categoriaId: number, db: Database.Datab
           AND precio <> @precio
           AND id IN (
             SELECT i.id FROM inscripciones i
-             WHERE i.categoria_id = @cat AND ${PAGADO_SQL} < (i.precio + i.extra_habitacion)
+             WHERE i.categoria_id = @cat AND EXISTS (SELECT 1 FROM personas per WHERE per.id=i.persona_id AND per.archivada=0) AND ${PAGADO_SQL} < (i.precio + i.extra_habitacion)
           )`,
     )
     .run({ cat: categoriaId, precio: cat.precio })
@@ -360,7 +361,7 @@ export function fichaPersona(id: number, db: Database.Database = conectar(), eve
       excedente: calcularExcedente(pagado, precio),
       estado: calcularEstado(pagado, precio),
     },
-    pagos,
+    pagos: pagos.map((p) => ({ ...p, firma: firmaDePago(p, db) })),
   }
 }
 
@@ -372,7 +373,7 @@ export function resumen(db: Database.Database = conectar()) {
     return { evento: null, totales: null, ultimos_pagos: [], iglesias: [], categorias: [] }
   }
 
-  const personas = listarPersonas({ incluir_archivadas: true }, db).filter((p) => p.inscripcion_id != null)
+  const personas = listarPersonas({}, db).filter((p) => p.inscripcion_id != null)
 
   const meta = personas.reduce((s, p) => s + p.precio, 0)
   const recaudado = personas.reduce((s, p) => s + Math.min(p.pagado, p.precio), 0)
@@ -422,7 +423,7 @@ export function resumen(db: Database.Database = conectar()) {
          FROM pagos pg
          JOIN inscripciones i ON i.id = pg.inscripcion_id
          JOIN personas per ON per.id = i.persona_id
-        WHERE i.evento_id = ? AND pg.anulado = 0
+        WHERE i.evento_id = ? AND pg.anulado = 0 AND per.archivada = 0
         -- Se ordena por la FECHA DEL PAGO, no por cuándo se digitó: la lista se
         -- titula "Últimos pagos" y ella la lee como fechas. Ordenar por
         -- creado_en dejaba "hace 2 días" encima de "1 de agosto".

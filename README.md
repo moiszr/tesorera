@@ -77,7 +77,7 @@ carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borr
 - **El precio vive en las categorías, no en el evento.** La inscripción guarda
   una *foto* del precio; `precio_a_mano = 1` marca las becas para que
   "aplicar precio" no las pise.
-- **Nada se borra.** Pagos → `anulado = 1`. Personas e iglesias → `archivada = 1`.
+- **Correcciones explícitas.** Los pagos se editan o eliminan con respaldo previo. Eliminar una persona borra sus pagos e inscripciones de todos los eventos en una transacción, con confirmación y revisión del reparto de habitación. En la transición 1.2.0 se eliminan las personas archivadas y sus pagos, una sola vez, con copia previa protegida; se conservan las cuentas activas. Iglesias y habitaciones conservan el archivo.
 - **La búsqueda ignora tildes**: `personas.nombre_busqueda` guarda el nombre
   normalizado; se actualiza en cada insert/update de persona.
 

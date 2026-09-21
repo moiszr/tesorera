@@ -2756,3 +2756,60 @@ button.accion-archivar:hover {
     margin-right: 0;
   }
 }
+
+/* Correcciones de cuenta: la misma escala discreta del detalle. */
+.accion-eliminar {
+  color: #a83240;
+  background: #fff1f2;
+}
+.accion-eliminar:hover {
+  background: #ffe4e7;
+  color: #8b2532;
+}
+.boton-eliminar {
+  background: #a83240 !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+.boton-eliminar:hover {
+  background: #8b2532 !important;
+}
+.revision-cuenta {
+  display: grid;
+  gap: 18px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.revision-importes {
+  padding-block: 14px;
+  border-block: 1px solid var(--linea, #e2e5ec);
+}
+.revision-importes > div {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding-block: 5px;
+}
+.revision-importes dt {
+  color: #596479;
+}
+.revision-importes dd {
+  font-weight: 600;
+  text-align: right;
+}
+.revision-habitaciones {
+  display: grid;
+  gap: 16px;
+}
+.revision-habitaciones p {
+  color: #596479;
+  margin-block: 6px 12px;
+}
+.revision-reparto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding-block: 6px;
+  font-size: 14px;
+}

@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { conectar, RAIZ } from './db/conexion'
+import { completarActualizacion } from './db/actualizacion'
 import { hacerRespaldo } from './db/respaldo'
 import { rutasHabitaciones } from './rutas/habitaciones'
 import { rutasDatos } from './rutas/datos'
@@ -50,6 +51,7 @@ export function crearApp() {
 
 export function arrancarServidor() {
   conectar()
+  completarActualizacion()
   const respaldo = hacerRespaldo()
   if (respaldo) console.log(`Respaldo guardado: ${respaldo.nombre}`)
 

@@ -7,7 +7,7 @@ export type FiltrosInforme = { desde?: string; hasta?: string; iglesia?: number 
 /** Los saldos son actuales. Las fechas filtran cobros, nunca la deuda de una persona. */
 export function informe(filtros: FiltrosInforme = {}, db: Database.Database = conectar()) {
   const evento = eventoActivo(db)
-  const todas = listarPersonas({ incluir_archivadas: true }, db).filter((p) => p.inscripcion_id)
+  const todas = listarPersonas({}, db).filter((p) => p.inscripcion_id)
   const personas = todas.filter((p) =>
     filtros.iglesia === 'sin' ? p.iglesia_id === null : !filtros.iglesia || p.iglesia_id === filtros.iglesia,
   )

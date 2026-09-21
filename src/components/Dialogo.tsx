@@ -117,6 +117,7 @@ export function Confirmacion({
   children,
   textoConfirmar,
   cargando,
+  destructiva = false,
 }: {
   abierto: boolean
   alCerrar: () => void
@@ -125,6 +126,7 @@ export function Confirmacion({
   children: ReactNode
   textoConfirmar: string
   cargando?: boolean
+  destructiva?: boolean
 }) {
   return (
     <Dialogo
@@ -137,7 +139,12 @@ export function Confirmacion({
           <Boton variante="texto" onClick={alCerrar} disabled={cargando}>
             No, dejarlo así
           </Boton>
-          <Boton variante="principal" onClick={alConfirmar} cargando={cargando}>
+          <Boton
+            variante="principal"
+            className={destructiva ? 'boton-eliminar' : undefined}
+            onClick={alConfirmar}
+            cargando={cargando}
+          >
             {textoConfirmar}
           </Boton>
         </>

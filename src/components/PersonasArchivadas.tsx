@@ -50,8 +50,8 @@ export function PersonasArchivadas({
   return (
     <Dialogo abierto={abierto} alCerrar={alCerrar} titulo="Personas archivadas" ancho={560} lateral>
       <p className="text-tinta2 mb-5">
-        Sus cuentas y pagos se conservan. Abre una cuenta para consultar su historial o devolver a la persona
-        a la lista.
+        Estas personas se archivaron anteriormente y no cuentan en los totales. Abre su cuenta para
+        devolverlas a la lista o eliminarlas definitivamente.
       </p>
       <Campo
         type="search"
@@ -90,7 +90,9 @@ export function PersonasArchivadas({
         <EstadoVacio
           titulo={buscar ? 'No encontré esa persona' : 'No hay personas archivadas'}
           explicacion={
-            buscar ? 'Prueba con otro nombre o iglesia.' : 'Cuando archives una persona, la encontrarás aquí.'
+            buscar
+              ? 'Prueba con otro nombre o iglesia.'
+              : 'Aquí aparecen las personas que se archivaron en versiones anteriores.'
           }
         />
       )}

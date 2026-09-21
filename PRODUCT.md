@@ -123,8 +123,7 @@ ni sincronización que ella deba entender o mantener.
 - Iglesias como etiqueta y filtro, con color propio y una sección Iglesias para
   administrarlas y abrir sus personas. Cada iglesia muestra recaudado, por cobrar,
   total, cantidades por estado y cualquier excedente. Participantes y Archivadas
-  separan sus listas; los importes incluyen las cuentas archivadas para conservar
-  el total recaudado. Los nombres siguen un orden natural en español, también
+  separan sus listas; los importes excluyen las personas archivadas. Los nombres siguen un orden natural en español, también
   en los selectores: iglesia 9 antes de iglesia 10.
 - Navegación: Inicio, Personas, Iglesias, Habitaciones, Cupos y Reportes; Ajustes queda separado.
   Habitaciones también se abre desde Personas y desde la cuenta individual.
@@ -134,21 +133,21 @@ ni sincronización que ella deba entender o mantener.
   desplazable. El icono Centrar / Al lateral permite elegir la posición y recordarla
   sin perder el abono en curso; en móvil se oculta esta opción y ambas posiciones
   se adaptan al mismo espacio. Cobrar, ver
-  historial, editar y anular conservan ese contexto; cerrar vuelve a la lista.
+  historial, editar y eliminar pagos conservan ese contexto; cerrar vuelve a la lista.
   Pagos muestra el historial y el número de pagos válidos; Datos reúne estado de
   pago, iglesia, teléfono, tipo y precio del cupo, extra privado cuando corresponde,
   habitación y notas. Los valores editables abren el editor correspondiente;
   iglesia, teléfono y notas enfocan el campo elegido. Registrar pago, Editar y
-  Archivar o Devolver a la lista comparten el pie fijo de Pagos y Datos. En móvil
+  Eliminar comparten el pie fijo de Pagos y Datos. En móvil
   Registrar pago ocupa una fila sobre las otras acciones. Al abrir el formulario
   el pie se oculta para dejar Guardar pago como acción principal. Cada pago
-  tiene un menú para ver su comprobante o anularlo con confirmación. Registrar
+  tiene un menú para ver su comprobante, editarlo o eliminarlo con confirmación y respaldo previo. Registrar
   pago abre el monto enfocado y Guardar pago confirma el abono. Crear abre un
   diálogo sin perder filtros. Tras guardar, la misma cuenta confirma el pago y
   ofrece comprobante, continuar con otra persona o registrar otro abono aquí.
 - Personas archivadas tiene una lista lateral con búsqueda propia, independiente
   de los filtros de personas activas. Permite abrir cada cuenta y devolverla a la
-  lista mediante una acción visible con confirmación.
+  lista o eliminarla mediante una acción visible con confirmación. No cuentan en las métricas.
 - Habitaciones muestra personas pagadas y saldo por cobrar al grupo en tarjetas
   de altura uniforme, con espacios libres y extra total juntos. Ver integrantes
   abre el diálogo lateral compartido de hasta 560px; Editar y Archivar o Devolver
@@ -174,15 +173,12 @@ ni sincronización que ella deba entender o mantener.
   pendientes y habitaciones; resumen visual de estados, métodos de pago y cobros
   por mes. Se puede filtrar por iglesia y período, descargar la tabla en CSV e
   imprimir. Las fechas filtran solo los cobros: recaudado acumulado y pendiente
-  siguen mostrando los saldos actuales, incluyendo personas archivadas para no
-  ocultar dinero. Los pagos anulados se excluyen de lo recaudado.
+  siguen mostrando los saldos actuales de personas activas. Los pagos anulados se excluyen de lo recaudado.
 - Exportar a CSV y respaldar la base con un botón.
 
 **Restricciones duras:**
 
-- **Los datos son sagrados.** Nada se borra físicamente: los pagos se anulan
-  (`anulado = 1`) y quedan visibles tachados en el historial con su motivo. Las
-  personas y las iglesias se archivan. Toda acción destructiva pide confirmación clara.
+- **Los datos son sagrados.** Por decisión explícita del usuario, las personas y los pagos pueden eliminarse definitivamente con confirmación y respaldo previo. Eliminar una persona incluye todos sus eventos y recalcula los extras de las habitaciones afectadas. Los pagos se pueden editar sin duplicarlos. Las iglesias y habitaciones se archivan. Los datos archivados o anulados anteriores permanecen accesibles hasta una acción explícita.
 - Dinero en **centavos como INTEGER**; formato de salida `RD$ 1,500`.
 - Fechas ISO 8601 en la base, en español al mostrarse ("16 de agosto de 2026").
 - La lógica de estados y balances vive en **un solo lugar**, nunca duplicada.
@@ -246,9 +242,7 @@ y estar reconocible como ejemplo, nunca presentarse como el estado real del even
 1. **El cobro manda.** Registrar un abono es EL flujo de la app; todo lo demás lo
    orbita. Cualquier función nueva que le agregue un clic a ese flujo se rediseña
    o no entra.
-2. **Nada se pierde, todo se corrige.** Cada error tiene deshacer visible (anular,
-   editar, archivar) y deja rastro. Preferimos un historial tachado a un dato limpio
-   que borró la verdad.
+2. **Corregir debe ser claro.** Se pueden editar datos, cupos y pagos. Antes de eliminar se explica el alcance, se revisa el reparto afectado y se guarda un respaldo. Nunca se modifica una cuenta desde una confirmación obsoleta.
 3. **Los números son el contenido.** La claridad de un monto y de un estado gana
    sobre cualquier adorno, efecto o densidad de información.
 4. **Escrito para ella, no para un usuario genérico.** Cada texto se prueba contra
@@ -270,3 +264,11 @@ Requisitos del proyecto, no genéricos:
   porque ella puede estar leyendo con lentes bajo la luz del templo.
 - Diseñar para el ancho angosto (~1280px útiles) como caso base, no como excepción.
 - Respetar `prefers-reduced-motion`.
+
+### Correcciones de cuentas — septiembre de 2026
+
+Nombres y apellidos capitalizan sus iniciales al salir del campo y al guardar, sin modificar automáticamente nombres existentes. Cambiar cupo propone su precio estándar y permite ajustarlo; muestra el saldo resultante antes de confirmar y conserva los pagos. Un cupo sin alojamiento libera la habitación y reparte su extra en la misma operación. Los identificadores de personas, pagos e inscripciones no se reutilizan tras eliminar para que los enlaces antiguos no abran otras cuentas.
+
+## Transición de la versión 1.2.0
+
+Por petición explícita del usuario, el primer arranque elimina las personas archivadas y sus pagos de todos los eventos, con copia SQLite íntegra protegida antes de tocar las cuentas. La transición es atómica y se marca una sola vez; si no hay respaldo o falla una eliminación, no se completa. Los precios base y pagos de personas activas permanecen; las habitaciones afectadas reparten su extra entre quienes quedan. Personas deja de mostrar el acceso a Archivadas. El instalador recuerda la carpeta anterior, cierra únicamente su propio motor y conserva data y respaldos.

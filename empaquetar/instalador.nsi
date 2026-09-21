@@ -9,6 +9,7 @@ Unicode true
 Name "Tesorera"
 OutFile "salida\Tesorera-Instalador.exe"
 InstallDir "$LOCALAPPDATA\Programs\Tesorera"
+InstallDirRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Tesorera" "InstallLocation"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 BrandingText "Tesorera"
@@ -31,6 +32,20 @@ BrandingText "Tesorera"
 !insertmacro MUI_LANGUAGE "Spanish"
 
 Section "Tesorera"
+  ; Cierra el motor anterior antes de reemplazar archivos, sin tocar data.
+  InitPluginsDir
+  SetOutPath "$PLUGINSDIR"
+  File "cerrar-para-actualizar.ps1"
+  nsExec::ExecToStack '"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\cerrar-para-actualizar.ps1" -Destino "$INSTDIR"'
+  Pop $0
+  Pop $1
+  StrCmp $0 "0" motor_cerrado
+    IfSilent fallo_actualizacion
+    MessageBox MB_OK|MB_ICONSTOP "No pude cerrar Tesorera. Reinicia Windows y vuelve a ejecutar este instalador. Tus datos no se han cambiado."
+    fallo_actualizacion:
+    SetErrorLevel 1
+    Quit
+  motor_cerrado:
   SetOutPath "$INSTDIR"
 
   ; Los archivos se sobrescriben uno a uno. En ningún momento se borra la

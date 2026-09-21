@@ -172,26 +172,54 @@ jobs:
           Write-Host "OK: la app instalada abre y responde."
           Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
 
-      - name: Actualizar una base de la versión anterior sin perder pagos
+      - name: Actualizar desde el instalador 1.1.0 con la aplicación abierta
         run: |
-          $destino = "$env:RUNNER_TEMP\Tesorera-actualizacion"
+          $destino = "$env:RUNNER_TEMP\Tesorera actualización con espacios"
+          Invoke-WebRequest "https://github.com/moiszr/tesorera/releases/download/v1.1.0/Tesorera-Instalador.exe" -OutFile "$env:RUNNER_TEMP\anterior.exe"
+          Start-Process -Wait -FilePath "$env:RUNNER_TEMP\anterior.exe" -ArgumentList "/S", "/D=$destino"
           & ".\Tesorera\node.exe" empaquetar/probar-actualizacion.cjs preparar $destino ".\Tesorera"
           if ($LASTEXITCODE -ne 0) { throw "No se pudo preparar la base anterior" }
-          Start-Process -Wait -FilePath ".\Tesorera-Instalador.exe" -ArgumentList "/S", "/D=$destino"
-          $p = Start-Process -PassThru -WindowStyle Hidden -WorkingDirectory $destino `
+          $anterior = Start-Process -PassThru -WindowStyle Hidden -WorkingDirectory $destino `
             -FilePath "$destino\node.exe" -ArgumentList "app\iniciar.mjs"
+          $ajeno = Start-Process -PassThru -WindowStyle Hidden -FilePath ".\Tesorera\node.exe" -ArgumentList '-e "setInterval(()=>{},1000)"'
           try {
             $ok = $false
             foreach ($i in 1..30) {
               Start-Sleep -Seconds 2
               try {
-                $r = Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5
-                if ($r.StatusCode -eq 200) { $ok = $true; break }
+                if ((Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break }
+              } catch { }
+            }
+            if (-not $ok) { throw "La versión anterior no abrió" }
+            # Sin /D: debe recuperar la carpeta personalizada del registro.
+            $instalador = Start-Process -Wait -PassThru -FilePath ".\Tesorera-Instalador.exe" -ArgumentList "/S"
+            if ($instalador.ExitCode -ne 0) { throw "El instalador falló" }
+            $anterior.Refresh()
+            $ajeno.Refresh()
+            if (-not $anterior.HasExited) { throw "No cerró el motor anterior" }
+            if ($ajeno.HasExited) { throw "Cerró un motor ajeno a esta instalación" }
+            $version = (Get-Content "$destino\version.txt").Trim()
+            if ($version -ne (Get-Content package.json | ConvertFrom-Json).version) { throw "No actualizó la carpeta original" }
+            $p = Start-Process -PassThru -WindowStyle Hidden -WorkingDirectory $destino `
+              -FilePath "$destino\node.exe" -ArgumentList "app\iniciar.mjs"
+            $ok = $false
+            foreach ($i in 1..30) {
+              Start-Sleep -Seconds 2
+              try {
+                if ((Invoke-WebRequest "http://localhost:5177/api/resumen" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break }
               } catch { }
             }
             if (-not $ok) { throw "La actualización no abrió" }
             & ".\Tesorera\node.exe" empaquetar/probar-actualizacion.cjs verificar $destino ".\Tesorera"
-            if ($LASTEXITCODE -ne 0) { throw "La actualización no conservó los pagos o el respaldo" }
+            if ($LASTEXITCODE -ne 0) { throw "No conservó las cuentas activas o el respaldo de archivadas" }
+            Stop-Process -Id $p.Id -Force
+            $p.WaitForExit(15000) | Out-Null
+            # Segundo arranque: la limpieza no se repite ni altera las cuentas.
+            $p = Start-Process -PassThru -WindowStyle Hidden -WorkingDirectory $destino `
+              -FilePath "$destino\node.exe" -ArgumentList "app\iniciar.mjs"
+            Start-Sleep -Seconds 5
+            & ".\Tesorera\node.exe" empaquetar/probar-actualizacion.cjs verificar $destino ".\Tesorera"
+            if ($LASTEXITCODE -ne 0) { throw "El segundo arranque modificó la transición" }
           } finally {
             Get-Process node -EA SilentlyContinue | Stop-Process -Force -EA SilentlyContinue
           }
@@ -235,5 +263,7 @@ jobs:
             Al terminar quedan el icono en el Escritorio y Tesorera en el menú
             de inicio.
 
-            > Actualizar es volver a instalar encima: **los pagos no se tocan**.
+            > Actualiza sobre la misma instalación. Se conservan las personas activas y sus pagos.
+            > En 1.2.0 se eliminan las personas archivadas y sus pagos una sola vez, con un respaldo previo protegido.
+            > Si compartían una habitación privada, el extra se reparte entre quienes permanecen.
             > Desinstalar tampoco los borra.

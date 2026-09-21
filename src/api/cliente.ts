@@ -1,3 +1,4 @@
+import type { PlanEliminarPersona, PlanCupo } from './tipos'
 import { ordenarPorNombre } from '../lib/orden'
 import type {
   HabitacionesDatos,
@@ -40,8 +41,8 @@ async function pedir<T>(ruta: string, opciones?: RequestInit): Promise<T> {
   return respuesta.json() as Promise<T>
 }
 
-const enviar = (ruta: string, metodo: string, cuerpo?: unknown) =>
-  pedir<any>(ruta, { method: metodo, body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo) })
+const enviar = <T = any>(ruta: string, metodo: string, cuerpo?: unknown) =>
+  pedir<T>(ruta, { method: metodo, body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo) })
 
 export const api = {
   resumen: () => pedir<Resumen>('/resumen'),
@@ -75,6 +76,13 @@ export const api = {
   crearPersona: (datos: Record<string, unknown>) =>
     enviar('/personas', 'POST', datos) as Promise<{ id: number; aviso_repetida: string | null }>,
   editarPersona: (id: number, datos: Record<string, unknown>) => enviar(`/personas/${id}`, 'PATCH', datos),
+  revisarEliminarPersona: (id: number) => pedir<PlanEliminarPersona>(`/personas/${id}/eliminacion`),
+  eliminarPersona: (id: number, firma: string) =>
+    enviar<{ ok: boolean }>(`/personas/${id}`, 'DELETE', { firma }),
+  revisarCupo: (id: number, cuerpo: unknown) =>
+    enviar<PlanCupo>(`/inscripciones/${id}/revisar`, 'POST', cuerpo),
+  editarPago: (id: number, cuerpo: unknown) => enviar<{ ficha: Ficha }>(`/pagos/${id}`, 'PATCH', cuerpo),
+  eliminarPago: (id: number, firma: string) => enviar<{ ficha: Ficha }>(`/pagos/${id}`, 'DELETE', { firma }),
   editarInscripcion: (id: number, datos: Record<string, unknown>) =>
     enviar(`/inscripciones/${id}`, 'PATCH', datos),
   inscribir: (personaId: number, categoriaId: number, precio?: number) =>
@@ -82,8 +90,6 @@ export const api = {
 
   registrarPago: (datos: Record<string, unknown>) =>
     enviar('/pagos', 'POST', datos) as Promise<{ id: number; ficha: Ficha }>,
-  anularPago: (id: number, nota?: string) =>
-    enviar(`/pagos/${id}/anular`, 'POST', { nota }) as Promise<{ ficha: Ficha }>,
   comprobante: (id: number) => pedir<any>(`/pagos/${id}/comprobante`),
 
   respaldar: () => enviar('/respaldo', 'POST') as Promise<{ nombre: string; carpeta: string }>,

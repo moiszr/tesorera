@@ -163,18 +163,18 @@ describe('habitaciones privadas', () => {
 })
 
 describe('reportes y cortes de dinero', () => {
-  it('filtra cobros por fecha e iglesia sin recortar saldos actuales ni ocultar pagos archivados', () => {
+  it('filtra cobros por fecha e iglesia y excluye las cuentas archivadas', () => {
     pago(ids[0], 10000, '2026-09-01')
     pago(ids[0], 20000, '2026-09-20')
     pago(ids[0], 99999, '2026-09-20', 1)
     pago(ids[3], 50000, '2026-09-20')
     db.prepare('UPDATE personas SET archivada=1 WHERE id=?').run(personas[0])
     const r = informe({ desde: '2026-09-20', hasta: '2026-09-20', iglesia })
-    expect(r.totales.periodo).toBe(20000)
-    expect(r.totales.recaudado).toBe(30000)
-    expect(r.anulados).toBe(1)
-    expect(r.archivadas).toBe(1)
-    expect(r.totales.pendiente).toBe(1020000)
+    expect(r.totales.periodo).toBe(0)
+    expect(r.totales.recaudado).toBe(0)
+    expect(r.anulados).toBe(0)
+    expect(r.archivadas).toBe(0)
+    expect(r.totales.pendiente).toBe(600000)
     expect(r.iglesias.reduce((s, g) => s + g.periodo, 0)).toBe(r.totales.periodo)
     expect(r.metodos.reduce((s, m) => s + m.monto, 0)).toBe(r.totales.periodo)
     expect(r.dias.reduce((s, d) => s + d.monto, 0)).toBe(r.totales.periodo)

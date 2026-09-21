@@ -31,7 +31,7 @@ export function hacerRespaldo(): { ruta: string; nombre: string } | null {
 
 function limpiarViejos() {
   const archivos = readdirSync(CARPETA_RESPALDOS)
-    .filter((f) => f.startsWith('tesorera-') && f.endsWith('.db'))
+    .filter((f) => f.startsWith('tesorera-') && !f.startsWith('tesorera-antes-') && f.endsWith('.db'))
     .map((f) => ({ f, t: statSync(join(CARPETA_RESPALDOS, f)).mtimeMs }))
     .sort((a, b) => b.t - a.t)
 
@@ -53,4 +53,17 @@ export function listarRespaldos() {
       return { nombre: f, cuando: new Date(s.mtimeMs).toISOString(), tamano: s.size }
     })
     .sort((a, b) => b.cuando.localeCompare(a.cuando))
+}
+
+/** Una corrección irreversible se detiene si no puede conservar el estado anterior. */
+export function respaldarAntesDeCorregir() {
+  try {
+    const respaldo = hacerRespaldo()
+    if (!respaldo && ARCHIVO_DB !== ':memory:') throw new Error('Sin archivo de respaldo')
+    return respaldo
+  } catch {
+    throw new Error(
+      'No pude guardar el respaldo. No cambié la cuenta. Revisa el espacio disponible en esta computadora y vuelve a intentarlo.',
+    )
+  }
 }
