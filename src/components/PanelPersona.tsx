@@ -1,3 +1,5 @@
+import { EliminarPersona } from './EliminarPersona'
+import { EditarPago } from './EditarPago'
 import { MenuPago } from './MenuPago'
 import { CampoDinero } from './CampoDinero'
 import { useEffect, useRef, useState } from 'react'
@@ -10,7 +12,7 @@ import { fechaLarga, hoyISO } from '../lib/fechas'
 import { Aviso, Boton, Campo, ChipEstado, EtiquetaIglesia, Monto } from './Piezas'
 import { Confirmacion, Dialogo } from './Dialogo'
 import { DialogoCupo, DialogoEditarPersona } from './DialogosPersona'
-import { IconoCheque, IconoLapiz, IconoPago, IconoArchivar } from './Iconos'
+import { IconoCheque, IconoLapiz, IconoPago, IconoEliminar } from './Iconos'
 
 const METODOS: Record<string, string> = { efectivo: 'Efectivo', transferencia: 'Transferencia', otro: 'Otro' }
 
@@ -66,9 +68,10 @@ export function PanelPersona({
   const [editando, setEditando] = useState(false)
   const [campoEdicion, setCampoEdicion] = useState<'nombre' | 'iglesia' | 'telefono' | 'notas'>('nombre')
   const [cupo, setCupo] = useState(false)
-  const [aAnular, setAAnular] = useState<Pago | null>(null)
-  const [motivo, setMotivo] = useState('')
-  const [archivando, setArchivando] = useState(false)
+  const [aEliminar, setAEliminar] = useState<Pago | null>(null)
+  const [pagoEditando, setPagoEditando] = useState<Pago | null>(null)
+  const [eliminandoPersona, setEliminandoPersona] = useState(false)
+  const [restaurando, setRestaurando] = useState(false)
   const campoMonto = useRef<HTMLInputElement>(null)
   const titulo = useRef<HTMLDivElement>(null)
   const confirmacionPago = useRef<HTMLHeadingElement>(null)
@@ -157,34 +160,30 @@ export function PanelPersona({
       ocupar(false)
     }
   }
-  async function anular() {
-    if (!aAnular || enCurso.current) return
+  async function eliminarPago() {
+    if (!aEliminar || enCurso.current) return
     ocupar(true)
     try {
-      const r = await api.anularPago(aAnular.id, motivo || undefined)
+      const r = await api.eliminarPago(aEliminar.id, aEliminar.firma)
       setFicha(r.ficha)
-      setAAnular(null)
-      setMotivo('')
+      setAEliminar(null)
       setUltimo(null)
-      toast.success('Pago anulado. El saldo ya está actualizado.')
+      toast.success('Pago eliminado. El saldo ya está actualizado.')
       alCambiar()
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'No pude anular el pago.')
+      actualizar()
+      toast.error(e instanceof Error ? e.message : 'No pude eliminar el pago.')
     } finally {
       ocupar(false)
     }
   }
-  async function archivar() {
+  async function restaurar() {
     if (!ficha || enCurso.current) return
     ocupar(true)
     try {
-      await api.editarPersona(personaId, { archivada: ficha.persona.archivada ? 0 : 1 })
-      toast.success(
-        ficha.persona.archivada
-          ? 'Persona devuelta a la lista'
-          : 'Persona archivada. Sus pagos se conservan.',
-      )
-      setArchivando(false)
+      await api.editarPersona(personaId, { archivada: 0 })
+      toast.success('Persona devuelta a la lista. Sus pagos vuelven a contar en los totales.')
+      setRestaurando(false)
       actualizar()
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'No pude guardar el cambio.')
@@ -253,13 +252,13 @@ export function PanelPersona({
               Editar
             </Boton>
             <Boton
-              className="accion-tarjeta accion-archivar"
-              aria-label={ficha.persona.archivada ? 'Devolver a la lista' : 'Archivar persona'}
-              icono={<IconoArchivar tam={17} />}
-              onClick={() => setArchivando(true)}
+              className="accion-tarjeta accion-eliminar"
+              aria-label="Eliminar persona"
+              icono={<IconoEliminar tam={17} />}
+              onClick={() => setEliminandoPersona(true)}
               disabled={guardando}
             >
-              {ficha.persona.archivada ? 'Devolver a la lista' : 'Archivar'}
+              Eliminar
             </Boton>
           </div>
         ) : undefined
@@ -298,11 +297,11 @@ export function PanelPersona({
               <div ref={titulo} tabIndex={-1} className="perfil-resumen">
                 {ficha.persona.archivada ? (
                   <Aviso>
-                    Esta persona está archivada. Sus pagos se conservan.
+                    Esta persona está archivada. Su cuenta no se incluye en los totales.
                     <Boton
                       className="mt-3 accion-editar"
                       disabled={guardando}
-                      onClick={() => setArchivando(true)}
+                      onClick={() => setRestaurando(true)}
                     >
                       Devolver a la lista
                     </Boton>
@@ -655,18 +654,12 @@ export function PanelPersona({
                               centavos={p.monto}
                               className={p.anulado ? 'line-through text-tinta2' : 'font-semibold'}
                             />
-                            {!p.anulado ? (
-                              <MenuPago
-                                id={p.id}
-                                descripcion={`de ${formatoRD(p.monto)} del ${fechaLarga(p.fecha)}`}
-                                alAnular={() => {
-                                  setAAnular(p)
-                                  setMotivo('')
-                                }}
-                              />
-                            ) : (
-                              <span className="pago-sin-acciones" />
-                            )}
+                            <MenuPago
+                              id={p.id}
+                              descripcion={`de ${formatoRD(p.monto)} del ${fechaLarga(p.fecha)}`}
+                              alEditar={p.anulado ? undefined : () => setPagoEditando(p)}
+                              alEliminar={() => setAEliminar(p)}
+                            />
                           </div>
                           {(p.nota || p.nota_anulacion) && (
                             <p className="pago-nota">{p.anulado ? p.nota_anulacion : p.nota}</p>
@@ -678,6 +671,33 @@ export function PanelPersona({
                 </div>
               </div>
             </div>
+            {pagoEditando && (
+              <EditarPago
+                pago={pagoEditando}
+                ficha={ficha}
+                alCerrar={() => {
+                  setPagoEditando(null)
+                  actualizar()
+                }}
+                alGuardar={(f) => {
+                  setFicha(f)
+                  setPagoEditando(null)
+                  setUltimo(null)
+                  alCambiar()
+                }}
+              />
+            )}
+            {eliminandoPersona && (
+              <EliminarPersona
+                id={personaId}
+                nombre={ficha.persona.nombre}
+                alCerrar={() => setEliminandoPersona(false)}
+                alEliminar={() => {
+                  alCambiar()
+                  alCerrar()
+                }}
+              />
+            )}
             <DialogoEditarPersona
               abierto={editando}
               campoInicial={campoEdicion}
@@ -701,44 +721,40 @@ export function PanelPersona({
               }}
             />
             <Confirmacion
-              abierto={aAnular !== null}
+              abierto={aEliminar !== null}
               alCerrar={() => {
-                if (!guardando) setAAnular(null)
+                if (!guardando) setAEliminar(null)
               }}
-              alConfirmar={anular}
+              alConfirmar={eliminarPago}
               cargando={guardando}
-              titulo={`¿Anular el pago de ${formatoRD(aAnular?.monto ?? 0)}?`}
-              textoConfirmar="Sí, anular pago"
+              titulo={`¿Eliminar el pago de ${formatoRD(aEliminar?.monto ?? 0)}?`}
+              textoConfirmar="Eliminar pago"
+              destructiva
             >
               <p>
-                El saldo de {ficha.persona.nombre} se corregirá. El pago queda tachado en su historial; no se
-                borra.
+                Se borrará este pago de {ficha.persona.nombre}, del{' '}
+                {aEliminar ? fechaLarga(aEliminar.fecha) : ''}, y su comprobante dejará de estar disponible.
               </p>
-              <Campo
-                etiqueta="Motivo (opcional)"
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-              />
+              <p>
+                {aEliminar?.anulado
+                  ? 'Estaba anulado, así que el saldo no cambiará.'
+                  : `El saldo pendiente quedará en ${formatoRD(Math.max(0, ficha.cuenta.precio - ficha.cuenta.pagado + (aEliminar?.monto ?? 0)))}.`}
+              </p>
+              <p className="text-menuda">
+                Se guardará un respaldo antes de eliminar. No se puede deshacer desde el historial.
+              </p>
             </Confirmacion>
             <Confirmacion
-              abierto={archivando}
+              abierto={restaurando}
               alCerrar={() => {
-                if (!guardando) setArchivando(false)
+                if (!guardando) setRestaurando(false)
               }}
-              alConfirmar={archivar}
+              alConfirmar={restaurar}
               cargando={guardando}
-              titulo={
-                ficha.persona.archivada
-                  ? '¿Devolver a esta persona a la lista?'
-                  : `¿Archivar a ${ficha.persona.nombre}?`
-              }
-              textoConfirmar={ficha.persona.archivada ? 'Sí, devolver a la lista' : 'Sí, archivar persona'}
+              titulo="¿Devolver a esta persona a la lista?"
+              textoConfirmar="Devolver a la lista"
             >
-              <p>
-                {ficha.persona.archivada
-                  ? 'Volverá a aparecer en la lista y podrás registrar sus pagos.'
-                  : 'Dejará de aparecer entre las personas activas. Sus pagos y su historial se conservan, y podrás devolverla desde el panel de personas archivadas.'}
-              </p>
+              <p>Volverá a aparecer en la lista. Sus pagos y su saldo volverán a contar en los totales.</p>
             </Confirmacion>
           </>
         )}

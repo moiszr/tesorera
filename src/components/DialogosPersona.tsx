@@ -1,8 +1,10 @@
+import { CambiosHabitacion } from './CambiosHabitacion'
+import { formatoNombre } from '../lib/nombres'
 import { CampoDinero } from './CampoDinero'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { api, ErrorDeTesorera } from '../api/cliente'
-import type { Evento, Ficha, Iglesia } from '../api/tipos'
+import type { Evento, Ficha, Iglesia, PlanCupo } from '../api/tipos'
 import { aCentavos, aTextoEditable, formatoRD } from '../lib/dinero'
 import { Boton, Campo, colorIglesia } from './Piezas'
 import { Dialogo } from './Dialogo'
@@ -58,7 +60,7 @@ export function DialogoEditarPersona({
     setGuardando(true)
     try {
       await api.editarPersona(ficha.persona.id, {
-        nombre: nombre.trim(),
+        nombre: formatoNombre(nombre),
         iglesia_id: iglesiaId ?? null,
         telefono: telefono || null,
         notas: notas || null,
@@ -80,6 +82,8 @@ export function DialogoEditarPersona({
           etiqueta="Nombre completo"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          onBlur={() => setNombre(formatoNombre(nombre))}
+          autoCapitalize="words"
           autoFocus={campoInicial === 'nombre'}
         />
         {iglesias.length > 0 && (
@@ -140,6 +144,8 @@ export function DialogoCupo({
   const [precio, setPrecio] = useState(aTextoEditable(inscripcion?.precio ?? 0))
   const [problema, setProblema] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
+  const [plan, setPlan] = useState<PlanCupo | null>(null)
+  const enCurso = useRef(false)
 
   const categorias = (evento?.categorias ?? []).filter(
     (c) => !c.archivada || c.id === inscripcion?.categoria_id,
@@ -159,10 +165,12 @@ export function DialogoCupo({
     setCategoriaId(inscripcion?.categoria_id)
     setPrecio(aTextoEditable(inscripcion?.precio ?? 0))
     setProblema(null)
+    setPlan(null)
   }, [abierto, inscripcion])
 
   async function guardar(e: React.FormEvent) {
     e.preventDefault()
+    if (enCurso.current) return
     if (!categoriaId) {
       setProblema('Elige el tipo de cupo.')
       return
@@ -173,19 +181,34 @@ export function DialogoCupo({
       return
     }
 
+    enCurso.current = true
     setGuardando(true)
     try {
       if (!inscripcion) {
         await api.inscribir(ficha.persona.id, categoriaId, valor)
         toast.success(`${ficha.persona.nombre} quedó inscrita`)
       } else {
-        await api.editarInscripcion(inscripcion.id, { categoria_id: categoriaId, precio: valor })
+        const datos = {
+          categoria_id: categoriaId,
+          precio: valor,
+          precio_a_mano:
+            categoriaId === inscripcion.categoria_id && valor === inscripcion.precio
+              ? inscripcion.precio_a_mano
+              : Number(!!difiere),
+        }
+        if (!plan) {
+          setPlan(await api.revisarCupo(inscripcion.id, datos))
+          return
+        }
+        await api.editarInscripcion(inscripcion.id, { ...datos, firma: plan.firma })
         toast.success('Cupo actualizado')
       }
       alGuardar()
     } catch (err) {
+      setPlan(null)
       setProblema(err instanceof ErrorDeTesorera ? err.message : 'No pude guardar.')
     } finally {
+      enCurso.current = false
       setGuardando(false)
     }
   }
@@ -199,48 +222,91 @@ export function DialogoCupo({
       ancho={520}
     >
       <form onSubmit={guardar} className="space-y-4">
-        <Selector
-          etiqueta="Tipo de cupo"
-          opciones={opcionesCupo}
-          valor={categoriaId}
-          alElegir={(id) => {
-            setCategoriaId(id)
-            const c = categorias.find((x) => x.id === id)
-            // Solo arrastramos el precio si nadie lo había tocado a mano.
-            if (c && (!inscripcion || inscripcion.precio_a_mano === 0)) setPrecio(aTextoEditable(c.precio))
-            setProblema(null)
-          }}
-          textoBuscar="Buscar tipo de cupo…"
-        />
+        {!plan ? (
+          <>
+            <fieldset disabled={guardando} className="space-y-4">
+              <Selector
+                etiqueta="Tipo de cupo"
+                opciones={opcionesCupo}
+                valor={categoriaId}
+                alElegir={(id) => {
+                  setCategoriaId(id)
+                  const c = categorias.find((x) => x.id === id)
+                  if (c) setPrecio(aTextoEditable(c.precio))
+                  setProblema(null)
+                }}
+                textoBuscar="Buscar tipo de cupo…"
+              />
 
-        <CampoDinero
-          etiqueta="Precio para esta persona"
-          value={precio}
-          alCambiar={setPrecio}
-          adorno={<span className="text-menuda font-medium">RD$</span>}
-          className="cifra"
-          inputMode="decimal"
-          ayuda={
-            difiere
-              ? `Distinto del precio del tipo de cupo (${formatoRD(elegida!.precio)}). Se guardará como precio puesto a mano y no cambiará cuando actualices ese tipo de cupo.`
-              : 'Puedes cambiarlo si esta persona tiene una beca o un descuento.'
-          }
-        />
-
-        {!!inscripcion?.extra_habitacion && (
-          <p className="text-menuda text-tinta2">
-            Además del cupo, tiene {formatoRD(inscripcion.extra_habitacion)} de extra de habitación. Ese
-            reparto se cambia desde Habitaciones.
-          </p>
+              <CampoDinero
+                etiqueta="Precio para esta persona"
+                value={precio}
+                alCambiar={setPrecio}
+                adorno={<span className="text-menuda font-medium">RD$</span>}
+                className="cifra"
+                inputMode="decimal"
+                ayuda={
+                  difiere
+                    ? `Distinto del precio del tipo de cupo (${formatoRD(elegida!.precio)}). Se guardará como precio puesto a mano y no cambiará cuando actualices ese tipo de cupo.`
+                    : 'Puedes cambiarlo si esta persona tiene una beca o un descuento.'
+                }
+              />
+            </fieldset>
+            {!!inscripcion?.extra_habitacion && !!elegida?.incluye_alojamiento && (
+              <p className="text-menuda text-tinta2">
+                Además del cupo, tiene {formatoRD(inscripcion.extra_habitacion)} de extra de habitación. Ese
+                reparto se cambia desde Habitaciones.
+              </p>
+            )}
+            {inscripcion?.habitacion_id && elegida && !elegida.incluye_alojamiento ? (
+              <p className="text-menuda text-tinta2">
+                Este cupo no incluye alojamiento. Al continuar podrás revisar la salida de su habitación y el
+                nuevo reparto del extra.
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <div className="revision-cuenta">
+            <p>
+              <strong>{plan.categoria}</strong> será el cupo de {ficha.persona.nombre}. Sus pagos se
+              conservan.
+            </p>
+            <dl className="revision-importes">
+              <div>
+                <dt>Precio del cupo</dt>
+                <dd className="cifra">{formatoRD(plan.precio)}</dd>
+              </div>
+              {plan.extra > 0 && (
+                <div>
+                  <dt>Extra privado</dt>
+                  <dd className="cifra">{formatoRD(plan.extra)}</dd>
+                </div>
+              )}
+              <div>
+                <dt>Ya pagó</dt>
+                <dd className="cifra">{formatoRD(plan.pagado)}</dd>
+              </div>
+              <div>
+                <dt>{plan.excedente ? 'Quedará a favor' : 'Quedará pendiente'}</dt>
+                <dd className="cifra">{formatoRD(plan.excedente || plan.pendiente)}</dd>
+              </div>
+            </dl>
+            <CambiosHabitacion habitaciones={plan.habitaciones} />
+          </div>
         )}
         {problema && <p className="text-menuda text-accionTexto">{problema}</p>}
 
         <div className="flex justify-end gap-2 border-t border-linea pt-4">
-          <Boton type="button" variante="texto" onClick={alCerrar} disabled={guardando}>
-            Cancelar
+          <Boton
+            type="button"
+            variante="texto"
+            onClick={plan ? () => setPlan(null) : alCerrar}
+            disabled={guardando}
+          >
+            {plan ? 'Volver' : 'Cancelar'}
           </Boton>
           <Boton type="submit" variante="principal" cargando={guardando}>
-            Guardar
+            {plan ? 'Confirmar cambio' : inscripcion ? 'Revisar cambio' : 'Asignar cupo'}
           </Boton>
         </div>
       </form>

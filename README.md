@@ -63,9 +63,9 @@ son 15 MB de peso muerto—.
 
 ## Actualizar la app en su laptop
 
-Hacer un respaldo desde Ajustes, reiniciar Windows y ejecutar el instalador nuevo en la misma carpeta. **Los pagos no se tocan**:
-el instalador sobrescribe archivo por archivo y en ningún momento borra la
-carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borra.
+Guardar los cambios, cerrar la ventana de Tesorera y ejecutar el instalador nuevo. Recuerda la carpeta anterior y cierra únicamente el motor de esa instalación antes de reemplazar los archivos. **Las cuentas activas se conservan**; no sobrescribe `data\` y desinstalar tampoco la borra.
+
+En 1.2.0 se eliminan las personas archivadas y sus pagos una sola vez al arrancar, por decisión explícita del usuario. Antes se crea una copia SQLite íntegra `data/respaldos/tesorera-antes-v1.2.0-…db`, excluida de la rotación cotidiana. Si falla el respaldo o la limpieza, la transición no se confirma. Los extras de las habitaciones afectadas se reparten entre quienes permanecen.
 
 ## Decisiones que conviene no romper
 
@@ -77,7 +77,7 @@ carpeta de instalación, que es donde vive `data\`. Desinstalar tampoco los borr
 - **El precio vive en las categorías, no en el evento.** La inscripción guarda
   una *foto* del precio; `precio_a_mano = 1` marca las becas para que
   "aplicar precio" no las pise.
-- **Nada se borra.** Pagos → `anulado = 1`. Personas e iglesias → `archivada = 1`.
+- **Correcciones explícitas.** Los pagos se editan o eliminan con respaldo previo. Eliminar una persona borra sus pagos e inscripciones de todos los eventos en una transacción, con confirmación y revisión del reparto de habitación. En la transición 1.2.0 se eliminan las personas archivadas y sus pagos, una sola vez, con copia previa protegida; se conservan las cuentas activas. Iglesias y habitaciones conservan el archivo.
 - **La búsqueda ignora tildes**: `personas.nombre_busqueda` guarda el nombre
   normalizado; se actualiza en cada insert/update de persona.
 

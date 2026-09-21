@@ -16,7 +16,7 @@ export function numero(valor: unknown): number | null {
 
 export function entero(valor: unknown): number | null {
   const n = numero(valor)
-  return n === null ? null : Math.trunc(n)
+  return n !== null && Number.isSafeInteger(n) ? n : null
 }
 
 export function texto(valor: unknown): string | null {

@@ -77,7 +77,7 @@ export default function Personas() {
   }, [])
   useEffect(() => {
     void cargarOpciones()
-  }, [cargarOpciones])
+  }, [cargarOpciones, revision])
   useEffect(() => {
     let vigente = true
     setCargando(true)
@@ -297,9 +297,6 @@ export default function Personas() {
                 : `${personas.length} ${personas.length === 1 ? 'persona' : 'personas'}${hayFiltro ? ' en esta lista' : ''}`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <Boton variante="texto" disabled={ocupado} onClick={() => parametro('archivadas', '1')}>
-                Archivadas
-              </Boton>
               <FiltroMenu
                 etiqueta="Orden"
                 valor={orden}

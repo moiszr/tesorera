@@ -1,16 +1,18 @@
 import { useId, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { IconoArchivar, IconoExportar } from './Iconos'
+import { IconoEliminar, IconoLapiz, IconoExportar } from './Iconos'
 
 /** Acciones secundarias del historial, con el mismo popover nativo de los filtros. */
 export function MenuPago({
   id,
   descripcion,
-  alAnular,
+  alEliminar,
+  alEditar,
 }: {
   id: number
   descripcion: string
-  alAnular: () => void
+  alEliminar: () => void
+  alEditar?: () => void
 }) {
   const menu = useRef<HTMLDivElement>(null)
   const identificador = useId()
@@ -35,7 +37,7 @@ export function MenuPago({
           const ancho = Math.min(230, window.innerWidth - 32)
           p.style.width = `${ancho}px`
           p.style.left = `${Math.max(16, Math.min(r.right - ancho, window.innerWidth - ancho - 16))}px`
-          p.style.top = `${r.bottom + 112 < window.innerHeight ? r.bottom + 4 : Math.max(16, r.top - 112)}px`
+          p.style.top = `${r.bottom + 164 < window.innerHeight ? r.bottom + 4 : Math.max(16, r.top - 164)}px`
           p.showPopover()
           p.querySelector<HTMLElement>('a')?.focus({ preventScroll: true })
         }}
@@ -56,13 +58,24 @@ export function MenuPago({
         <Link to={`/comprobante/${id}`} target="_blank" rel="noreferrer" onClick={cerrar}>
           <IconoExportar tam={17} /> Ver comprobante
         </Link>
+        {alEditar && (
+          <button
+            onClick={() => {
+              cerrar()
+              alEditar()
+            }}
+          >
+            <IconoLapiz tam={17} /> Editar pago
+          </button>
+        )}
         <button
+          className="accion-eliminar"
           onClick={() => {
             cerrar()
-            alAnular()
+            alEliminar()
           }}
         >
-          <IconoArchivar tam={17} /> Anular pago
+          <IconoEliminar tam={17} /> Eliminar pago
         </button>
       </div>
     </>

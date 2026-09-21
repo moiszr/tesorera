@@ -190,9 +190,7 @@ export default function Reporte() {
             <p className="reporte-aclaracion">
               Las fechas filtran los pagos recibidos. El acumulado y los pendientes muestran la cuenta actual
               del evento.
-              {datos.archivadas > 0
-                ? ` Se incluyen ${datos.archivadas} personas archivadas para conservar todas las cuentas.`
-                : ''}
+              {' Las personas archivadas no se incluyen en estos totales.'}
               {total.excedente > 0
                 ? ` Hay ${formatoRD(total.excedente)} de excedente; no cubren el saldo de otras personas.`
                 : ''}

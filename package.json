@@ -1,7 +1,7 @@
 {
   "name": "tesorera",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "Control de pagos para convenciones de iglesia. App local, una sola usuaria.",
   "scripts": {

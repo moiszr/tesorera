@@ -1,3 +1,4 @@
+import { formatoNombre } from '../lib/nombres'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { api, ErrorDeTesorera } from '../api/cliente'
@@ -118,7 +119,7 @@ export function DialogoPersona({
     setGuardando(true)
     try {
       const r = await api.crearPersona({
-        nombre: nombre.trim(),
+        nombre: formatoNombre(nombre),
         iglesia_id: iglesiaId,
         categoria_id: categoriaId,
         telefono: telefono || undefined,
@@ -126,7 +127,7 @@ export function DialogoPersona({
       })
       recordarEleccion({ iglesiaId, categoriaId })
       toast.success(`${nombre.trim()} quedó agregada`)
-      alGuardar({ id: r.id, nombre: nombre.trim() })
+      alGuardar({ id: r.id, nombre: formatoNombre(nombre) })
     } catch (err) {
       setProblema(err instanceof ErrorDeTesorera ? err.message : 'No pude guardar la persona.')
     } finally {

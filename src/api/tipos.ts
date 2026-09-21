@@ -70,6 +70,7 @@ export type Conteos = {
 }
 
 export type Pago = {
+  firma: string
   id: number
   inscripcion_id: number
   monto: number
@@ -178,3 +179,8 @@ export type HabitacionesDatos = {
   personas: PersonaEnLista[]
 }
 export type ReporteDatos = ReturnType<typeof import('../../server/db/informes').informe>
+
+export type PlanEliminarPersona = ReturnType<
+  typeof import('../../server/db/correcciones').revisarEliminarPersona
+>
+export type PlanCupo = ReturnType<typeof import('../../server/db/correcciones').revisarCupo>
